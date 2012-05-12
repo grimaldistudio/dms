@@ -1,0 +1,84 @@
+.modal
+{
+    margin: auto;
+    left: auto;
+    max-width: 960px;
+    width: inherit;
+}
+
+.modal.fade.in
+{
+    top: 5%;     
+}
+
+.toolbar{
+    margin-bottom: 20px;
+}
+
+label.big{
+    font-size: x-large;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+input.big-input{
+    padding: 10px;
+    font-size: x-large;
+    color: #999;
+}
+
+.document-search-form div.control-group
+{
+    margin-bottom: 3em;
+}
+
+.document-search-form button[type="submit"] {
+    padding: 10px;
+    font-size: 2em;
+    margin: auto;
+}
+
+.document-search-form label{
+    vertical-align: middle;
+    width: 200px;
+}
+
+#document-tags-search-form label, #document-tags-search-form button{
+    margin-bottom: 40px;
+}
+
+.document-search-form button
+{
+    vertical-align: middle;
+}
+
+.document-search-form ul.token-input-list-facebook{
+    width: 472px;
+    font-size: x-large;
+    display: inline-block;
+}
+
+.document-search-form ul.token-input-list-facebook li{
+    padding: 10px;
+}
+
+.document-search-form ul.token-input-list-facebook li input{
+    padding: 0;
+}
+
+a.notification_item{
+    font-weight: bold;
+    border-bottom: #DDD;
+    width: 100%;
+}
+
+a.read_more{
+    color: #0088cc;
+}
+
+.notifications_highlight{
+    font-weight: bold;
+    background-color: red;
+    padding: 5px;
+    color: #FFF;
+}

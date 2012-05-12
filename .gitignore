@@ -1,0 +1,15 @@
+#Netbeans project files
+nbproject
+
+#Yii framework assets files
+assets/**/*
+assets/*
+
+#IDE Files
+.buildpath
+.project
+.settings
+
+#Uploads
+protected/uploads/**/*
+protected/uploads/*

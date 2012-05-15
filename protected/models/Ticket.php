@@ -165,12 +165,9 @@ class Ticket extends CActiveRecord
     
     public function getGrantedAccessLevelArray()
     {
-        $arr = array(
-            0 => 'Accesso negato',
-        );
         $access_level_array = DocumentRight::model()->getPrivilegeArray();
-        return array_merge($arr, $access_level_array);
-        
+        $access_level_array[0] = 'Accesso Negato';
+        return $access_level_array;        
     }
     public function getGrantedAccessLevelDesc($value = null)
     {

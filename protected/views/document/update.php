@@ -8,7 +8,7 @@ $this->renderPartial('/documentright/_form', array('model'=>$model));
 <div class="row">
 <?php $form = $this->beginWidget('bootstrap.widgets.BootActiveForm', array(
     'id'=>'document-update-form',
-    'htmlOptions'=>array('class'=>'well span8 pull-left'),
+    'htmlOptions'=>array('class'=>'well span6 pull-left'),
     'enableClientValidation'=>true,
     'clientOptions'=>array(
         'validateOnSubmit'=>true,
@@ -31,7 +31,6 @@ if(Yii::app()->user->hasDocumentPrivilege($model->id, AclManager::PERMISSION_ADM
 ?>
 <?php echo $form->textFieldRow($model, 'name', array('disabled'=>$disabled)); ?>
 <?php echo $form->textFieldRow($model, 'subject', array('class'=>'span6', 'disabled'=>$disabled)); ?>
-<?php echo $form->checkBoxRow($model, 'comments_enabled', array('disabled'=>$disabled)); ?>
 <div class="control-group">
 <?php echo $form->labelEx($model, 'sender_id'); ?>
 <?php echo $form->hiddenField($model, 'sender_id', array('id'=>'sender_id', 'disabled'=>$disabled)); ?>
@@ -102,7 +101,7 @@ if(Yii::app()->user->hasDocumentPrivilege($model->id, AclManager::PERMISSION_ADM
 
 <?php $this->beginWidget('bootstrap.widgets.BootModal', array(
     'id'=>'sender_create_dialog',
-    'htmlOptions'=>array('class'=>'hide span9', 'style'=>'height: auto; max-height: none;'),
+    'htmlOptions'=>array('class'=>'hide span7', 'style'=>'height: auto; max-height: none;'),
 )); ?>
 <div class="modal-header">
     <a class="close" data-dismiss="modal">&times;</a>

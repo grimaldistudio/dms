@@ -10,7 +10,7 @@ class DocumentController extends SecureController{
         $this->redirect(array('/document/search'));
     }
     
-    public function actionPending()
+    public function actionPending($force_reload = 0)
     {
         // load user's folders
         if(Yii::app()->user->isAdmin())
@@ -29,7 +29,7 @@ class DocumentController extends SecureController{
         if(Yii::app()->request->isAjaxRequest)
         {
             // check if there are updates
-            $has_update = $fm->hasUpdates($groups_array, Yii::app()->user->id, $last_check);
+            $has_update = ($force_reload==1 || $fm->hasUpdates($groups_array, Yii::app()->user->id, $last_check));
             if($has_update)
                 $documents = $fm->getPendingDocuments($groups_array, Yii::app()->user->id, $last_check);
         }

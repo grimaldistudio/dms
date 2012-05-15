@@ -11,8 +11,8 @@ class PreviewManager {
     const THUMBNAIL_MAX_WIDTH = 250;
     const THUMBNAIL_MAX_HEIGHT = 250;
     
-    const FULL_MAX_WIDTH = 450;
-    const FULL_MAX_HEIGHT = 450;
+    const FULL_MAX_WIDTH = 700;
+    const FULL_MAX_HEIGHT = 700;
     
     private $document_name = null;
     private $blank_image = null;

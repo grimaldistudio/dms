@@ -284,7 +284,7 @@ class Document extends CActiveRecord
         {
             $time = strtotime($this->date_created);
             $dst_path = Yii::getPathOfAlias('uploads').DIRECTORY_SEPARATOR.'archive'.DIRECTORY_SEPARATOR.date('Y', $time).DIRECTORY_SEPARATOR.date('m', $time).DIRECTORY_SEPARATOR.date('d', $time);
-            if(@mkdir($dst_path, 0777, true))
+            if(file_exists($dst_path) || mkdir($dst_path, 0777, true))
             {
                 if(@rename($this->tmp_path, $dst_path.DIRECTORY_SEPARATOR.'documento_'.$this->id.'.pdf'))
                 {
@@ -304,7 +304,7 @@ class Document extends CActiveRecord
         {
             $time = strtotime($this->date_created);
             $dst_path = Yii::getPathOfAlias('uploads').DIRECTORY_SEPARATOR.'protocol'.DIRECTORY_SEPARATOR.date('Y', $time).DIRECTORY_SEPARATOR.date('m', $time).DIRECTORY_SEPARATOR.date('d', $time);
-            if(mkdir($dst_path, 0777, true))
+            if(file_exists($dst_path) || mkdir($dst_path, 0777, true))
             {
                 if(rename($this->tmp_path, $dst_path.DIRECTORY_SEPARATOR.'documento_'.$this->id.'.pdf'))
                 {
@@ -486,8 +486,8 @@ class Document extends CActiveRecord
             }
             $sql_select .= ", MAX(dr.right) as max_right";
             $sql_from = " FROM documents_rights dr ";
-            $sql_join = " JOIN users u ON u.id = dr.user_id ";
-            $sql_join .= " JOIN documents d ON dr.document_id = d.id ";
+            $sql_join = " JOIN documents d ON dr.document_id = d.id ";
+            $sql_join .= " LEFT JOIN users u ON u.id = dr.user_id ";
             $sql_where = " WHERE (dr.user_id = :user_id 
                             OR dr.group_id IN (".implode(",",$user_groups_ids).") )
             ";

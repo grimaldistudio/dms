@@ -36,7 +36,7 @@
 </p>
 
 <?php echo $form->dropDownListRow($model,'granted_access_level',$model->getGrantedAccessLevelArray(), array('empty'=>'Seleziona il permesso')); ?>
-<?php echo $form->textAreaRow($model, 'reply', array('rows'=>10, 'cols'=>70, 'style'=>'width: auto')); ?>
+<?php echo $form->textAreaRow($model, 'reply', array('rows'=>10, 'cols'=>50, 'style'=>'width: auto')); ?>
 </div>
 
 <div class="modal-footer">

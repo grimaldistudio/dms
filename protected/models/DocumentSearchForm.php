@@ -92,7 +92,7 @@ class DocumentSearchForm extends CFormModel{
                 $sql_count_select = "SELECT count(DISTINCT(i2t" . ($num_tags - 1) . ".document_id)) ";
                 $sql_from = " FROM ";
                 $sql_where = " WHERE ";
-                $sql_joins = " JOIN users u ON u.id=d.creator_id ";
+                $sql_joins = "";
                 $sql_group = " GROUP BY i2t" . ($num_tags - 1) . ".document_id ";
                 foreach($this->tags_array as $i=>$tag)
                 {
@@ -106,13 +106,15 @@ class DocumentSearchForm extends CFormModel{
                     else {
                         $sql_from .= " CROSS JOIN tags t" . $i;
                         $sql_where .= " AND t" . $i . ".id = :tag".$i." ";
-                        $sql_joins .= " INNER JOIN tags_documents i2t" . $i . " ON i2t" . ($i - 1) . ".item_id = i2t" . $i . ".item_id " .
+                        $sql_joins .= " INNER JOIN tags_documents i2t" . $i . " ON i2t" . ($i - 1) . ".document_id = i2t" . $i . ".document_id " .
                                             " AND i2t" . $i . ".tag_id = t" . $i . ".id ";
 
                     }
                 }
                 
                 $sql_joins .= " JOIN documents d ON d.id = i2t". ($num_tags - 1) .".document_id ";
+                $sql_joins .= " JOIN users u ON u.id=d.creator_id ";
+
                 $sql_where .= " AND d.status = :active_status ";
                 
                 $params[':active_status'] = Document::ACTIVE_STATUS;
@@ -129,7 +131,8 @@ class DocumentSearchForm extends CFormModel{
             {
                 $params = array();
                 $sql_count = "SELECT count(d.id) FROM documents d WHERE d.status = 1 ";
-                $sql = "SELECT d.id, d.name, d.identifier, d.subject, d.description, d.date_received, d.last_updated, u.firstname, u.lastname, u.email FROM documents d
+                $sql = "SELECT d.id, d.name, d.identifier, d.subject, d.description, d.date_received, d.last_updated, u.firstname, u.lastname, u.email 
+                                                            FROM documents d
                                                             JOIN users u ON u.id = d.creator_id
                                                             WHERE d.status = 1";
                 if($this->date_from_ts)

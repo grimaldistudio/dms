@@ -9,7 +9,7 @@ if(Yii::app()->user->hasDocumentPrivilege($model->id, AclManager::PERMISSION_ADM
 
 <div class="row">
     
-    <span class="span8 pull-left">
+    <span class="span6 pull-left">
         
         <table class="table table-striped table-condensed detail-view">
             <tbody>

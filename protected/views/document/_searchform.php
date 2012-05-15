@@ -14,7 +14,7 @@
 
 <?php $form->errorSummary($idmodel); ?> 
 
-<?php echo CHtml::hiddenField('s_type', 'tags'); ?>
+<?php echo CHtml::hiddenField('s_type', 'identifier'); ?>
 
 <div class="control-group">
 <label class="big">N. Protocollo</label>

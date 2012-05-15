@@ -1,6 +1,6 @@
 <?php $this->beginWidget('bootstrap.widgets.BootModal', array(
     'id'=>'document_upload_dialog',
-    'htmlOptions'=>array('class'=>'hide'),
+    'htmlOptions'=>array('class'=>'hide', 'style'=>'width: 400px'),
 )); ?>
 <div class="modal-header">
     <a class="close" data-dismiss="modal">&times;</a>

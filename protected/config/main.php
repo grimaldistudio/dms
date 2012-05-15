@@ -90,11 +90,11 @@ return array(
 		'log'=>array(
 			'class'=>'CLogRouter',
 			'routes'=>array(
-/*
+
 				array(
 					'class'=>'CFileLogRoute',
 					'levels'=>'error, warning',
-				),*/
+				),
 				// uncomment the following to show log messages on web pages
 				/*
 				array(
@@ -172,6 +172,7 @@ return array(
 		'adminEmail'=>'info@dms.engisolution.it',
 		'supportEmail'=>'support@dms.engisolution.it',
 		'superadmins'=>array('superadmin@comune1.fr.it'),
-		'entity' => 'Comune XXX'
+		'entity' => 'Comune XXX',
+		'isDemo' => true
 	),
 );

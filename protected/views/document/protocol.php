@@ -5,7 +5,7 @@
 <div class="row">
 <?php $form = $this->beginWidget('bootstrap.widgets.BootActiveForm', array(
     'id'=>'protocol-form',
-    'htmlOptions'=>array('class'=>'well span8 pull-left'),
+    'htmlOptions'=>array('class'=>'well span6 pull-left'),
     'enableClientValidation'=>true,
     'clientOptions'=>array(
         'validateOnSubmit'=>true,
@@ -29,7 +29,6 @@
 </div>
 
 <?php echo $form->dropDownListRow($model, 'document_type', $model->getTypeOptions()); ?>
-<?php echo $form->checkBoxRow($model, 'comments_enabled'); ?>
 
 <div class="control-group">
 <?php echo $form->label($model, 'priority'); ?>
@@ -83,7 +82,7 @@
 
 <?php $this->beginWidget('bootstrap.widgets.BootModal', array(
     'id'=>'sender_create_dialog',
-    'htmlOptions'=>array('class'=>'hide span9', 'style'=>'height: auto; max-height: none;'),
+    'htmlOptions'=>array('class'=>'hide span7', 'style'=>'height: auto; max-height: none;'),
 )); ?>
 <div class="modal-header">
     <a class="close" data-dismiss="modal">&times;</a>

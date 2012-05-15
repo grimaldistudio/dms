@@ -30,7 +30,6 @@
         ),            
         array(
             'class'=>'bootstrap.widgets.BootButtonColumn',
-            'htmlOptions'=>array('style'=>'width: 70px'),
             'template'=>'{view} {delete}',
             'buttons' => array(
                 'delete' => array(
@@ -60,7 +59,7 @@
 
 <?php $this->beginWidget('bootstrap.widgets.BootModal', array(
     'id'=>'ticket_update_dialog',
-    'htmlOptions'=>array('class'=>'hide span9', 'style'=>'height: auto; max-height: none;'),
+    'htmlOptions'=>array('class'=>'hide span7', 'style'=>'height: auto; max-height: none;'),
 )); ?>
 <div class="modal-header">
     <a class="close" data-dismiss="modal">&times;</a>

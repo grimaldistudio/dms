@@ -1,4 +1,4 @@
-<div class="preview_container pull-left span7" >
+<div class="preview_container pull-left span5" >
     <div style="height:700px; width: 100%" id="preview_loader">
         <img src="<?php echo Yii::app()->baseUrl?>/images/ajax-loader.gif" />
     </div>

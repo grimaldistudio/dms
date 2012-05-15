@@ -5,7 +5,7 @@
 
 <div id="pending-table-container" class="span9 pull-left" style="margin-left: 0">
     <?php endif; ?>
-    <p class=""help-block">
+    <p class="help-block">
        Ultimi aggiornamenti: <?php echo date('d-m-Y H:i:s', Yii::app()->user->getState('last_update_check')); ?>
        <?php echo CHtml::link('<i class="icon-refresh icon-white"></i>', '#', array('id'=>'refresh_link', 'class'=>'btn btn-primary')); ?>
     </p>
@@ -42,7 +42,6 @@
                                 <?php echo CHtml::link('<i class="icon-trash icon-white"></i>', array('/document/deletepending', 'group_id'=>$g_id, 'document_name'=>$document['name']), array('class'=>'btn btn-primary delete', 'data-content'=>'Cancella il documento', 'rel'=>'tooltip')); ?>                            
                             <?php endif; ?>
                         </td>
-                        
                     </tr>
                 <?php endforeach; ?>
             <?php endforeach;?>
@@ -72,13 +71,13 @@ Yii::app()->clientScript->registerScript('pending-periodic', "
     $.periodic({period: 15000, decay: 1.2, max_period: 90000}, function()
     {
         if(!updating)
-            refreshTable();
+            refreshTable(0);
     });
 
     $('#refresh_link').live('click', function(e){
         e.preventDefault();
         if(!updating)
-            refreshTable();
+            refreshTable(0);
     });
     
     $(document).on('click', 'a.delete', function(e){
@@ -95,7 +94,7 @@ Yii::app()->clientScript->registerScript('pending-periodic', "
             dataType: 'json',
             success: function(data){
                 if(data.success==1)
-                    refreshTable();
+                    refreshTable(1);
                 else
                     alert('Impossibile cancellare il file');
             },
@@ -107,12 +106,13 @@ Yii::app()->clientScript->registerScript('pending-periodic', "
         });
     });
     
-    function refreshTable()
+    function refreshTable(force_reload)
     {
         updating: true;
         $('#refresh_link').addClass('disabled');
         $.ajax({
             url: '".Yii::app()->createUrl('/document/pending')."',
+            data: { 'force_reload':force_reload },
             dataType: 'json',
             cache: false,
             complete: this.ajax_complete,

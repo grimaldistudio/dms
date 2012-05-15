@@ -185,14 +185,18 @@ class User extends CActiveRecord
     public function createAccount()
     {
         $this->salt = $this->generateSalt();
-        $this->plain_password = $this->createRandomPassword();
+        if(Yii::app()->params['isDemo']===true)
+            $this->plain_password = "testuser";
+        else
+            $this->plain_password = $this->createRandomPassword();
         $this->status = self::ACTIVE_STATUS;            
         $this->password = $this->hashPassword($this->plain_password, $this->salt);
         $ret = $this->save();
         
         if($ret)
         {
-            $this->sendNewAccountEmail();
+            if(Yii::app()->params['isDemo']===false)
+                $this->sendNewAccountEmail();
             return TRUE;
         }
         return FALSE;

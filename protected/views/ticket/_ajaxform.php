@@ -19,7 +19,7 @@
     <?php echo $document->getTitle(); ?>
 </p>
 <?php echo $form->dropDownListRow($model,'access_level',DocumentRight::model()->getPrivilegeArray(), array('empty'=>'Seleziona il permesso')); ?>
-<?php echo $form->textAreaRow($model, 'request', array('rows'=>10, 'cols'=>70, 'style'=>'width:auto')); ?>
+<?php echo $form->textAreaRow($model, 'request', array('rows'=>10, 'cols'=>50, 'style'=>'width:auto')); ?>
 
 <?php if(count($last_tickets)>0): ?>
 <p class="alert alert-warning">Attenzione: hai già aperto dei tickets per questo documento.</p>

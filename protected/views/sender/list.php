@@ -62,7 +62,7 @@
 
 <?php $this->beginWidget('bootstrap.widgets.BootModal', array(
     'id'=>'sender_create_dialog',
-    'htmlOptions'=>array('class'=>'hide span9', 'style'=>'height: auto; max-height: none;'),
+    'htmlOptions'=>array('class'=>'hide span7', 'style'=>'height: auto; max-height: none;'),
 )); ?>
 <div class="modal-header">
     <a class="close" data-dismiss="modal">&times;</a>
@@ -73,7 +73,7 @@
 
 <?php $this->beginWidget('bootstrap.widgets.BootModal', array(
     'id'=>'sender_update_dialog',
-    'htmlOptions'=>array('class'=>'hide span9', 'style'=>'height: auto; max-height: none;'),
+    'htmlOptions'=>array('class'=>'hide span7', 'style'=>'height: auto; max-height: none;'),
 )); ?>
 <div class="modal-header">
     <a class="close" data-dismiss="modal">&times;</a>

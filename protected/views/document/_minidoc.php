@@ -12,12 +12,6 @@
 
     </tr>
     
-    <tr>
-        <th><label><?php echo Document::model()->getAttributeLabel('subject'); ?></label></th>
-        <td><p><?php echo CHtml::encode($data['subject']); ?></p></td>
-
-    </tr>
-    
     <?php if(isset($data['firstname']) && isset($data['lastname'])): ?>
     <tr>
         <th><label><?php echo Document::model()->getAttributeLabel('creator_id'); ?></label></th>

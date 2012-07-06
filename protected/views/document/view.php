@@ -26,11 +26,6 @@ if(Yii::app()->user->hasDocumentPrivilege($model->id, AclManager::PERMISSION_ADM
             </tr>
 
             <tr>
-                <th><?php echo $model->getAttributeLabel('subject'); ?></th>
-                <td><?php echo CHtml::encode($model->subject); ?></td>
-            </tr>
-
-            <tr>
                 <th><?php echo $model->getAttributeLabel('date_received'); ?></th>
                 <td><?php echo date('d/m/Y', strtotime($model->date_received)); ?></td>
             </tr>

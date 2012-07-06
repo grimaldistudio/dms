@@ -32,19 +32,19 @@
                                 <?php endif; ?>
                             <?php endif; ?>
                             <?php if($this->isAllowed('document', 'archive')): ?>                            
-                            <?php if($g_id=='user'): ?>
-                                <?php echo CHtml::link('Archivia', array('/document/archive', 'document_name'=>$document['name']), array('class'=>'btn btn-primary', 'data-content'=>'Archivia il documento senza protocollarlo', 'rel'=>'tooltip')); ?>                            
-                            <?php else:  ?> 
-                                <?php echo CHtml::link('Archivia', array('/document/archive', 'group_id'=>$g_id, 'document_name'=>$document['name']), array('class'=>'btn btn-primary', 'data-content'=>'Archivia il documento senza protocollarlo', 'rel'=>'tooltip')); ?>
+                                <?php if($g_id=='user'): ?>
+                                    <?php echo CHtml::link('Archivia', array('/document/archive', 'document_name'=>$document['name']), array('class'=>'btn btn-primary', 'data-content'=>'Archivia il documento senza protocollarlo', 'rel'=>'tooltip')); ?>                            
+                                <?php else:  ?> 
+                                    <?php echo CHtml::link('Archivia', array('/document/archive', 'group_id'=>$g_id, 'document_name'=>$document['name']), array('class'=>'btn btn-primary', 'data-content'=>'Archivia il documento senza protocollarlo', 'rel'=>'tooltip')); ?>
+                                <?php endif; ?>
                             <?php endif; ?>
-                            <?endif; ?>
                             <?php if($this->isAllowed('document', 'deletepending')): ?>
                                 <?php echo CHtml::link('<i class="icon-trash icon-white"></i>', array('/document/deletepending', 'group_id'=>$g_id, 'document_name'=>$document['name']), array('class'=>'btn btn-primary delete', 'data-content'=>'Cancella il documento', 'rel'=>'tooltip')); ?>                            
                             <?php endif; ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>
-            <?php endforeach;?>
+            <?php endforeach; ?>
         </tbody>
     </table>
     <?php if(!isset($is_ajax)):?>

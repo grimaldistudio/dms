@@ -9,15 +9,8 @@
     <tr>
         <th><label><?php echo Document::model()->getAttributeLabel('name'); ?></label></th>
         <td><p><?php echo CHtml::encode($data['name']); ?></p></td>
-
     </tr>
     
-    <tr>
-        <th><label><?php echo Document::model()->getAttributeLabel('subject'); ?></label></th>
-        <td><p><?php echo CHtml::encode($data['subject']); ?></p></td>
-
-    </tr>
-
     <tr>
         <th><label><?php echo Document::model()->getAttributeLabel('date_received'); ?></label></th>
         <td><p><?php echo date('d-m-Y', strtotime($data['date_received'])); ?></p></td>

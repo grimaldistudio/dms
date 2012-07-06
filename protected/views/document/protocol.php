@@ -20,7 +20,6 @@
 <?php echo $form->textFieldRow($model, 'identifier'); ?>
 <?php endif; ?>
 <?php echo $form->textFieldRow($model, 'name'); ?>
-<?php echo $form->textFieldRow($model, 'subject', array('class'=>'span6')); ?>
 
 <div class="control-group">
 <?php echo $form->labelEx($model, 'description'); ?>

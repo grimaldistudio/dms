@@ -204,7 +204,7 @@ class SecureController extends CController
             $home = array('label'=>'Home', 'url'=>Yii::app()->homeUrl, 'active'=>($this->id=='site' && $this->action->id=='index'));
             $document = array('label'=>'Documenti', 'url'=>Yii::app()->createUrl('/document'), 'active'=>$this->id=='document');            
 
-            $admin = array('label'=>'Amministrazione', 'url'=>Yii::app()->createUrl('/comment'), 'active'=>in_array($this->id, array('comment', 'tag', 'ticket', 'sender')));            
+            $admin = array('label'=>'Amministrazione', 'url'=>Yii::app()->createUrl('/ticket'), 'active'=>in_array($this->id, array('ticket', 'tag', 'sender')));            
             $users = array('label'=>'Organizzazione', 'url'=>Yii::app()->createUrl('/user'), 'active'=>in_array($this->id, array('user', 'role', 'group', 'right')));            
             $items[] = $home;
             $items[] = $document;

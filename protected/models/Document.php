@@ -58,7 +58,7 @@ class Document extends CActiveRecord
     public function rules()
     {
         return array(
-            array('name,subject,sender_id,description,sendername,tagsname,priority,date_received,document_type', 'required', 'on'=>'protocol,archive,admin'),
+            array('name,sender_id,description,sendername,tagsname,priority,date_received,document_type', 'required', 'on'=>'protocol,archive,admin'),
             array('description,tagsname,document_type,priority,change_description,revision', 'required', 'on'=>'update,admin'),
             array('revision', 'required', 'on'=>'update'),            
             array('identifier', 'required', 'on'=>'protocol'),
@@ -98,9 +98,8 @@ class Document extends CActiveRecord
     {
         return array(
             'id' => 'Id',
-            'name' => 'Nome',
+            'name' => 'Titolo',
             'description' => 'Descrizione',
-            'subject' => 'Oggetto',
             'date_received'=> 'Data di ricezione',
             'date_created' => 'Data di creazione',
             'last_updated' => 'Ultimo aggiornamento',
@@ -466,7 +465,7 @@ class Document extends CActiveRecord
         $this->validate();
         
         $params = array();
-        $sql_select = "SELECT d.id, d.name, d.identifier, d.subject, d.description, d.date_received, d.last_updated, u.firstname, u.lastname, u.email ";
+        $sql_select = "SELECT d.id, d.name, d.identifier, d.description, d.date_received, d.last_updated, u.firstname, u.lastname, u.email ";
         $sql_count = "SELECT COUNT(DISTINCT(d.id)) ";
         
         $sql_group = " GROUP BY d.id";
@@ -550,7 +549,7 @@ class Document extends CActiveRecord
         $this->validate();
         
         $params = array();
-        $sql_select = "SELECT d.id, d.name, d.identifier, d.subject, d.description, d.date_received, d.last_updated, u.firstname, u.lastname, u.email ";
+        $sql_select = "SELECT d.id, d.name, d.identifier, d.description, d.date_received, d.last_updated, u.firstname, u.lastname, u.email ";
         $sql_count = "SELECT COUNT(DISTINCT(d.id)) ";
         
         $sql_group = " GROUP BY d.id";
@@ -635,7 +634,7 @@ class Document extends CActiveRecord
         $this->validate();
                 
         $params = array();
-        $sql_select = "SELECT d.id, d.name, d.identifier, d.subject, d.description, d.date_received, d.last_updated, d.last_updater_id ";
+        $sql_select = "SELECT d.id, d.name, d.identifier, d.description, d.date_received, d.last_updated, d.last_updater_id ";
         $sql_count = "SELECT COUNT(d.id) ";
         
         $sql_from = " FROM documents d";

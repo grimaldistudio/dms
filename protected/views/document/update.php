@@ -30,7 +30,6 @@ if(Yii::app()->user->hasDocumentPrivilege($model->id, AclManager::PERMISSION_ADM
     $disabled = "";
 ?>
 <?php echo $form->textFieldRow($model, 'name', array('disabled'=>$disabled)); ?>
-<?php echo $form->textFieldRow($model, 'subject', array('class'=>'span6', 'disabled'=>$disabled)); ?>
 <div class="control-group">
 <?php echo $form->labelEx($model, 'sender_id'); ?>
 <?php echo $form->hiddenField($model, 'sender_id', array('id'=>'sender_id', 'disabled'=>$disabled)); ?>

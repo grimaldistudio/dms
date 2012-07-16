@@ -4,22 +4,37 @@
     <tr>
         <th style="width: 20%"><label><?php echo Document::model()->getAttributeLabel('identifier'); ?></label></th>
         <td style="width: 30%"><p><?php echo CHtml::encode($data['identifier']!==null?$data['identifier']:'n/d'); ?></p></td>
-        <td rowspan="6"><div class="richtext limited"><?php echo $data['description']; ?></div></td>
+        <td rowspan="8"><div class="richtext limited"><?php echo $data['description']; ?></div></td>
     </tr>    
     
     <tr>
         <th><label><?php echo Document::model()->getAttributeLabel('name'); ?></label></th>
         <td><p><?php echo CHtml::encode($data['name']); ?></p></td>
     </tr>
+    
+    <tr>
+        <th><label><?php echo Document::model()->getAttributeLabel('document_type'); ?></label></th>
+        <td><p><?php echo Document::model()->getDocumentTypeDesc($data['document_type']); ?></p></td>
+    </tr>
 
     <tr>
-        <th><label><?php echo Document::model()->getAttributeLabel('date_received'); ?></label></th>
-        <td><p><?php echo date('d-m-Y', strtotime($data['date_received'])); ?></p></td>
+        <th><label><?php echo Document::model()->getAttributeLabel('publication_date_from'); ?></label></th>
+        <td><p><?php echo $data['publication_date_from']?date('d-m-Y', strtotime($data['publication_date_from'])):'n/d'; ?></p></td>
     </tr>
     
     <tr>
-        <th><label><?php echo Document::model()->getAttributeLabel('last_updated'); ?></label></th>
-        <td><p><?php echo date('d-m-Y H:i:s', strtotime($data['last_updated'])); ?></p></td>
+        <th><label><?php echo Document::model()->getAttributeLabel('publication_date_to'); ?></label></th>
+        <td><p><?php echo $data['publication_date_to']?date('d-m-Y', strtotime($data['publication_date_to'])):'n/d'; ?></p></td>
+    </tr>
+    
+    <tr>
+        <th><label><?php echo Document::model()->getAttributeLabel('publication_requested'); ?></label></th>
+        <td><p><?php echo $data['publication_requested']==1?'Si':'No'; ?></p></td>
+    </tr>
+    
+    <tr>
+        <th><label><?php echo Document::model()->getAttributeLabel('publication_status'); ?></label></th>
+        <td><p><?php echo Document::model()->getPublicationStatusDesc($data['publication_status']); ?></p></td>
     </tr>
     
     <tr>

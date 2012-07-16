@@ -35,10 +35,31 @@
         </td>
     </tr>
     
+    <?php if($data['main_document_type']==Document::INBOX): ?>
     <tr>
         <th><label><?php echo Document::model()->getAttributeLabel('date_received'); ?></label></th>
         <td><p><?php echo date('d-m-Y', strtotime($data['date_received'])); ?></p></td>
     </tr>
+    <?php endif; ?>
+    
+    <?php if($data['main_document_type']==Document::OUTGOING): ?>
+
+        <tr>
+            <th><label><?php echo Document::model()->getAttributeLabel('document_type'); ?></label></th>
+            <td><p><?php echo Document::model()->getTypeDesc($data['document_type']); ?></p></td>
+        </tr>
+        
+        <tr>
+            <th><label><?php echo Document::model()->getAttributeLabel('publication_date_from'); ?></label></th>
+            <td><p><?php echo $data['publication_date_from']?date('d-m-Y', strtotime($data['publication_date_from'])):'n/d'; ?></p></td>
+        </tr>
+
+        <tr>
+            <th><label><?php echo Document::model()->getAttributeLabel('publication_date_to'); ?></label></th>
+            <td><p><?php echo $data['publication_date_to']?date('d-m-Y', strtotime($data['publication_date_to'])):'n/d'; ?></p></td>
+        </tr>
+
+    <?php endif; ?>
     
     <tr>
         <th><label><?php echo Document::model()->getAttributeLabel('last_updated'); ?></label></th>

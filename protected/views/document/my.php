@@ -13,7 +13,7 @@ $this->widget('bootstrap.widgets.BootListView', array(
 		'sortableAttributes'=>array(
 				'identifier' => 'Numero di Protocollo',
 				'name' => 'Nome',
-                                'date_received' => 'Data di ricezione'
+                                'date_created' => 'Data di creazione'
 		),
 ));
 ?>

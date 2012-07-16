@@ -60,11 +60,25 @@ class SecureController extends CController
                     );
             
             // documents
-            $search = array(
-                        'label'=>'Cerca', 
-                        'url'=>Yii::app()->createUrl('/document/search'), 
-                        'visible'=>Yii::app()->authgateway->isAllowed('document', 'pending'),
-                        'active'=>$this->id=='document' && $this->action->id=='search'
+            $archive_search = array(
+                        'label'=>'Archivio', 
+                        'url'=>array('/document/search', 'doc_type'=>Document::INTERNAL_USE_TYPE),                
+                        'visible'=>Yii::app()->authgateway->isAllowed('document', 'search'),
+                        'active'=>$this->id=='document' && $this->action->id=='search' && (isset($_GET['doc_type']) && $_GET['doc_type']==Document::INTERNAL_USE_TYPE)
+                    );
+            
+            $protocol_search = array(
+                        'label'=>'Posta in entrata', 
+                        'url'=>array('/document/search', 'doc_type'=>Document::INBOX),                
+                        'visible'=>Yii::app()->authgateway->isAllowed('document', 'search'),
+                        'active'=>$this->id=='document' && $this->action->id=='search' && (!isset($_GET['doc_type']) || $_GET['doc_type']==Document::INBOX)
+                    );
+            
+            $publish_search = array(
+                        'label'=>'Documenti pubblici', 
+                        'url'=>array('/document/search', 'doc_type'=>Document::OUTGOING),                
+                        'visible'=>Yii::app()->authgateway->isAllowed('document', 'search'),
+                        'active'=>$this->id=='document' && $this->action->id=='search' && (isset($_GET['doc_type']) && $_GET['doc_type']==Document::OUTGOING)
                     );
             
             $my = array(
@@ -171,13 +185,17 @@ class SecureController extends CController
                     );
 
             $items[] = $home;
+            $items[] = array('label'=>'Cerca in', 'icon'=>'zoom-in', 'itemOptions'=>array('class'=>'nav-header'));
+            $items[] = $archive_search;
+            $items[] = $protocol_search;
+            $items[] = $publish_search;
+            
             $items[] = array('label'=>'Documenti', 'icon'=>'book', 'itemOptions'=>array('class'=>'nav-header'));
-            $items[] = $search;
             $items[] = $pending;
             $items[] = $my;
             $items[] = $owned;
             $items[] = $disabled;
-            
+
             $items[] = array('label'=>'Amministrazione', 'icon'=>'tags', 'itemOptions'=>array('class'=>'nav-header'));            
             $items[] = $tickets;            
             $items[] = $my_tickets;
@@ -202,7 +220,11 @@ class SecureController extends CController
         {
             $items = array();
             $home = array('label'=>'Home', 'url'=>Yii::app()->homeUrl, 'active'=>($this->id=='site' && $this->action->id=='index'));
-            $document = array('label'=>'Documenti', 'url'=>Yii::app()->createUrl('/document'), 'active'=>$this->id=='document');            
+            $document = array('label'=>'Documenti', 'url'=>'#', 'active'=>$this->id=='document', 'items'=>array(
+                array('label' => 'Archivio', 'url' => Yii::app()->createUrl('/document/search', array('doc_type'=>Document::INTERNAL_USE_TYPE))),
+                array('label' => 'Posta in entrata', 'url' => Yii::app()->createUrl('/document/search', array('doc_type'=>Document::INBOX))),                
+                array('label' => 'Document pubblici', 'url' => Yii::app()->createUrl('/document/search', array('doc_type'=>Document::OUTGOING))),
+            ));            
 
             $admin = array('label'=>'Amministrazione', 'url'=>Yii::app()->createUrl('/ticket'), 'active'=>in_array($this->id, array('ticket', 'tag', 'sender')));            
             $users = array('label'=>'Organizzazione', 'url'=>Yii::app()->createUrl('/user'), 'active'=>in_array($this->id, array('user', 'role', 'group', 'right')));            

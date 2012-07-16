@@ -10,12 +10,22 @@ class Document extends CActiveRecord
     const MEDIUM_PRIORITY = 1;
     const HIGH_PRIORITY = 2;
     const VERY_HIGH_PRIORITY = 3;
+
+    const PUBLISHED = 2;
+    const PUBLISHING = 1;
+    const NOT_PUBLISHED = 0;
+    
+    const INTERNAL_USE_TYPE = 0;
+    const INBOX = 3;
+    const OUTGOING = 5;
     
     public $tagsname = null;
     public $sendername = null;
     public $senderaddress = null;
     
     public $tags_array = array();
+    
+    public $publication_requested;
     
     public $tmp_path;
     public $document_manager = null;
@@ -24,15 +34,11 @@ class Document extends CActiveRecord
     public $relative_path = null;
 
     
-    public $date_received_from;
-    public $date_received_to;
+    public $date_from;
+    public $date_to;
 
     public function __construct($scenario = 'insert') {
         parent::__construct($scenario);
-        if($scenario == 'protocol' || $scenario == 'archive')
-        {
-            $this->date_received = date('d/m/Y');
-        }
     }
     
     /**
@@ -58,18 +64,30 @@ class Document extends CActiveRecord
     public function rules()
     {
         return array(
-            array('name,sender_id,description,sendername,tagsname,priority,date_received,document_type', 'required', 'on'=>'protocol,archive,admin'),
-            array('description,tagsname,document_type,priority,change_description,revision', 'required', 'on'=>'update,admin'),
-            array('revision', 'required', 'on'=>'update'),            
-            array('identifier', 'required', 'on'=>'protocol'),
-            array('identifier', 'unique', 'on'=>'protocol'),
-            array('senderaddress', 'safe', 'on'=>'protocol,archive,update,admin'),
-            array('date_received', 'date', 'format'=>'dd/MM/yyyy', 'timestampAttribute'=>'date_received', 'on'=>'protocol,archive'),
-            array('description', 'length', 'max'=>2048, 'on'=>'protocol,archive,update,admin'),
-            array('description','filter','filter'=>array($obj=new CHtmlPurifier(),'purify'), 'on'=>'protocol,archive,update,admin'),
-            array('identifier,name,date_received_from,date_received_to', 'safe', 'on'=>'my,disabled,created'),
-            array('date_received_from', 'date', 'format'=>'dd/MM/yyyy', 'timestampAttribute'=>'date_received_from', 'on'=>'my,created,disabled'),
-            array('date_received_to', 'date', 'format'=>'dd/MM/yyyy', 'timestampAttribute'=>'date_received_to', 'on'=>'my,created,disabled')
+            array('name,identifier,sender_id,description,sendername,tagsname,priority,date_received', 'required', 'on'=>'protocol'),
+            array('name,description,tagsname', 'required', 'on'=>'archive'),
+            array('name,description,tagsname,document_type', 'required', 'on'=>'publish'),
+            array('publication_requested', 'safe', 'on'=>'publish,publish_admin'),
+            array('publication_requested', 'default', 'setOnEmpty'=>true, 'value'=>0, 'on'=>'publish,publish_admin'),            
+            array('entity,proposer_service,publication_date_from,publication_date_to,act_number,act_date', 'safe', 'on'=>'publish,publish_update,publish_admin'),
+            array('description,tagsname,priority,sender_id,sendername', 'required', 'on'=>'protocol_update,protocol_admin'),
+            array('description,tagsname', 'required', 'on'=>'publish_admin,publish_update,archive_update,archive_admin'),
+            array('name', 'required', 'on'=>'protocol_admin,archive_admin,publish_admin'),
+            array('change_description,revision', 'required', 'on'=>'protocol_update,protocol_admin,archive_update,archive_admin,publish_update,publish_admin'),            
+            array('identifier', 'safe', 'on'=>'publish,publish_admin'),
+            array('identifier,date_received', 'required', 'on' => 'protocol_admin'),
+            array('identifier', 'unique', 'on'=>'protocol,publish,protocol_admin,publish_admin'),
+            array('senderaddress', 'safe', 'on'=>'protocol,protocol_update,protocol_admin'),
+            array('date_received', 'date', 'format'=>'dd/MM/yyyy', 'timestampAttribute'=>'date_received', 'on'=>'protocol,protocol_admin'),
+            array('act_date', 'date', 'format'=>'dd/MM/yyyy', 'timestampAttribute'=>'act_date', 'allowEmpty' =>true, 'on'=>'publish,publish_update,publish_admin'),          
+            array('publication_date_from', 'date', 'format'=>'dd/MM/yyyy', 'timestampAttribute'=>'publication_date_from', 'allowEmpty' =>true, 'on'=>'publish,publish_update,publish_admin'),          
+            array('publication_date_to', 'date', 'format'=>'dd/MM/yyyy', 'timestampAttribute'=>'publication_date_to', 'allowEmpty' =>true, 'on'=>'publish,publish_update,publish_admin'),          
+            array('date_received,act_date,publication_date_from,publication_date_to', 'default', 'setOnEmpty'=>true, 'value'=>new CDbExpression('NULL')),
+            array('description', 'length', 'max'=>2048, 'on'=>'protocol,archive,publish,protocol_update,protocol_admin,publish_update,publish_admin,archive_update,archive_admin'),
+            array('description','filter','filter'=>array($obj=new CHtmlPurifier(),'purify'), 'on'=>'protocol,archive,publish,protocol_update,protocol_admin,publish_update,publish_admin,archive_update,archive_admin'),
+            array('identifier,name,date_from,date_to,main_document_type', 'safe', 'on'=>'my,disabled,created'),
+            array('date_from', 'date', 'format'=>'dd/MM/yyyy', 'timestampAttribute'=>'date_from', 'on'=>'my,created,disabled'),
+            array('date_to', 'date', 'format'=>'dd/MM/yyyy', 'timestampAttribute'=>'date_to', 'on'=>'my,created,disabled')
         );
     }
 
@@ -105,7 +123,8 @@ class Document extends CActiveRecord
             'last_updated' => 'Ultimo aggiornamento',
             'status' => 'Stato',
             'identifier' => 'Numero Protocollo',
-            'document_type' => 'Tipo Documento',
+            'main_document_type' => 'Tipo di documento',
+            'document_type' => 'Tipo di documento pubblico',
             'priority' => 'Priorità',
             'creator_id' => 'Creatore',
             'sender_id' => 'Mittente',
@@ -117,8 +136,16 @@ class Document extends CActiveRecord
             'num_pages' => 'Numero Pagine',
             'change_description' => 'Descrizione modifiche',
             'last_updater_id' => 'Ultimo aggiornamento di',
-            'date_received_from' => 'Ricevuto a partire da',
-            'date_received_to' => 'Ricevuto fino a'
+            'date_from' => 'Da',
+            'date_to' => 'A',
+            'entity' => 'Ente',
+            'proposer_service' => 'Servizio proponente',
+            'act_number' => 'Numero atto',
+            'act_date' => 'Data atto',
+            'publication_date_from' => 'Data inizio pubblicazione',
+            'publication_date_to' => 'Data fine pubblicazione',
+            'publication_status' => 'Pubblicazione albo',
+            'publication_requested' => 'Pubblicazione su albo'
         );
     }
 
@@ -153,12 +180,17 @@ class Document extends CActiveRecord
             $this->revision = $this->revision+1;
             $this->last_updater_id = Yii::app()->user->id;
         }
-        
+
         $this->last_updated = new CDbExpression('CURRENT_TIMESTAMP');
+
+        if(is_int($this->act_date))
+            $this->act_date = date('Y-m-d H:i:s', $this->act_date);
+        if(is_int($this->publication_date_from))
+            $this->publication_date_from = date('Y-m-d H:i:s', $this->publication_date_from);
+        if(is_int($this->publication_date_to))
+            $this->publication_date_to = date('Y-m-d H:i:s', $this->publication_date_to);            
         if(is_int($this->date_received))
-        {
             $this->date_received = date('Y-m-d H:i:s', $this->date_received);
-        }
         return parent::beforeSave();
     }
 
@@ -282,7 +314,7 @@ class Document extends CActiveRecord
         if(file_exists($this->tmp_path))
         {
             $time = strtotime($this->date_created);
-            $dst_path = Yii::getPathOfAlias('uploads').DIRECTORY_SEPARATOR.'archive'.DIRECTORY_SEPARATOR.date('Y', $time).DIRECTORY_SEPARATOR.date('m', $time).DIRECTORY_SEPARATOR.date('d', $time);
+            $dst_path = Yii::getPathOfAlias('uploads').DIRECTORY_SEPARATOR.'saved'.DIRECTORY_SEPARATOR.date('Y', $time).DIRECTORY_SEPARATOR.date('m', $time).DIRECTORY_SEPARATOR.date('d', $time);
             if(file_exists($dst_path) || mkdir($dst_path, 0777, true))
             {
                 if(@rename($this->tmp_path, $dst_path.DIRECTORY_SEPARATOR.'documento_'.$this->id.'.pdf'))
@@ -302,7 +334,7 @@ class Document extends CActiveRecord
         if(file_exists($this->tmp_path))
         {
             $time = strtotime($this->date_created);
-            $dst_path = Yii::getPathOfAlias('uploads').DIRECTORY_SEPARATOR.'protocol'.DIRECTORY_SEPARATOR.date('Y', $time).DIRECTORY_SEPARATOR.date('m', $time).DIRECTORY_SEPARATOR.date('d', $time);
+            $dst_path = Yii::getPathOfAlias('uploads').DIRECTORY_SEPARATOR.'saved'.DIRECTORY_SEPARATOR.date('Y', $time).DIRECTORY_SEPARATOR.date('m', $time).DIRECTORY_SEPARATOR.date('d', $time);
             if(file_exists($dst_path) || mkdir($dst_path, 0777, true))
             {
                 if(rename($this->tmp_path, $dst_path.DIRECTORY_SEPARATOR.'documento_'.$this->id.'.pdf'))
@@ -367,6 +399,27 @@ class Document extends CActiveRecord
             return $status_array[$this->status];
         return 'Non definito';
     }
+    
+    public function getPublicationStatusArray()
+    {
+        return array(
+            '' => 'Seleziona',		
+            self::NOT_PUBLISHED => 'Non pubblicato',
+            self::PUBLISHING => 'Da pubblicare',
+            self::PUBLISHED => 'Pubblicato'
+        );
+    }
+
+    public function getPublicationStatusDesc($value = -1)
+    {
+        if($value<0)
+            $value = $this->publication_status;
+        
+        $status_array = $this->getPublicationStatusArray();
+        if(array_key_exists($value, $status_array))
+            return $status_array[$value];
+        return 'Non definito';
+    }
 
     public function getPriorityOptions()
     {
@@ -387,22 +440,49 @@ class Document extends CActiveRecord
         }
         return 'n/d';
     }
-    
+
+    public function getMainTypeOptions()
+    {
+        return array(
+            self::INTERNAL_USE_TYPE => 'Archiviazione uso interno',
+            self::INBOX => 'Posta in entrata',
+            self::OUTGOING => 'Documenti pubblici'
+        );        
+    }
+
+    public function getMainTypeDesc()
+    {
+        if(array_key_exists($this->main_document_type, $this->getMainTypeOptions()))
+        {
+            $options = $this->getMainTypeOptions();
+            return $options[$this->main_document_type];
+        }
+        return 'n/d';        
+    }
+
     public function getTypeOptions()
     {
         return array(
-          0 => 'Tipo 1',
-          1 => 'Tipo 2',
-          2 => 'Tipo 3'  
+            5 => 'Avviso di accertamento',
+            10 => 'Bandi e avvisi',
+            15 => 'Convocazioni',
+            20 => 'Determine e delibere',
+            25 => 'Oggetti e valori ritrovati',
+            30 => 'Ordinanze',
+            35 => 'Pubblicazioni di matrimonio',
+            40 => 'Pubblicazioni di altri enti',
+            45 => 'Pubblicazioni varie'
         );
     }
     
-    public function getTypeDesc()
+    public function getTypeDesc($value = -1)
     {
-        if(array_key_exists($this->document_type, $this->getTypeOptions()))
+        if($value<0)
+            $value = $this->document_type;
+        if(array_key_exists($value, $this->getTypeOptions()))
         {
             $options = $this->getTypeOptions();
-            return $options[$this->document_type];
+            return $options[$value];
         }
         return 'n/d';        
     }
@@ -412,10 +492,7 @@ class Document extends CActiveRecord
         if(is_null($this->relative_path))
         {
             $time = strtotime($this->date_created);
-            if($this->isArchived())
-                $this->relative_path = 'archive'.DIRECTORY_SEPARATOR.date('Y', $time).DIRECTORY_SEPARATOR.date('m', $time).DIRECTORY_SEPARATOR.date('d', $time);        
-            else
-                $this->relative_path = 'protocol'.DIRECTORY_SEPARATOR.date('Y', $time).DIRECTORY_SEPARATOR.date('m', $time).DIRECTORY_SEPARATOR.date('d', $time); 
+            $this->relative_path = 'saved'.DIRECTORY_SEPARATOR.date('Y', $time).DIRECTORY_SEPARATOR.date('m', $time).DIRECTORY_SEPARATOR.date('d', $time);        
         }
         return $this->relative_path;
     }
@@ -433,16 +510,6 @@ class Document extends CActiveRecord
     public function getCachePath()
     {
         return Yii::getPathOfAlias('uploads').DIRECTORY_SEPARATOR.'cache'.DIRECTORY_SEPARATOR.$this->getRelativePath();
-    }
-    
-    public function isArchived()
-    {
-        return $this->identifier==null || $this->identifier=="";
-    }
-    
-    public function isProtocolled()
-    {
-        return !$this->isArchived();
     }
     
     public function download($force_download = false)
@@ -465,7 +532,7 @@ class Document extends CActiveRecord
         $this->validate();
         
         $params = array();
-        $sql_select = "SELECT d.id, d.name, d.identifier, d.description, d.date_received, d.last_updated, u.firstname, u.lastname, u.email ";
+        $sql_select = "SELECT d.id, d.name, d.identifier, d.description, d.document_type, d.main_document_type, d.publication_date_from, d.publication_date_to, d.date_received, d.last_updated, u.firstname, u.lastname, u.email ";
         $sql_count = "SELECT COUNT(DISTINCT(d.id)) ";
         
         $sql_group = " GROUP BY d.id";
@@ -495,8 +562,10 @@ class Document extends CActiveRecord
         }
         
         $sql_where .= " AND d.status = :active_status";
+        $sql_where .= " AND d.main_document_type = :main_document_type";
         
         $params[':active_status'] = Document::ACTIVE_STATUS;
+        $params[':main_document_type'] = $this->main_document_type;
         
         if($this->identifier)
         {
@@ -510,16 +579,27 @@ class Document extends CActiveRecord
             $params[':name'] = '%'.$this->name.'%';
         }
         
-        if(!$this->hasErrors('date_received_from') && $this->date_received_from)
+        if($this->main_document_type==Document::INTERNAL_USE_TYPE)
+            $attribute = 'date_created';
+        elseif($this->main_document_type==Document::OUTGOING)
+            $attribute = 'publication_date_from';
+        else
+            $attribute = 'date_received';
+        
+        
+        if(!$this->hasErrors('date_from') && $this->date_from)
         {
-            $sql_where .= " AND d.date_received >= :date_received_from";
-            $params[':date_received_from'] = date('Y-m-d', $this->date_received_from);
+            $sql_where .= " AND d.".$attribute." >= :date_from";
+            $params[':date_from'] = date('Y-m-d', $this->date_from);
         }
         
-        if(!$this->hasErrors('date_received_to') && $this->date_received_to)
+        if($this->main_document_type==Document::OUTGOING)
+            $attribute = 'publication_date_to';
+        
+        if(!$this->hasErrors('date_to') && $this->date_to)
         {
-            $sql_where .= " AND d.date_received <= :date_received_to";
-            $params[':date_received_to'] = date('Y-m-d', $this->date_received_to);            
+            $sql_where .= " AND d.".$attribute." <= :date_to";
+            $params[':date_to'] = date('Y-m-d', $this->date_to);            
         }
         
         $sql = $sql_select . $sql_from . $sql_join . $sql_where . $sql_group;
@@ -532,8 +612,8 @@ class Document extends CActiveRecord
             array(
                 'totalItemCount'=>$count,
                     'sort' => array(
-                        'attributes' => array('date_received', 'name', 'identifier'),
-                        'defaultOrder' => 'd.date_received DESC'
+                        'attributes' => array('name', 'identifier'),
+                        'defaultOrder' => 'd.date_created DESC'
                 ),
                 'pagination' => array(
                     'pageSize' => 10
@@ -549,7 +629,7 @@ class Document extends CActiveRecord
         $this->validate();
         
         $params = array();
-        $sql_select = "SELECT d.id, d.name, d.identifier, d.description, d.date_received, d.last_updated, u.firstname, u.lastname, u.email ";
+        $sql_select = "SELECT d.id, d.name, d.identifier, d.description, d.document_type, d.main_document_type, d.publication_date_from, d.publication_date_to, d.date_received, d.last_updated, u.firstname, u.lastname, u.email ";
         $sql_count = "SELECT COUNT(DISTINCT(d.id)) ";
         
         $sql_group = " GROUP BY d.id";
@@ -580,8 +660,10 @@ class Document extends CActiveRecord
         }
         
         $sql_where .= " AND d.status = :inactive_status";
+        $sql_where .= " AND d.main_document_type = :main_document_type";
         
         $params[':inactive_status'] = Document::DISABLED_STATUS;
+        $params[':main_document_type'] = $this->main_document_type;
         
         if($this->identifier)
         {
@@ -595,16 +677,27 @@ class Document extends CActiveRecord
             $params[':name'] = '%'.$this->name.'%';
         }
         
-        if(!$this->hasErrors('date_received_from') && $this->date_received_from)
+        if($this->main_document_type==Document::INTERNAL_USE_TYPE)
+            $attribute = 'date_created';
+        elseif($this->main_document_type==Document::OUTGOING)
+            $attribute = 'publication_date_from';
+        else
+            $attribute = 'date_received';
+        
+        
+        if(!$this->hasErrors('date_from') && $this->date_from)
         {
-            $sql_where .= " AND d.date_received >= :date_received_from";
-            $params[':date_received_from'] = date('Y-m-d', $this->date_received_from);
+            $sql_where .= " AND d.".$attribute." >= :date_from";
+            $params[':date_from'] = date('Y-m-d', $this->date_from);
         }
         
-        if(!$this->hasErrors('date_received_to') && $this->date_received_to)
+        if($this->main_document_type==Document::OUTGOING)
+            $attribute = 'publication_date_to';
+        
+        if(!$this->hasErrors('date_to') && $this->date_to)
         {
-            $sql_where .= " AND d.date_received <= :date_received_to";
-            $params[':date_received_to'] = date('Y-m-d', $this->date_received_to);            
+            $sql_where .= " AND d.".$attribute." <= :date_to";
+            $params[':date_to'] = date('Y-m-d', $this->date_to);            
         }
         
         $sql = $sql_select . $sql_from . $sql_join . $sql_where . $sql_group;
@@ -617,8 +710,8 @@ class Document extends CActiveRecord
             array(
                 'totalItemCount'=>$count,
                     'sort' => array(
-                        'attributes' => array('date_received', 'name', 'identifier'),
-                        'defaultOrder' => 'd.date_received DESC'
+                        'attributes' => array('name', 'identifier'),
+                        'defaultOrder' => 'd.date_created DESC'
                 ),
                 'pagination' => array(
                     'pageSize' => 10
@@ -634,14 +727,17 @@ class Document extends CActiveRecord
         $this->validate();
                 
         $params = array();
-        $sql_select = "SELECT d.id, d.name, d.identifier, d.description, d.date_received, d.last_updated, d.last_updater_id ";
+        $sql_select = "SELECT d.id, d.name, d.identifier, d.description, d.document_type, d.main_document_type, d.publication_date_from, d.publication_date_to, d.date_received, d.last_updated, d.last_updater_id ";
         $sql_count = "SELECT COUNT(d.id) ";
         
         $sql_from = " FROM documents d";
         $sql_where = " WHERE creator_id = :user_id AND status = :active_status";
+        $sql_where .= " AND d.main_document_type = :main_document_type";
+        
         
         $params[':user_id'] = Yii::app()->user->id;
         $params[':active_status'] = Document::ACTIVE_STATUS;
+        $params[':main_document_type'] = $this->main_document_type;
         
         if($this->identifier)
         {
@@ -655,16 +751,27 @@ class Document extends CActiveRecord
             $params[':name'] = '%'.$this->name.'%';
         }
         
-        if(!$this->hasErrors('date_received_from') && $this->date_received_from)
+        if($this->main_document_type==Document::INTERNAL_USE_TYPE)
+            $attribute = 'date_created';
+        elseif($this->main_document_type==Document::OUTGOING)
+            $attribute = 'publication_date_from';
+        else
+            $attribute = 'date_received';
+        
+        
+        if(!$this->hasErrors('date_from') && $this->date_from)
         {
-            $sql_where .= " AND d.date_received >= :date_received_from";
-            $params[':date_received_from'] = date('Y-m-d', $this->date_received_from);
+            $sql_where .= " AND d.".$attribute." >= :date_from";
+            $params[':date_from'] = date('Y-m-d', $this->date_from);
         }
         
-        if(!$this->hasErrors('date_received_to') && $this->date_received_to)
+        if($this->main_document_type==Document::OUTGOING)
+            $attribute = 'publication_date_to';
+        
+        if(!$this->hasErrors('date_to') && $this->date_to)
         {
-            $sql_where .= " AND d.date_received <= :date_received_to";
-            $params[':date_received_to'] = date('Y-m-d', $this->date_received_to);            
+            $sql_where .= " AND d.".$attribute." <= :date_to";
+            $params[':date_to'] = date('Y-m-d', $this->date_to);            
         }
         
         $sql = $sql_select . $sql_from . $sql_where;
@@ -677,8 +784,8 @@ class Document extends CActiveRecord
             array(
                 'totalItemCount'=>$count,
                     'sort' => array(
-                        'attributes' => array('date_received', 'name', 'identifier'),
-                        'defaultOrder' => 'd.date_received DESC'
+                        'attributes' => array('name', 'identifier'),
+                        'defaultOrder' => 'd.date_created DESC'
                 ),
                 'pagination' => array(
                     'pageSize' => 10
@@ -740,5 +847,15 @@ class Document extends CActiveRecord
         {
             return $this->name;
         }
+    }
+    
+    public function getPeriodDesc()
+    {
+        if($this->main_document_type==self::INTERNAL_USE_TYPE)
+            return "Data di archviazione";
+        elseif($this->main_document_type==self::OUTGOING)
+            return "Periodo di pubblicazione";
+        else
+            return "Data di ricezione";
     }
 }

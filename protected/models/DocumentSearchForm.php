@@ -68,27 +68,28 @@ class DocumentSearchForm extends CFormModel{
         return $this->dataProvider->getItemCount();
     }
     
-    public function search()
+    public function search($doc_type = Document::INBOX)
     {
         if($this->dataProvider===null)
         {
 
             if($this->scenario == 'identifier')
             {
-                $params = array(':identifier'=>$this->identifier);                
+                $params = array(':identifier'=>$this->identifier, ':main_document_type'=>$doc_type);                
                 $count = Yii::app()->db->createCommand("SELECT count(d.id) FROM documents d WHERE d.status = 1 AND d.identifier = :identifier")->queryScalar($params);
 
-                $sql = "SELECT d.id, d.name, d.identifier, d.subject, d.description, d.date_received, d.last_updated FROM documents d
+                $sql = "SELECT d.id, d.name, d.identifier, d.description, d.document_type, d.date_received, d.last_updated, d.publication_date_from, d.publication_date_to, d.publication_requested, d.publication_status,  FROM documents d
                                                             WHERE d.status = 1
                                                                 AND d.identifier = :identifier  
+                                                                AND d.main_document_type = :main_document_type
                 ";
             }
             elseif($this->scenario == 'tags') // tags scenario
             {
                 $this->buildTagsArray();
                 $num_tags = count($this->tags_array);
-                $params = array();
-                $sql_select = "SELECT i2t" . ($num_tags - 1) . ".document_id as id, d.identifier, d.name, d.subject, d.description, d.date_received, d.last_updated, u.firstname, u.lastname, u.email ";
+                $params = array(':main_document_type'=>$doc_type);
+                $sql_select = "SELECT i2t" . ($num_tags - 1) . ".document_id as id, d.identifier, d.name, d.description, d.document_type, d.date_received, d.publication_date_from, d.publication_date_to, d.publication_requested, d.publication_status, d.last_updated, u.firstname, u.lastname, u.email ";
                 $sql_count_select = "SELECT count(DISTINCT(i2t" . ($num_tags - 1) . ".document_id)) ";
                 $sql_from = " FROM ";
                 $sql_where = " WHERE ";
@@ -116,6 +117,7 @@ class DocumentSearchForm extends CFormModel{
                 $sql_joins .= " JOIN users u ON u.id=d.creator_id ";
 
                 $sql_where .= " AND d.status = :active_status ";
+                $sql_where .= " AND d.main_document_type = :main_document_type ";
                 
                 $params[':active_status'] = Document::ACTIVE_STATUS;
                 
@@ -129,36 +131,56 @@ class DocumentSearchForm extends CFormModel{
             }
             else
             {
-                $params = array();
+                $params = array(':main_document_type'=>$doc_type);
                 $sql_count = "SELECT count(d.id) FROM documents d WHERE d.status = 1 ";
-                $sql = "SELECT d.id, d.name, d.identifier, d.subject, d.description, d.date_received, d.last_updated, u.firstname, u.lastname, u.email 
+                $sql = "SELECT d.id, d.name, d.identifier, d.description, d.document_type, d.date_received, d.publication_date_from, d.publication_date_to, d.publication_requested, d.publication_status, d.last_updated, u.firstname, u.lastname, u.email 
                                                             FROM documents d
                                                             JOIN users u ON u.id = d.creator_id
-                                                            WHERE d.status = 1";
+                                                            WHERE d.status = 1
+                                                            AND d.main_document_type = :main_document_type";
+                
+                $date_field = "date_received";
+                if($doc_type==Document::INTERNAL_USE_TYPE)
+                    $date_field = "date_created";
+                elseif($doc_type==Document::OUTGOING)
+                    $date_field = "publication_date_from";
+                
                 if($this->date_from_ts)
                 {
-                    $sql_count .= " AND date_received >=:date_received_from ";
-                    $sql .= " AND date_received >=:date_received_from ";
+                    $sql_count .= " AND ".$date_field." >=:date_received_from ";
+                    $sql .= " AND ".$date_field." >=:date_received_from ";
                     $params[':date_received_from'] = date('Y-m-d', $this->date_from_ts);                    
                 }
                 
+                $date_field = "date_received";
+                if($doc_type==Document::INTERNAL_USE_TYPE)
+                    $date_field = "date_created";
+                elseif($doc_type==Document::OUTGOING)
+                    $date_field = "publication_date_to";                
+
                 if($this->date_to_ts)
                 {
-                    $sql_count .= " AND date_received <=:date_received_to ";
-                    $sql .= " AND date_received <=:date_received_to ";
+                    $sql_count .= " AND ".$date_field." <=:date_received_to ";
+                    $sql .= " AND ".$date_field." <=:date_received_to ";
                     $params[':date_received_to'] = date('Y-m-d', $this->date_to_ts);
                 }
                 
                 $count = Yii::app()->db->createCommand($sql_count)->queryScalar($params);
             }
 
+            $date_field = "date_received";
+            if($doc_type==Document::INTERNAL_USE_TYPE)
+                $date_field = "date_created";
+            elseif($doc_type==Document::OUTGOING)
+                $date_field = "publication_date_from";                
+                
             $this->dataProvider = new CSqlDataProvider(
                 $sql,
                 array(
                     'totalItemCount'=>$count,
                     'sort' => array(
-                        'attributes' => array('identifier','name','date_received','last_updated'),
-                        'defaultOrder' => 'date_received DESC' 
+                        'attributes' => array('identifier','name',$date_field,'last_updated'),
+                        'defaultOrder' => $date_field.' DESC' 
                     ),
                     'pagination' => array(
                         'pageSize' => 10

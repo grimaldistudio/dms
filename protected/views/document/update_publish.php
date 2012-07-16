@@ -1,5 +1,5 @@
-<?php $this->pageTitle = "Documento ".$model->identifier?'#'.$model->identifier:$model->name; ?>
-<?php $this->breadcrumbs = array('links'=> array('Documenti'=>'/document/index', 'Modifica')); ?>
+<?php $this->pageTitle = "Documento ".$model->getTitle(); ?>
+<?php $this->breadcrumbs = array('links'=> array('Documenti'=>array('/document/search', 'doc_type'=>$model->main_document_type), 'Modifica')); ?>
 <h1><?php echo $this->pageTitle; ?></h1>
 <?php
 $this->renderPartial('/documentright/_form', array('model'=>$model));
@@ -26,26 +26,14 @@ $this->renderPartial('/documentright/_form', array('model'=>$model));
 
 <?php 
 $disabled = "disabled";
-if(Yii::app()->user->hasDocumentPrivilege($model->id, AclManager::PERMISSION_ADMIN))
+if($model->scenario == 'publish_admin')
     $disabled = "";
 ?>
+<?php echo $form->textFieldRow($model, 'identifier', array('disabled'=>$disabled)); ?>
 <?php echo $form->textFieldRow($model, 'name', array('disabled'=>$disabled)); ?>
-<div class="control-group">
-<?php echo $form->labelEx($model, 'sender_id'); ?>
-<?php echo $form->hiddenField($model, 'sender_id', array('id'=>'sender_id', 'disabled'=>$disabled)); ?>
-<?php echo $form->textField($model, 'sendername', array('id'=>'sendername', 'disabled'=>$disabled)); ?>
-<br/>
-<?php echo $form->textArea($model, 'senderaddress', array('id'=>'senderaddress', 'readonly'=>'readonly', 'disabled'=>$disabled, 'class'=>'span6')); ?>    
-<?php echo $form->error($model, 'sender_id'); ?>
-</div>
 
 <?php echo $form->hiddenField($model, 'revision'); ?>
 <?php echo $form->textAreaRow($model, 'change_description', array('rows'=>5, 'class'=>'span6')) ; ?>
-
-<div class="control-group">
-<?php echo $form->labelEx($model, 'date_received'); ?>
-<?php echo date('d/m/Y', strtotime($model->date_received)); ?>
-</div>
 
 <div class="control-group">
 <?php echo $form->labelEx($model, 'description'); ?>
@@ -60,26 +48,27 @@ if(Yii::app()->user->hasDocumentPrivilege($model->id, AclManager::PERMISSION_ADM
 <p class="help-block">Inserisci al massimo 5 parole che identificano al meglio il documento ad es. "anagrafe, certificato, richiesta, nascita"</p>
 </div>
 
+<div class="control-group">
+    <?php echo $form->labelEx($model, 'entity'); ?>
+    <?php echo $form->textField($model, 'entity'); ?>
+    <?php echo $form->error($model, 'entity'); ?>
+    <p class="help-block">Lasciare vuoto se l'ente corrisponde a <?php echo Yii::app()->params['entity'] ;?></p>
+</div>
+
+<?php echo $form->textFieldRow($model, 'proposer_service'); ?>
+
+<?php echo $form->textFieldRow($model, 'act_number'); ?>
+
+<?php echo $form->textFieldRow($model, 'act_date', array('class' => 'date_field', 'value'=>$model->act_date?date('d/m/Y', is_int($model->act_date)?$model->act_date:strtotime($model->act_date)):'')); ?>
+
+<?php echo $form->textFieldRow($model, 'publication_date_from', array('class' => 'date_field', 'value'=>$model->publication_date_from?date('d/m/Y', is_int($model->publication_date_from)?$model->publication_date_from:strtotime($model->publication_date_from)):'')); ?>
+
+<?php echo $form->textFieldRow($model, 'publication_date_to', array('class' => 'date_field', 'value'=>$model->publication_date_to?date('d/m/Y', is_int($model->publication_date_to)?$model->publication_date_to:strtotime($model->publication_date_to)):'')); ?>
+
+<?php echo $form->checkBoxRow($model, 'publication_requested'); ?>
+
 <?php echo $form->dropDownListRow($model, 'document_type', $model->getTypeOptions()); ?>
 
-<div class="control-group">
-<?php echo $form->label($model, 'priority'); ?>
-<span id="priority"><?php echo $model->getPriorityDesc(); ?></span>
-<?php echo $form->hiddenField($model, 'priority', array('id'=>'priority_field')); ?>
-<?php $this->widget('zii.widgets.jui.CJuiSlider', array(
-    'value'=>$model->priority,
-    'options'=>array(
-        'min'=>Document::LOW_PRIORITY,
-        'max'=>Document::VERY_HIGH_PRIORITY,
-        'step'=>1,
-        'slide'=>'js:function(event, ui){ $(\'#priority_field\').val( ui.value ); $(\'#priority\').text( priorities[ui.value] ); }'
-    ),
-    'htmlOptions'=>array(
-        'style'=>'width: 210px'
-    )
-)); ?>
-<?php echo $form->error($model, 'priority'); ?>
-</div>
 <div class="buttons_bar">
 <?php echo CHtml::htmlButton('<i class="icon-ok icon-white"></i> Salva', array('class'=>'btn btn-primary', 'type'=>'submit')); ?>
     <span>&nbsp;</span>
@@ -112,7 +101,15 @@ if(Yii::app()->user->hasDocumentPrivilege($model->id, AclManager::PERMISSION_ADM
 
 <?php
 Yii::app()->clientScript->registerPackage('tagit');
+Yii::app()->clientScript->registerScriptFile('/js/jquery-ui-i18n.min.js');
 Yii::app()->clientScript->registerScript('document-update-form', "
+
+    $.datepicker.setDefaults( $.datepicker.regional['it'] );
+
+    $( '.date_field' ).datepicker({
+            showAnim: 'fold',
+            dateFormat: 'dd/mm/yy'
+    });
     
    var priorities = ".CJSON::encode($model->getPriorityOptions()).";
        

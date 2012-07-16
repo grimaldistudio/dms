@@ -7,6 +7,16 @@ $form=$this->beginWidget('bootstrap.widgets.BootActiveForm', array(
 		)
 	); 
 ?>
+    <br/>
+    
+    <div class="row">
+        <span class="span6">
+        <?php echo $form->dropDownListRow($model, 'main_document_type', Document::model()->getMainTypeOptions()); ?> 
+        </span>
+    </div>
+    
+    <br/>
+    
     <div class="row">
         <span class="span3">
         <?php echo $form->textFieldRow($model, 'identifier'); ?> 
@@ -17,18 +27,17 @@ $form=$this->beginWidget('bootstrap.widgets.BootActiveForm', array(
         </span>
     </div>
     
+    <p id="range_label"><?php echo $model->getPeriodDesc(); ?></p>
     <div class="row">
         <span class="span3">
-            <?php echo $form->textFieldRow($model, 'date_received_from', array('id'=>'from')); ?>
+            <?php echo $form->textFieldRow($model, 'date_from', array('id'=>'from')); ?>
         </span>
-        
+
         <span class="span3">
-            <?php echo $form->textFieldRow($model, 'date_received_to', array('id'=>'to')); ?>
+            <?php echo $form->textFieldRow($model, 'date_to', array('id'=>'to')); ?>
         </span>
     </div>
     
-    
-
 <?php echo CHtml::submitButton('Filtra', array('class'=>'btn btn-primary btn-filter')); ?>
 
 <?php 
@@ -55,6 +64,17 @@ var dates = $( '#from, #to' ).datepicker({
 				dates.not( this ).datepicker( 'option', option, date );
 			}
 		});  
+
+$('#".CHtml::activeId($model, 'main_document_type')."').change(function(e){
+    var elem = $(this);
+    var range_label = $('#range_label');
+    if(elem.val()==".Document::INTERNAL_USE_TYPE.")
+        range_label.text('Data di archiviazione');
+    else if(elem.val()==".Document::OUTGOING.")
+        range_label.text('Periodo di pubblicazione');        
+    else
+        range_label.text('Data di ricezione');
+});
 
 $('#filter-document-form').submit(function(){
     $.fn.yiiListView.update('documentslistview', { 

@@ -1,9 +1,9 @@
 <?php $this->pageTitle = "Risultati ricerca"; ?>
-<?php $this->breadcrumbs = array('links'=> array('Documenti'=>'/document/search', 'Risultati ricerca')); ?>
+<?php $this->breadcrumbs = array('links'=> array('Documenti'=>array('/document/search', 'doc_type'=>$doc_type), 'Risultati ricerca')); ?>
 <h1><?php echo $this->pageTitle; ?></h1>
 
 
-<?php if($idmodel->hasResults() || $tagsmodel->hasResults() || $datemodel->hasResults()): ?>
+<?php if((isset($idmodel) && $idmodel->hasResults()) || (isset($tagsmodel) && $tagsmodel->hasResults()) || (isset($datemodel) || $datemodel->hasResults())): ?>
 <?php Yii::app()->clientScript->registerScript('search-form-controls', "
     $('a.show-search-form').live('click', function(e){
         e.preventDefault();
@@ -28,14 +28,19 @@
 </span>
 
 <span>
-    <?php echo CHtml::link('Nuova Ricerca', array('/document/search'), array('class'=>'btn btn-primary')); ?>
+    <?php echo CHtml::link('Nuova Ricerca', array('/document/search', 'doc_type'=>$doc_type), array('class'=>'btn btn-primary')); ?>
 </span>
 </div>
 <div id="form-container" style="display:none">
 <?php else: ?>
 <div id="form-container">    
 <?php endif; ?>
-    <?php $this->renderPartial('_searchform', array('idmodel'=>$idmodel, 'tagsmodel'=>$tagsmodel, 'datemodel'=>$datemodel)); ?>
+    <?php 
+    $array_model = array('tagsmodel'=>$tagsmodel, 'datemodel'=>$datemodel); 
+    if(isset($idmodel))
+        $array_model['idmodel'] = $idmodel;
+    ?>
+    <?php $this->renderPartial($searchform_template, $array_model); ?>
 </div>
 
 <?php $this->beginWidget('bootstrap.widgets.BootModal', array(
@@ -54,7 +59,7 @@
 if($idmodel->hasDataProvider()):
     $this->widget('bootstrap.widgets.BootListView', array(
 		'dataProvider'=> $idmodel->getDataProvider(),
-		'itemView'=>'_searchresult',   // refers to the partial view named '_proficiency'
+		'itemView'=>$result_template,   // refers to the partial view named '_proficiency'
 		'id' => 'documentslistview',
                 'template'=>"{items}\n{pager}",        
 		'sortableAttributes'=>array(
@@ -67,7 +72,7 @@ if($idmodel->hasDataProvider()):
 elseif($tagsmodel->hasDataProvider()):
     $this->widget('bootstrap.widgets.BootListView', array(
 		'dataProvider'=> $tagsmodel->getDataProvider(),
-		'itemView'=>'_searchresult',   // refers to the partial view named '_proficiency'
+		'itemView'=>$result_template,   // refers to the partial view named '_proficiency'
 		'id' => 'documentslistview',
                 'template'=>"{items}\n{pager}",        
 		'sortableAttributes'=>array(
@@ -80,7 +85,7 @@ elseif($tagsmodel->hasDataProvider()):
 elseif($datemodel->hasDataProvider()):
     $this->widget('bootstrap.widgets.BootListView', array(
 		'dataProvider'=> $datemodel->getDataProvider(),
-		'itemView'=>'_searchresult',   // refers to the partial view named '_proficiency'
+		'itemView'=>$result_template,   // refers to the partial view named '_proficiency'
                 'template'=>"{items}\n{pager}",        
 		'id' => 'documentslistview',
 		'sortableAttributes'=>array(

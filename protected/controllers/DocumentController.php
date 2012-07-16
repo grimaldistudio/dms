@@ -172,6 +172,8 @@ class DocumentController extends SecureController{
             $model->tmp_path = $dm->getPath();
             $model->document_manager = $dm;
             $model->num_pages = $total_pages;
+            $model->main_document_type = Document::INBOX;
+            
             $model->attributes = $_POST['Document'];
             if($model->protocolDocument())
             {
@@ -182,6 +184,49 @@ class DocumentController extends SecureController{
         // render form
         $this->render('protocol', array('model'=>$model, 'scenario'=>'protocol', 'group_id'=>$group_id, 'document_name'=>$document_name, 'total_pages'=>$total_pages));
     }
+    
+    public function actionPublish($document_name, $group_id = 0)
+    {
+        if($group_id>0)
+        {
+            $document_name = basename($document_name); // sanitize
+            if(!Yii::app()->user->belongsToGroup($group_id))
+                throw new CHttpException(403, 'Non autorizzato');
+            // group_folder
+            $group_folder_name = Yii::app()->user->getGroupFolderName($group_id);            
+            $dm = new DocumentManager($group_folder_name, $document_name, DocumentManager::GROUP_PENDING_TYPE);
+        }
+        else
+        {
+            $dm = new DocumentManager(Yii::app()->user->id, $document_name, DocumentManager::USER_PENDING_TYPE);                        
+        }
+        $model = new Document('publish');
+        
+        $pm = new PreviewManager($dm);
+        $total_pages = intval($pm->getDocumentInfo());        
+
+        // lock check 
+
+        // lock document
+        
+        // if $_POST
+        if(isset($_POST['Document']))
+        {
+            $model->tmp_path = $dm->getPath();
+            $model->document_manager = $dm;
+            $model->num_pages = $total_pages;
+            $model->main_document_type = Document::OUTGOING;
+            
+            $model->attributes = $_POST['Document'];
+            if($model->protocolDocument())
+            {
+                Yii::app()->user->setFlash('success', 'Documento creato: '.$model->getTitle());
+                $this->redirect(array('/document/pending'));
+            }
+        }
+        // render form
+        $this->render('protocol', array('model'=>$model, 'scenario'=>'publish', 'group_id'=>$group_id, 'document_name'=>$document_name, 'total_pages'=>$total_pages));
+    }    
     
     public function actionArchive($document_name, $group_id = 0)
     {
@@ -215,6 +260,8 @@ class DocumentController extends SecureController{
             $model->tmp_path = $dm->getPath();
             $model->document_manager = $dm;
             $model->num_pages = $total_pages;
+            $model->main_document_type = Document::INTERNAL_USE_TYPE;
+            
             $model->attributes = $_POST['Document'];
             if($model->protocolDocument())
             {
@@ -227,7 +274,7 @@ class DocumentController extends SecureController{
 
         $this->render('protocol', array('model'=>$model, 'scenario'=>'archive', 'group_id'=>$group_id, 'document_name'=>$document_name, 'total_pages'=>$total_pages));        // render form
     }
-    
+
     public function actionPreviewpdf($document_name, $group_id = 0)
     {
         if($group_id>0)
@@ -256,8 +303,14 @@ class DocumentController extends SecureController{
         }
         
         $revisions = DocumentHistory::model()->findLatest($model->id);
-        //        $comments = Comment load 10 comments
-        $this->render('view', array('model'=>$model, 'revisions'=>$revisions['rows'], 'revisions_count'=>$revisions['count']));
+        $view_name = 'view_';
+        if($model->main_document_type == Document::INTERNAL_USE_TYPE)
+            $view_name .= 'archive';
+        elseif($model->main_document_type == Document::INBOX)
+            $view_name .= 'protocol';
+        else
+            $view_name .= 'publish';
+        $this->render($view_name, array('model'=>$model, 'revisions'=>$revisions['rows'], 'revisions_count'=>$revisions['count']));
     }
     
     public function actionViewpdf()
@@ -276,11 +329,22 @@ class DocumentController extends SecureController{
             throw new CHttpException(403, 'Azione non consentita');
         
         $model->loadTagsArray();
-        $model->loadSenderData();
-        if(Yii::app()->user->hasDocumentPrivilege($model->id, AclManager::PERMISSION_ADMIN))
-            $model->scenario = 'admin';
+        
+        if($model->main_document_type == Document::INTERNAL_USE_TYPE)
+            $name = 'archive';
+        elseif($model->main_document_type == Document::INBOX)
+        {
+            $model->loadSenderData();
+            $name = 'protocol';
+        }
         else
-            $model->scenario = 'update';
+            $name = 'publish';
+        
+        if(Yii::app()->user->hasDocumentPrivilege($model->id, AclManager::PERMISSION_ADMIN))
+            $model->scenario = $name.'_admin';
+        else
+            $model->scenario = $name.'_update';
+ 
         if(isset($_POST['Document']))
         {
             $model->attributes = $_POST['Document'];
@@ -296,7 +360,7 @@ class DocumentController extends SecureController{
             }
         }
 
-        $this->render('update', array('model'=>$model));        
+        $this->render('update_'.$name, array('model'=>$model));        
     }
     
     public function actionDisable()
@@ -475,19 +539,41 @@ class DocumentController extends SecureController{
         Yii::app()->end();
     }
     
-    public function actionSearch()
+    public function actionSearch($doc_type = Document::INBOX)
     {
-        $idmodel = new DocumentSearchForm('identifier');
         $tagsmodel = new DocumentSearchForm('tags');        
-        $datemodel = new DocumentSearchForm('date');        
-        
-        $template = 'search';
+        $datemodel = new DocumentSearchForm('date');                
+        $model_array = array('tagsmodel'=>$tagsmodel, 'datemodel'=>$datemodel);            
+
+            
+        if($doc_type == Document::OUTGOING)
+        {
+            $idmodel = new DocumentSearchForm('identifier');
+            $template = 'search_publish';
+            $model_array['idmodel'] = $idmodel;
+            $result_template = '_publishsearchresult';                        
+        }
+        elseif($doc_type == Document::INTERNAL_USE_TYPE)
+        {
+            $template = 'search_archive';            
+            $result_template = '_archivesearchresult';            
+        }
+        else
+        {
+            $idmodel = new DocumentSearchForm('identifier');
+            $template = 'search_protocol';     
+            $result_template = '_protocolsearchresult';
+            $model_array['idmodel'] = $idmodel;            
+        }
+
+        $searchform_template = $template;
+
         if(isset($_GET['DocumentSearchForm']))
         {
             if(isset($_GET['s_type']) && $_GET['s_type']=='id')
             {
                 $idmodel->attributes = $_GET['DocumentSearchForm'];
-                $idmodel->search();
+                $idmodel->search($doc_type);
                 if($idmodel->hasResults() && $idmodel->getResultsCount()==1)
                 {
                     $document = $idmodel->getFirst();
@@ -498,7 +584,7 @@ class DocumentController extends SecureController{
             {
                 // search by tags
                 $tagsmodel->attributes = $_GET['DocumentSearchForm'];
-                $tagsmodel->search();
+                $tagsmodel->search($doc_type);
                 if($tagsmodel->hasResults() && $tagsmodel->getResultsCount()==1)
                 {
                     $document = $tagsmodel->getFirst();
@@ -509,7 +595,7 @@ class DocumentController extends SecureController{
             {
                 // search by tags
                 $datemodel->attributes = $_GET['DocumentSearchForm'];
-                $datemodel->search();
+                $datemodel->search($doc_type);
                 if($datemodel->hasResults() && $datemodel->getResultsCount()==1)
                 {
                     $document = $datemodel->getFirst();
@@ -518,10 +604,11 @@ class DocumentController extends SecureController{
             }
             $template = 'searchresults';
         }
+        
         if(!isset($_GET['ajax']))
-            $this->render($template, array('idmodel'=>$idmodel, 'tagsmodel'=>$tagsmodel, 'datemodel'=>$datemodel));
+            $this->render($template, array_merge(array('searchform_template' => $searchform_template, 'result_template'=>$result_template, 'doc_type' => $doc_type), $model_array));
         else
-            $this->renderPartial($template, array('idmodel'=>$idmodel, 'tagsmodel'=>$tagsmodel, 'datemodel'=>$datemodel));
+            $this->renderPartial($template, array_merge(array('searchform_template' => $searchform_template, 'result_template'=>$result_template, 'doc_type' => $doc_type), $model_array));
 
     }
     

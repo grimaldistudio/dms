@@ -1,8 +1,44 @@
-<?php $this->pageTitle = $scenario=='archive'?"Archivia Documento":"Protocolla Documento"; ?>
-<?php $this->breadcrumbs = array('links'=> array('Documenti'=>'/document/pending', $scenario=='archive'?'Archivia':'Protocolla')); ?>
+<?php 
+$action_name = ""; 
+if($scenario=='archive')
+{
+    $action_name = 'Archivia per uso interno';
+    $breadcrumb = 'Uso interno';
+}
+elseif($scenario == 'protocol')
+{
+    $action_name = 'Crea posta in entrata';
+    $breadcrumb = 'In entrata';
+}
+else
+{
+    $action_name = 'Crea documento pubblico';
+    $breadcrumb = 'Pubblico';
+}
+?>
+
+
+<?php $this->pageTitle = $action_name; ?>
+<?php $this->breadcrumbs = array('links'=> array('Documenti'=>'/document/pending', $breadcrumb)); ?>
 <h1><?php echo $this->pageTitle; ?></h1>
 
+<div class="btn-group">
+        <?php if($scenario=='archive'): ?>
+            <?php if(Yii::app()->authgateway->isAllowed('document', 'protocol')) echo CHtml::link('Passa a Posta in entrata', array('/document/protocol', 'document_name'=>$document_name, 'group_id'=>$group_id), array('class' => 'btn')); ?>
+            <?php if(Yii::app()->authgateway->isAllowed('document', 'publish')) echo CHtml::link('Passa a Documento pubblico', array('/document/publish', 'document_name'=>$document_name, 'group_id'=>$group_id), array('class' => 'btn')); ?>
+        <?php elseif($scenario=='protocol'): ?>
+            <?php if(Yii::app()->authgateway->isAllowed('document', 'archive')) echo CHtml::link('Passa a Uso interno', array('/document/archive', 'document_name'=>$document_name, 'group_id'=>$group_id), array('class' => 'btn')); ?>
+            <?php if(Yii::app()->authgateway->isAllowed('document', 'publish')) echo CHtml::link('Passa a Documento pubblico', array('/document/publish', 'document_name'=>$document_name, 'group_id'=>$group_id), array('class' => 'btn')); ?>        
+        <?php else: ?>
+            <?php if(Yii::app()->authgateway->isAllowed('document', 'archive')) echo CHtml::link('Passa a Uso interno', array('/document/archive', 'document_name'=>$document_name, 'group_id'=>$group_id), array('class' => 'btn')); ?>
+            <?php if(Yii::app()->authgateway->isAllowed('document', 'protocol')) echo CHtml::link('Passa a Posta in entrata', array('/document/protocol', 'document_name'=>$document_name, 'group_id'=>$group_id), array('class' => 'btn')); ?>        
+        <?php endif; ?>
+</div>
+
+<br/><br/>
 <div class="row">
+    
+    
 <?php $form = $this->beginWidget('bootstrap.widgets.BootActiveForm', array(
     'id'=>'protocol-form',
     'htmlOptions'=>array('class'=>'well span6 pull-left'),
@@ -13,60 +49,89 @@
         'inputContainer'=>'div.control-group',
     )
 )); ?>
+    
 <?php echo $form->errorSummary($model);  ?>
 <p class="help-block">I campi marcati con <span class="required">*</span> sono obbligatori.</p>
 
-<?php if($scenario!='archive'): ?>
-<?php echo $form->textFieldRow($model, 'identifier'); ?>
+
+<?php if($model->scenario!=='archive'): ?>
+    <?php echo $form->textFieldRow($model, 'identifier'); ?>
 <?php endif; ?>
+
 <?php echo $form->textFieldRow($model, 'name'); ?>
 
 <div class="control-group">
-<?php echo $form->labelEx($model, 'description'); ?>
-<?php $this->widget('application.extensions.tinymce.ETinyMce', array('model'=>$model, 'attribute'=> 'description', 'useSwitch'=>false, 'language'=>'it')); ?>
-<?php echo $form->error($model, 'description'); ?>
+    <?php echo $form->labelEx($model, 'description'); ?>
+    <?php $this->widget('application.extensions.tinymce.ETinyMce', array('model'=>$model, 'attribute'=> 'description', 'useSwitch'=>false, 'language'=>'it')); ?>
+    <?php echo $form->error($model, 'description'); ?>
 </div>
+
+<div class="control-group">
+    <?php echo $form->labelEx($model, 'tagsname'); ?>
+    <?php echo $form->textField($model, 'tagsname', array('id'=>'tagsname')); ?>
+    <?php echo $form->error($model, 'tagsname'); ?>
+    <p class="help-block">Inserisci al massimo 5 parole che identificano al meglio il documento ad es. "anagrafe, certificato, richiesta, nascita"</p>
+</div>
+
+<?php if($model->scenario=='publish'): ?>
 
 <?php echo $form->dropDownListRow($model, 'document_type', $model->getTypeOptions()); ?>
 
 <div class="control-group">
-<?php echo $form->label($model, 'priority'); ?>
-<span id="priority"><?php echo $model->getPriorityDesc(); ?></span>
-<?php echo $form->hiddenField($model, 'priority', array('id'=>'priority_field')); ?>
-<?php $this->widget('zii.widgets.jui.CJuiSlider', array(
-    'value'=>$model->priority,
-    'options'=>array(
-        'min'=>Document::LOW_PRIORITY,
-        'max'=>Document::VERY_HIGH_PRIORITY,
-        'step'=>1,
-        'slide'=>'js:function(event, ui){ $(\'#priority_field\').val( ui.value ); $(\'#priority\').text( priorities[ui.value] ); }'
-    ),
-    'htmlOptions'=>array(
-        'style'=>'width: 210px'
-    )
-)); ?>
-<?php echo $form->error($model, 'priority'); ?>
+    <?php echo $form->labelEx($model, 'entity'); ?>
+    <?php echo $form->textField($model, 'entity'); ?>
+    <?php echo $form->error($model, 'entity'); ?>
+    <p class="help-block">Lasciare vuoto se l'ente corrisponde a <?php echo Yii::app()->params['entity'] ;?></p>
+</div>
+
+<?php echo $form->textFieldRow($model, 'proposer_service'); ?>
+
+<?php echo $form->textFieldRow($model, 'act_number'); ?>
+
+<?php echo $form->textFieldRow($model, 'act_date', array('class' => 'date_field', 'value'=>$model->act_date?date('d/m/Y', is_int($model->act_date)?$model->act_date:strtotime($model->act_date)):'')); ?>
+
+<?php echo $form->textFieldRow($model, 'publication_date_from', array('class' => 'date_field', 'value'=>$model->publication_date_from?date('d/m/Y', is_int($model->publication_date_from)?$model->publication_date_from:strtotime($model->publication_date_from)):'')); ?>
+
+<?php echo $form->textFieldRow($model, 'publication_date_to', array('class' => 'date_field', 'value'=>$model->publication_date_to?date('d/m/Y', is_int($model->publication_date_to)?$model->publication_date_to:strtotime($model->publication_date_to)):'')); ?>
+
+<?php echo $form->checkBoxRow($model, 'publication_requested'); ?>
+
+<?php endif; ?>
+
+<?php if($model->scenario == 'protocol'): ?>
+<div class="control-group">
+    <?php echo $form->label($model, 'priority'); ?>
+    <span id="priority"><?php echo $model->getPriorityDesc(); ?></span>
+    <?php echo $form->hiddenField($model, 'priority', array('id'=>'priority_field')); ?>
+    <?php $this->widget('zii.widgets.jui.CJuiSlider', array(
+        'value'=>$model->priority,
+        'options'=>array(
+            'min'=>Document::LOW_PRIORITY,
+            'max'=>Document::VERY_HIGH_PRIORITY,
+            'step'=>1,
+            'slide'=>'js:function(event, ui){ $(\'#priority_field\').val( ui.value ); $(\'#priority\').text( priorities[ui.value] ); }'
+        ),
+        'htmlOptions'=>array(
+            'style'=>'width: 210px'
+        )
+    )); ?>
+    <?php echo $form->error($model, 'priority'); ?>
 </div>
 
 <div class="control-group">
-<?php echo $form->labelEx($model, 'tagsname'); ?>
-<?php echo $form->textField($model, 'tagsname', array('id'=>'tagsname')); ?>
-<?php echo $form->error($model, 'tagsname'); ?>
-<p class="help-block">Inserisci al massimo 5 parole che identificano al meglio il documento ad es. "anagrafe, certificato, richiesta, nascita"</p>
+    <?php echo $form->labelEx($model, 'sender_id'); ?>
+    <?php echo $form->hiddenField($model, 'sender_id', array('id'=>'sender_id')); ?>
+    <?php echo $form->textArea($model, 'senderaddress', array('id'=>'senderaddress', 'readonly'=>'readonly', 'class'=>'span6')); ?>
+    <br/>
+    <?php echo $form->textField($model, 'sendername', array('id'=>'sendername')); ?>
+    <?php echo $form->error($model, 'sender_id'); ?>
 </div>
 
-<div class="control-group">
-<?php echo $form->labelEx($model, 'sender_id'); ?>
-<?php echo $form->hiddenField($model, 'sender_id', array('id'=>'sender_id')); ?>
-<?php echo $form->textArea($model, 'senderaddress', array('id'=>'senderaddress', 'readonly'=>'readonly', 'class'=>'span6')); ?>
-<br/>
-<?php echo $form->textField($model, 'sendername', array('id'=>'sendername')); ?>
-<?php echo $form->error($model, 'sender_id'); ?>
-</div>
+<?php echo $form->textFieldRow($model, 'date_received', array('id'=>'date_received', 'value'=>date('d/m/Y', is_int($model->date_received)?$model->date_received:strtotime($model->date_received)))); ?>
 
-<?php echo $form->textFieldRow($model, 'date_received', array('id'=>'date_received')); ?>
+<?php endif; ?>
 
-<?php echo CHtml::htmlButton('<i class="icon-ok icon-white"></i> Protocolla', array('class'=>'btn btn-primary', 'type'=>'submit')); ?>
+<?php echo CHtml::htmlButton('<i class="icon-ok icon-white"></i> '.$action_name, array('class'=>'btn btn-primary', 'type'=>'submit')); ?>
 
 <?php $this->endWidget(); ?>
 
@@ -107,7 +172,13 @@ Yii::app()->clientScript->registerScript('protocol-form', "
             showAnim: 'fold',
             dateFormat: 'dd/mm/yy'
     });  
-
+    
+    $( '.date_field' ).datepicker({
+            showAnim: 'fold',
+            dateFormat: 'dd/mm/yy'
+    });  
+    
+    
        $('#tagsname').tagit({
             allowSpaces: false,
             tagSource: function(search, showChoices) {

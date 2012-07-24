@@ -13,3 +13,5 @@ assets/*
 #Uploads
 protected/uploads/**/*
 protected/uploads/*
+protected/tmp_files/*
+protected/runtime/*

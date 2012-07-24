@@ -60,11 +60,6 @@ if(Yii::app()->user->hasDocumentPrivilege($model->id, AclManager::PERMISSION_ADM
             </tr>            
             
             <tr>
-                <th><?php echo $model->getAttributeLabel('document_type'); ?></th>
-                <td><?php echo $model->getTypeDesc(); ?></td>
-            </tr>          
-            
-            <tr>
                 <th><?php echo $model->getAttributeLabel('last_updated'); ?></th>
                 <td><?php echo date('d-m-Y H:i:s', strtotime($model->last_updated)); ?></td>
             </tr>          

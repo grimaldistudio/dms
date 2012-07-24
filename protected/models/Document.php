@@ -11,8 +11,7 @@ class Document extends CActiveRecord
     const HIGH_PRIORITY = 2;
     const VERY_HIGH_PRIORITY = 3;
 
-    const PUBLISHED = 2;
-    const PUBLISHING = 1;
+    const PUBLISHED = 1;
     const NOT_PUBLISHED = 0;
     
     const INTERNAL_USE_TYPE = 0;
@@ -198,6 +197,7 @@ class Document extends CActiveRecord
     {
         // start transaction
         $t = Yii::app()->db->beginTransaction();
+        $this->is_dirty = 1;        
         if($this->save())
         {
             // save tags
@@ -221,6 +221,7 @@ class Document extends CActiveRecord
     {
         // start transaction
         $t = Yii::app()->db->beginTransaction();
+        $this->is_dirty = 1;        
         if($this->save())
         {
             // save tags
@@ -245,6 +246,7 @@ class Document extends CActiveRecord
         // start transaction
         $t = Yii::app()->db->beginTransaction();
         $this->revision = $this->revision+1;
+        $this->is_dirty = 1;
         if($this->save())
         {
             // save tags
@@ -354,6 +356,7 @@ class Document extends CActiveRecord
         $t = Yii::app()->db->beginTransaction();
         $this->status = self::DISABLED_STATUS;
         $this->change_description = "Documento rimosso dall'elenco";
+        $this->is_dirty = 1;        
         if($this->save())
         {
             if($this->saveHistory())
@@ -371,6 +374,7 @@ class Document extends CActiveRecord
         $t = Yii::app()->db->beginTransaction();
         $this->status = self::ACTIVE_STATUS;
         $this->change_description = "Documento ripristinato nell'elenco";
+        $this->is_dirty = 1;        
         if($this->save())
         {
             if($this->saveHistory())
@@ -405,7 +409,6 @@ class Document extends CActiveRecord
         return array(
             '' => 'Seleziona',		
             self::NOT_PUBLISHED => 'Non pubblicato',
-            self::PUBLISHING => 'Da pubblicare',
             self::PUBLISHED => 'Pubblicato'
         );
     }
@@ -822,15 +825,28 @@ class Document extends CActiveRecord
         $path = $this->getPath();
         $cache_path = $this->getCachePath();
         $db = Yii::app()->db->beginTransaction();
-        
-        if($this->delete())
-        {
-            if(@unlink($path))
-            {
-                @exec('rm -f '.$cache_path.DIRECTORY_SEPARATOR.$name.'_*.jpg');
-                $db->commit();
-                return true;
 
+        if($this->isSynched())
+        {
+            $sql = "INSERT INTO documents_deleted (document_id, document_title, document_identifier, deleted_by, deletion_date, is_synched) VALUES(:document_id, :document_title, :document_identifier, :deleted_by, CURRENT_TIMESTAMP, :is_synched)";
+            if(Yii::app()->db->createCommand($sql)->execute(array(
+                ':document_id' => $this->id,
+                ':document_title' => $this->name,
+                ':document_identifier' => $this->identifier,
+                ':deleted_by' => Yii::app()->user->id,
+                ':is_synched' => 0
+            )))
+            {
+                if($this->delete())
+                {
+                    if(@unlink($path))
+                    {
+                        @exec('rm -f '.$cache_path.DIRECTORY_SEPARATOR.$name.'_*.jpg');
+                        $db->commit();
+                        return true;
+
+                    }
+                }
             }
         }
         $db->rollback();
@@ -857,5 +873,10 @@ class Document extends CActiveRecord
             return "Periodo di pubblicazione";
         else
             return "Data di ricezione";
+    }
+    
+    public function isSynched()
+    {
+        return $this->publication_status == self::PUBLISHED;
     }
 }

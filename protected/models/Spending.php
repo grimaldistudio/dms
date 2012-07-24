@@ -1,42 +1,34 @@
 <?php
 
-class Document extends CActiveRecord
+class Spending extends CActiveRecord
 {
 
     const DISABLED_STATUS = 0;
     const ACTIVE_STATUS = 1;
     
-    const LOW_PRIORITY = 0;
-    const MEDIUM_PRIORITY = 1;
-    const HIGH_PRIORITY = 2;
-    const VERY_HIGH_PRIORITY = 3;
-
     const PUBLISHED = 2;
     const PUBLISHING = 1;
     const NOT_PUBLISHED = 0;
     
-    const INTERNAL_USE_TYPE = 0;
-    const INBOX = 3;
-    const OUTGOING = 5;
+    const MAX_OTHER_DOCUMENTS = 3;
     
-    public $tagsname = null;
-    public $sendername = null;
-    public $senderaddress = null;
+    const CV_MAX_SIZE = 8;
+    const CONTRACT_MAX_SIZE = 8;
+    const PROJECT_MAX_SIZE = 8;
+    const CAPITULATE_MAX_SIZE = 8; 
+    const OTHER_MAX_SIZE = 8;
     
-    public $tags_array = array();
-    
-    public $publication_requested;
-    
-    public $tmp_path;
-    public $document_manager = null;
-    public $change_description;
-    
-    public $relative_path = null;
+    public $spending_date_from;
+    public $spending_date_to;
 
+    public $cv_file;
+    public $contract_file;
+    public $capitulate_file;
+    public $project_file;
+    public $other_file;
     
-    public $date_from;
-    public $date_to;
-
+    public $tmp_files;
+    
     public function __construct($scenario = 'insert') {
         parent::__construct($scenario);
     }
@@ -55,7 +47,7 @@ class Document extends CActiveRecord
     */
     public function tableName()
     {
-        return 'documents';
+        return 'spendings';
     }
 
     /**
@@ -64,30 +56,24 @@ class Document extends CActiveRecord
     public function rules()
     {
         return array(
-            array('name,identifier,sender_id,description,sendername,tagsname,priority,date_received', 'required', 'on'=>'protocol'),
-            array('name,description,tagsname', 'required', 'on'=>'archive'),
-            array('name,description,tagsname,document_type', 'required', 'on'=>'publish'),
-            array('publication_requested', 'safe', 'on'=>'publish,publish_admin'),
-            array('publication_requested', 'default', 'setOnEmpty'=>true, 'value'=>0, 'on'=>'publish,publish_admin'),            
-            array('entity,proposer_service,publication_date_from,publication_date_to,act_number,act_date', 'safe', 'on'=>'publish,publish_update,publish_admin'),
-            array('description,tagsname,priority,sender_id,sendername', 'required', 'on'=>'protocol_update,protocol_admin'),
-            array('description,tagsname', 'required', 'on'=>'publish_admin,publish_update,archive_update,archive_admin'),
-            array('name', 'required', 'on'=>'protocol_admin,archive_admin,publish_admin'),
-            array('change_description,revision', 'required', 'on'=>'protocol_update,protocol_admin,archive_update,archive_admin,publish_update,publish_admin'),            
-            array('identifier', 'safe', 'on'=>'publish,publish_admin'),
-            array('identifier,date_received', 'required', 'on' => 'protocol_admin'),
-            array('identifier', 'unique', 'on'=>'protocol,publish,protocol_admin,publish_admin'),
-            array('senderaddress', 'safe', 'on'=>'protocol,protocol_update,protocol_admin'),
-            array('date_received', 'date', 'format'=>'dd/MM/yyyy', 'timestampAttribute'=>'date_received', 'on'=>'protocol,protocol_admin'),
-            array('act_date', 'date', 'format'=>'dd/MM/yyyy', 'timestampAttribute'=>'act_date', 'allowEmpty' =>true, 'on'=>'publish,publish_update,publish_admin'),          
-            array('publication_date_from', 'date', 'format'=>'dd/MM/yyyy', 'timestampAttribute'=>'publication_date_from', 'allowEmpty' =>true, 'on'=>'publish,publish_update,publish_admin'),          
-            array('publication_date_to', 'date', 'format'=>'dd/MM/yyyy', 'timestampAttribute'=>'publication_date_to', 'allowEmpty' =>true, 'on'=>'publish,publish_update,publish_admin'),          
-            array('date_received,act_date,publication_date_from,publication_date_to', 'default', 'setOnEmpty'=>true, 'value'=>new CDbExpression('NULL')),
-            array('description', 'length', 'max'=>2048, 'on'=>'protocol,archive,publish,protocol_update,protocol_admin,publish_update,publish_admin,archive_update,archive_admin'),
-            array('description','filter','filter'=>array($obj=new CHtmlPurifier(),'purify'), 'on'=>'protocol,archive,publish,protocol_update,protocol_admin,publish_update,publish_admin,archive_update,archive_admin'),
-            array('identifier,name,date_from,date_to,main_document_type', 'safe', 'on'=>'my,disabled,created'),
-            array('date_from', 'date', 'format'=>'dd/MM/yyyy', 'timestampAttribute'=>'date_from', 'on'=>'my,created,disabled'),
-            array('date_to', 'date', 'format'=>'dd/MM/yyyy', 'timestampAttribute'=>'date_to', 'on'=>'my,created,disabled')
+            array('title,receiver,attribution_norm,attribution_mod,office,employee,amount,spending_date', 'required', 'on'=>'create,update'),
+            array('title,attribution_norm,attribution_mod,employee,office', 'length', 'max'=>255, 'on'=>'create,update'),
+            array('description', 'length', 'max'=>2048, 'on'=>'create,update'),
+            array('publication_requested', 'safe', 'on'=>'create,update'),
+            array('publication_requested', 'default', 'setOnEmpty'=>true, 'value'=>self::NOT_PUBLISHED, 'on'=>'create,update'),                           
+            array('spending_date', 'date', 'format'=>'dd/MM/yyyy', 'timestampAttribute'=>'spending_date', 'on'=>'create,update'),            
+            array('description','filter','filter'=>array($obj=new CHtmlPurifier(),'purify'), 'on'=>'create,update'),            
+            array('receiver', 'length', 'max'=>1024, 'on'=>'create,update'),
+            array('title,receiver,attribution_norm,attribution_mod,office,employee,amount_from,amount_to', 'safe', 'on'=>'search'),
+            array('spending_date_from', 'date', 'format'=>'dd/MM/yyyy', 'timestampAttribute'=>'spending_date_from', 'on'=>'search'),            
+            array('spending_date_to', 'date', 'format'=>'dd/MM/yyyy', 'timestampAttribute'=>'spending_date_to', 'on'=>'search'),   
+            array('amount_from,amount_to', 'match', 'pattern'=>'/^[0-9]+(\.[0-9]{0,2})?$/', 'on'=>'search'),
+            array('amount', 'match', 'pattern'=>'/^[0-9]+(\.[0-9]{0,2})?$/', 'on'=>'create,update'),            
+            array('cv_file', 'file', 'types'=>'pdf', 'maxSize'=>self::CV_MAX_SIZE*1024*1024, 'on'=>'cv_upload'),
+            array('project_file', 'file', 'types'=>'pdf', 'maxSize'=>self::PROJECT_MAX_SIZE*1024*1024, 'on'=>'project_upload'),
+            array('contract_file', 'file', 'types'=>'pdf', 'maxSize'=>self::CONTRACT_MAX_SIZE*1024*1024, 'on'=>'contract_upload'),
+            array('capitulate_file', 'file', 'types'=>'pdf', 'maxSize'=>self::CAPITULATE_MAX_SIZE*1024*1024, 'on'=>'capitulate_upload'),
+            array('other_file', 'file', 'types'=>'pdf', 'maxSize'=>self::OTHER_MAX_SIZE*1024*1024, 'on'=>'other_upload')            
         );
     }
 
@@ -97,15 +83,7 @@ class Document extends CActiveRecord
     public function relations()
     {
         return array(
-            'tags' => array(self::MANY_MANY, 'Tag', 'tags_documents(document_id, tag_id)' ),
-            'history' => array(self::HAS_MANY, 'DocumentHistory', 'document_id'),
-            'rights' => array(self::HAS_MANY, 'DocumentRight', 'document_id'),
-            'comments' => array(self::HAS_MANY, 'Comment', 'document_id'),
-            'creator' => array(self::BELONGS_TO, 'User', 'creator_id'),
-            'last_updater' => array(self::BELONGS_TO, 'User', 'last_updater_id'),            
-            'sender' => array(self::BELONGS_TO, 'Sender', 'sender_id'),
-            'folders' => array(self::MANY_MANY, 'Folder', 'documents_folders(document_id, folder_id)'),
-            'notifications' => array(self::HAS_MANY, 'Notification', 'document_id')
+            'creator' => array(self::BELONGS_TO, 'User', 'creator_id')
         );
     }
 
@@ -116,55 +94,39 @@ class Document extends CActiveRecord
     {
         return array(
             'id' => 'Id',
-            'name' => 'Titolo',
+            'title' => 'Oggetto',
+            'receiver' => 'Beneficiario',
+            'amount' => 'Importo',
+            'attribution_norm' => 'Norma di attribuzione',
+            'attribution_mod' => 'Modalità di attribuzione',
+            'employee' => 'Responsabile procedimento',
+            'office' => 'Uffico responsabile',
             'description' => 'Descrizione',
-            'date_received'=> 'Data di ricezione',
+            'cv_file' => 'CV Incaricato',
+            'cv_name' => 'CV Incaricato',
+            'contract_file' => 'Contratto',
+            'contract_name' => 'Contratto',
+            'project_file' => 'Progetto',
+            'project_name' => 'Progetto',
+            'capitulate_file' => 'Capitolato',
+            'capitulate_name' => 'Capitolato',
+            'status' => 'Stato',
+            'spending_date' => 'Data', 
             'date_created' => 'Data di creazione',
             'last_updated' => 'Ultimo aggiornamento',
-            'status' => 'Stato',
-            'identifier' => 'Numero Protocollo',
-            'main_document_type' => 'Tipo di documento',
-            'document_type' => 'Tipo di documento pubblico',
-            'priority' => 'Priorità',
-            'creator_id' => 'Creatore',
-            'sender_id' => 'Mittente',
-            'revision' => 'Revisione',
-            'tagsname'=>'Tags',
-            'sendername'=>'Mittente',
-            'comments_enabled' => 'Commenti abilitati',
-            'document_size' => 'Dimensione',
-            'num_pages' => 'Numero Pagine',
-            'change_description' => 'Descrizione modifiche',
-            'last_updater_id' => 'Ultimo aggiornamento di',
-            'date_from' => 'Da',
-            'date_to' => 'A',
-            'entity' => 'Ente',
-            'proposer_service' => 'Servizio proponente',
-            'act_number' => 'Numero atto',
-            'act_date' => 'Data atto',
-            'publication_date_from' => 'Data inizio pubblicazione',
-            'publication_date_to' => 'Data fine pubblicazione',
+            'spending_date_from' => 'Data da',
+            'spending_date_to' => 'Data a',
+            'amount_from' => 'Importo min',
+            'amount_to' => 'Importo max',
             'publication_status' => 'Pubblicazione albo',
-            'publication_requested' => 'Pubblicazione su albo'
+            'publication_requested' => 'Pubblicazione su albo',
+            'creator_id' => 'Creato da'
         );
     }
 
     function __toString()
     {
-        return $this->name;
-    }
-    
-    public function afterValidate()
-    {
-        $tags = explode(",", $this->tagsname);
-        foreach($tags as $tag)
-        {
-            $tag = trim($tag);
-            if(strlen($tag)>2)
-            {
-                $this->tags_array[] = $tag;
-            }
-        }
+        return $this->title;
     }
     
     public function beforeSave()
@@ -175,212 +137,136 @@ class Document extends CActiveRecord
             $this->date_created = date('Y-m-d H:i:s', time());
             $this->creator_id = Yii::app()->user->id;
         }
-        else
-        {
-            $this->revision = $this->revision+1;
-            $this->last_updater_id = Yii::app()->user->id;
-        }
 
         $this->last_updated = new CDbExpression('CURRENT_TIMESTAMP');
 
-        if(is_int($this->act_date))
-            $this->act_date = date('Y-m-d H:i:s', $this->act_date);
-        if(is_int($this->publication_date_from))
-            $this->publication_date_from = date('Y-m-d H:i:s', $this->publication_date_from);
-        if(is_int($this->publication_date_to))
-            $this->publication_date_to = date('Y-m-d H:i:s', $this->publication_date_to);            
-        if(is_int($this->date_received))
-            $this->date_received = date('Y-m-d H:i:s', $this->date_received);
+        if(is_int($this->spending_date))
+            $this->spending_date = date('Y-m-d H:i:s', $this->spending_date);
         return parent::beforeSave();
     }
 
-    public function protocolDocument()
+    public function createSpending()
     {
-        // start transaction
+        $this->is_dirty = 1;
+        
+        $this->cv_name = $this->getCVName(true);
+        $this->project_name = $this->getProjectName(true);
+        $this->contract_name = $this->getContractName(true);
+        $this->capitulate_name = $this->getCapitulateName(true);
+        
         $t = Yii::app()->db->beginTransaction();
         if($this->save())
         {
-            // save tags
-            if($this->updateTags())
+            if($this->moveFiles())
             {
-                // move file to the proper folder
-                if($this->protocolFile())
-                {
-                    // commit
-                    $t->commit();
-                    return true;
-                }
+                $t->commit();
+                return true;
             }
         }
-        // rollback
         $t->rollback();
         return false;
     }
     
-    public function archiveDocument()
+    public function updateSpending()
     {
-        // start transaction
-        $t = Yii::app()->db->beginTransaction();
-        if($this->save())
-        {
-            // save tags
-            if($this->updateTags())
-            {
-                // move file to the proper folder
-                if($this->archiveFile())
-                {
-                    // commit
-                    $t->commit();
-                    return true;
-                }
-            }
-        }
-        // rollback
-        $t->rollback();
-        return false;
-    }
-    
-    public function updateDocument()
-    {
-        // start transaction
-        $t = Yii::app()->db->beginTransaction();
-        $this->revision = $this->revision+1;
-        if($this->save())
-        {
-            // save tags
-            if($this->updateTags())
-            {
-                if($this->saveHistory())
-                {
-                    // commit
-                    $t->commit();
-                    return true;
-                }
-            }
-        }
-        $t->rollBack();
-        // rollback        
-        return false;
-    }
-    
-    private function updateTags()
-    {
-        $safe_tags = array();
-        foreach($this->tags_array as $tag)
-        {
-            $safe_tags[] = Yii::app()->db->quoteValue($tag);
-        }
-        $safe_tags_str = implode(",", $safe_tags);
-
-        $stm = Yii::app()->db->createCommand("DELETE FROM tags_documents WHERE document_id = :document_id");
-
-        if($stm->execute(array(':document_id' => $this->id))===FALSE)
-        {
-            return FALSE;
-        }
-
-        $batch_inserts = array();
-        foreach($safe_tags as $tag)
-        {
-            $batch_inserts[] = "(".$tag.")";
-        }
-
-        $stm = Yii::app()->db->createCommand("INSERT IGNORE INTO tags(name) VALUES ".implode(",", $batch_inserts));
-        if($stm->execute()===FALSE)
-        {
-            return FALSE;
-        }
-
-        $stm = Yii::app()->db->createCommand("INSERT IGNORE INTO tags_documents(document_id, tag_id) SELECT :document_id, id FROM tags WHERE name IN (".$safe_tags_str.")");
-        if($stm->execute(array(':document_id' => $this->id))===FALSE)
-        {
-            return FALSE;
-        }	
-
-        return TRUE;        
-    }
-    
-    private function saveHistory()
-    {
-        $sql = "INSERT INTO document_history(user_id, document_id, description, revision, date_created) VALUES(:user_id, :document_id, :description, :revision, CURRENT_TIMESTAMP);";
-        $cmd = Yii::app()->db->createCommand($sql);
-        if($cmd->execute(array(':user_id'=>Yii::app()->user->id, ':document_id'=>$this->id, ':description'=>$this->change_description, ':revision'=>$this->revision)))
-            return true;
-        return false;
-    }
-    
-    private function archiveFile()
-    {
-        if(file_exists($this->tmp_path))
-        {
-            $time = strtotime($this->date_created);
-            $dst_path = Yii::getPathOfAlias('uploads').DIRECTORY_SEPARATOR.'saved'.DIRECTORY_SEPARATOR.date('Y', $time).DIRECTORY_SEPARATOR.date('m', $time).DIRECTORY_SEPARATOR.date('d', $time);
-            if(file_exists($dst_path) || mkdir($dst_path, 0777, true))
-            {
-                if(@rename($this->tmp_path, $dst_path.DIRECTORY_SEPARATOR.'documento_'.$this->id.'.pdf'))
-                {
-                    $this->document_manager->deleteCacheFiles();
-                    return true;
-                }
-                
-            }
-            return false;
-        }
-        return false;
-    }
-    
-    private function protocolFile()
-    {
-        if(file_exists($this->tmp_path))
-        {
-            $time = strtotime($this->date_created);
-            $dst_path = Yii::getPathOfAlias('uploads').DIRECTORY_SEPARATOR.'saved'.DIRECTORY_SEPARATOR.date('Y', $time).DIRECTORY_SEPARATOR.date('m', $time).DIRECTORY_SEPARATOR.date('d', $time);
-            if(file_exists($dst_path) || mkdir($dst_path, 0777, true))
-            {
-                if(rename($this->tmp_path, $dst_path.DIRECTORY_SEPARATOR.'documento_'.$this->id.'.pdf'))
-                {
-                    $this->document_manager->deleteCacheFiles();
-                    return true;
-                }
-                
-            }
-            return false;
-        }
-        return false;        
+        $this->is_dirty = 1;
+        return $this->save();
     }
     
     public function disable()
     {
-        $t = Yii::app()->db->beginTransaction();
+        $this->is_dirty = 1;
         $this->status = self::DISABLED_STATUS;
-        $this->change_description = "Documento rimosso dall'elenco";
-        if($this->save())
-        {
-            if($this->saveHistory())
-            {
-                $t->commit();
-                return true;
-            }
-        }
-        $t->rollback();
-        return false;
+        return $this->save();
     }
     
     public function enable()
     {
-        $t = Yii::app()->db->beginTransaction();
-        $this->status = self::ACTIVE_STATUS;
-        $this->change_description = "Documento ripristinato nell'elenco";
-        if($this->save())
+        $this->is_dirty = 1;        
+        $this->status = self::ENABLED_STATUS;
+        return $this->save();
+    }
+    
+    public function moveFiles()
+    {
+        
+        if(!@mkdir($this->getPath(), 0777, true))
         {
-            if($this->saveHistory())
+            $this->addError('id', 'Errore durante la creazione: 10');
+            return false;
+        }
+        
+        if(!@mkdir($this->getOtherDir(), 0777, true))
+        {
+            $this->addError('id', 'Errore durante la creazione: 11');
+            return false;
+        }
+        
+        // if has cv
+        $cv_path = $this->getCVPath(true);
+        if(file_exists($cv_path))
+        {
+            if(!@copy($cv_path, $this->getPath().DIRECTORY_SEPARATOR.$this->cv_name))
             {
-                $t->commit();
-                return true;
+                $this->addError('cv_name', 'Errore durante la creazione: 12');
+                return false;
             }
         }
-        $t->rollback();
-        return false;        
+        
+        // if has contract
+        $contract_path = $this->getContractPath(true);
+        if(file_exists($contract_path))
+        {
+            if(!@copy($contract_path, $this->getPath().DIRECTORY_SEPARATOR.$this->contract_name))
+            {
+                $this->addError('contract_name', 'Errore durante la creazione: 13');
+                return false;
+            }
+        }
+        
+        // if has project
+        $project_path = $this->getProjectPath(true);
+        if(file_exists($project_path))
+        {
+            if(!@copy($project_path, $this->getPath().DIRECTORY_SEPARATOR.$this->project_name))
+            {
+                $this->addError('project_name', 'Errore durante la creazione: 14');
+                return false;
+            }
+        }
+        
+        // if has capitulate
+        $capitulate_path = $this->getCapitulatePath(true);
+        if(file_exists($capitulate_path))
+        {
+            if(!@copy($capitulate_path, $this->getPath().DIRECTORY_SEPARATOR.$this->capitulate_name))
+            {
+                $this->addError('capitulate_name', 'Errore durante la creazione: 15');
+                return false;
+            }
+        }
+        
+        // if has others
+        foreach($this->listOtherDocuments(true) as $other)
+        {
+            $other_path = $this->getOtherPath($other, true);
+            if(!@copy($other_path, $this->getOtherPath($other)))
+            {
+                $this->addError('id', 'Errore durante la creazione: 16');
+                return false;
+            }
+        }
+        
+        @unlink($cv_path);
+        @unlink($capitulate_path);
+        @unlink($contract_path);
+        @unlink($project_path);
+        
+        foreach($this->listOtherDocuments(true) as $other){
+            @unlink($this->getOtherPath($other, true));
+        }
+        
+        return true;
     }
     
     public function getStatusArray()
@@ -421,103 +307,479 @@ class Document extends CActiveRecord
         return 'Non definito';
     }
 
-    public function getPriorityOptions()
+    public function listOtherDocuments($tmp = false)
     {
-        return array(
-            self::LOW_PRIORITY => 'Bassa',
-            self::MEDIUM_PRIORITY => 'Media',
-            self::HIGH_PRIORITY => 'Alta',
-            self::VERY_HIGH_PRIORITY => 'Molto Alta'
-        );
+        $other_path = $this->getOtherDir($tmp);
+        $files = array();
+        if(is_dir($other_path))
+            $files =  scandir($other_path);
+        else
+            $files = array();
+        
+        $ret = array();
+        foreach($files as $file)
+        {
+            if($file=='.' || $file=='..')
+            {
+                continue;
+            }
+            $ret[] = $file;
+        }
+        return $ret;
     }
     
-    public function getPriorityDesc()
+    public function getOtherDir($tmp = false)
     {
-        if(array_key_exists($this->priority, $this->getPriorityOptions()))
+        if($tmp)
+            return $this->getTmpPath().DIRECTORY_SEPARATOR.'others';        
+        else
+            return Yii::getPathOfAlias('uploads').DIRECTORY_SEPARATOR.'spendings'.DIRECTORY_SEPARATOR.$this->id.DIRECTORY_SEPARATOR.'others';        
+    }
+    
+    public function getOtherPath($name, $tmp = false)
+    {
+        return $this->getOtherDir($tmp).DIRECTORY_SEPARATOR.$name;
+    }
+    
+    public function getOtherSize($name, $tmp = false)
+    {
+        $path = $this->getOtherPath($name, $tmp);
+        $size = filesize($path);
+        return sprintf("%.2f", $size/1000.00);
+    }
+    
+    public function downloadOther($name, $force_download = false)
+    {
+        $path = $this->getOtherPath($name);
+        $this->download($path, $force_download);
+    }
+    
+    public function deleteOther($name, $tmp = false)
+    {
+        $path = $this->getOtherPath($name, $tmp);
+
+        $ret = true;
+        if(file_exists($path))
+            $ret = @unlink($path);
+
+        return $ret;        
+    }
+    
+    public function processOtherUpload($tmp = false)
+    {
+        $other_files = $this->listOtherDocuments($tmp);
+        if(count($other_files)>=self::MAX_OTHER_DOCUMENTS)
+            return false;
+        
+        $dest_path = $this->getOtherPath($this->other_file->name, $tmp);
+        
+        return $this->processUploadedFile($this->other_file, $dest_path);
+    }
+    
+    public function hasCapitulate()
+    {
+        if($this->id>0)
         {
-            $options = $this->getPriorityOptions();
-            return $options[$this->priority];
+            if($this->capitulate_name!=null && $this->capitulate_name!="")
+                return true;
         }
-        return 'n/d';
+        else
+        {
+            if($this->getCapitulatePath(true))
+                return true;            
+        }
+        return false;
+    }
+    
+    public function getCapitulateName($tmp = false)
+    {
+        if($tmp)
+            return str_replace ("cap_", "", basename($this->getCapitulatePath ($tmp)));
+        else
+            return $this->capitulate_name;
+    }
+    
+    public function getCapitulatePath($tmp = false)
+    {
+        if($tmp)
+        {
+            $tmp_files = $this->getTmpFiles();
+            if(isset($tmp_files['capitulate']))
+            {
+                return $this->getTmpPath().DIRECTORY_SEPARATOR.$this->tmp_files['capitulate'];
+            }
+            else
+            {
+                return null;
+            }
+        }
+        else
+            return Yii::getPathOfAlias('uploads').DIRECTORY_SEPARATOR.'spendings'.DIRECTORY_SEPARATOR.$this->id.DIRECTORY_SEPARATOR.$this->getCapitulateName();            
+    }    
+    
+    public function getCapitulateSize($tmp = false)
+    {
+        $path = $this->getCapitulatePath($tmp);
+        $size = filesize($path);
+        return sprintf("%.2f", $size/1000.00);
+    }
+    
+    public function deleteCapitulate($tmp = false)
+    {
+        $path = $this->getCapitulatePath($tmp);
+        $ret = true;
+        
+        if(file_exists($path))
+            $ret = @unlink($path);
+
+        if($ret && !$tmp)
+        {
+            $this->capitulate_name = new CDbExpression('NULL');
+            return $this->save();
+        }
+        else
+        {
+            return $ret;
+        }
+    }    
+
+    public function downloadCapitulate($force_download = false)
+    {
+        $path = $this->getCapitulatePath();
+        $this->download($path, $force_download);
+    }
+    
+    public function processCapitulateUpload($tmp = false)
+    {
+        if($tmp)
+        {
+            $path = $this->getTmpPath();
+        }
+        else
+        {
+            $path = $this->getPath();
+        }
+        
+        $old_path = $this->getCapitulatePath($tmp);
+        
+        $dest_path = $path.DIRECTORY_SEPARATOR.'cap_'.$this->capitulate_file->getName();
+        
+        return $this->processUploadedFile($this->capitulate_file, $dest_path, $old_path);
+    }
+    
+    public function hasContract()
+    {
+        if($this->id>0)
+        {
+            if($this->contract_name!=null && $this->contract_name!="")
+                return true;
+        }
+        else
+        {
+            if($this->getContractPath(true))
+                return true;            
+        }
+        return false;
+    }    
+    
+    public function getContractName($tmp = false)
+    {
+        if($tmp)
+            return str_replace ("ctr_", "", basename($this->getContractPath ($tmp)));
+        else
+            return $this->contract_name;
     }
 
-    public function getMainTypeOptions()
+    public function getContractPath($tmp = false)
     {
-        return array(
-            self::INTERNAL_USE_TYPE => 'Archiviazione uso interno',
-            self::INBOX => 'Posta in entrata',
-            self::OUTGOING => 'Documenti pubblici'
-        );        
+        if($tmp)
+        {
+            $tmp_files = $this->getTmpFiles();
+            if(isset($tmp_files['contract']))
+            {
+                return $this->getTmpPath().DIRECTORY_SEPARATOR.$this->tmp_files['contract'];
+            }
+            else
+            {
+                return null;
+            }
+        }
+        else
+            return Yii::getPathOfAlias('uploads').DIRECTORY_SEPARATOR.'spendings'.DIRECTORY_SEPARATOR.$this->id.DIRECTORY_SEPARATOR.$this->getContractName();            
+    }
+    
+    public function downloadContract($force_download = false)
+    {
+        $path = $this->getContractPath();
+        $this->download($path, $force_download);
+    }
+    
+    public function getContractSize($tmp = false)
+    {
+        $path = $this->getContractPath($tmp);
+        $size = filesize($path);
+        return sprintf("%.2f", $size/1000.00);
+    }
+    
+    public function deleteContract($tmp = false)
+    {
+        $path = $this->getContractPath($tmp);
+        
+        $ret = true;
+        if(file_exists($path))
+            $ret = @unlink($path);
+        
+        if($ret && !$tmp)
+        {
+            $this->contract_name = new CDbExpression('NULL');
+            return $this->save();
+        }
+        else
+        {
+            return $ret;
+        }
+    }
+    
+    public function processContractUpload($tmp = false)
+    {
+        if($tmp)
+        {
+            $path = $this->getTmpPath();
+        }
+        else
+        {
+            $path = $this->getPath();
+        }
+        
+        $old_path = $this->getContractPath($tmp);
+        
+        $dest_path = $path.DIRECTORY_SEPARATOR.'ctr_'.$this->contract_file->getName();
+        
+        return $this->processUploadedFile($this->contract_file, $dest_path, $old_path);
+    }
+    
+    public function hasProject()
+    {
+        if($this->id>0)
+        {
+            if($this->project_name!=null && $this->project_name!="")
+                return true;
+        }
+        else
+        {
+            if($this->getProjectPath(true))
+                return true;            
+        }
+        return false;
+    }
+    
+    public function getProjectName($tmp = false)
+    {
+        if($tmp)
+            return str_replace ("prj_", "", basename($this->getProjectPath ($tmp)));
+        else
+            return $this->project_name;
+    }
+    
+    public function getProjectPath($tmp = false)
+    {
+        if($tmp)
+        {
+            $tmp_files = $this->getTmpFiles();
+            if(isset($tmp_files['project']))
+            {
+                return $this->getTmpPath().DIRECTORY_SEPARATOR.$this->tmp_files['project'];
+            }
+            else
+            {
+                return null;
+            }
+        }
+        else
+            return Yii::getPathOfAlias('uploads').DIRECTORY_SEPARATOR.'spendings'.DIRECTORY_SEPARATOR.$this->id.DIRECTORY_SEPARATOR.$this->getProjectName();            
+    }
+    
+    public function downloadProject($force_download = false)
+    {
+        $path = $this->getProjectPath();
+        $this->download($path, $force_download);
+    }
+    
+    public function getProjectSize($tmp = false)
+    {
+        $path = $this->getProjectPath($tmp);
+        $size = filesize($path);
+        return sprintf("%.2f", $size/1000.00);
+    }
+    
+    public function deleteProject($tmp = false)
+    {
+        $path = $this->getProjectPath($tmp);
+
+        $ret = true;
+        
+        if(file_exists($path))
+            $ret = @unlink($path);
+        
+        if($ret && !$tmp)
+        {
+            $this->project_name = new CDbExpression('NULL');
+            return $this->save();
+        }
+        else
+        {
+            return $ret;
+        }
+    }
+    
+    public function processProjectUpload($tmp = false)
+    {
+        if($tmp)
+        {
+            $path = $this->getTmpPath();
+        }
+        else
+        {
+            $path = $this->getPath();
+        }
+        
+        $old_path = $this->getProjectPath($tmp);
+        
+        $dest_path = $path.DIRECTORY_SEPARATOR.'prj_'.$this->project_file->getName();
+        
+        return $this->processUploadedFile($this->project_file, $dest_path, $old_path);
+    }
+    
+    public function hasCV()
+    {
+        if($this->id>0)
+        {
+            if($this->cv_name!=null && $this->cv_name!="")
+                return true;
+        }
+        else
+        {
+            if($this->getCVPath(true))
+                return true;            
+        }
+        return false;
+    }
+    
+    public function getCVName($tmp = false)
+    {
+        if($tmp)
+            return str_replace ("cv_", "", basename($this->getCVPath ($tmp)));
+        else
+            return $this->cv_name;
+    }
+    
+    public function getCVPath($tmp = false)
+    {
+        if($tmp)
+        {
+            $tmp_files = $this->getTmpFiles();
+            if(isset($tmp_files['cv']))
+            {
+                return $this->getTmpPath().DIRECTORY_SEPARATOR.$tmp_files['cv'];
+            }
+            else
+            {
+                return null;
+            }
+        }
+        else
+            return Yii::getPathOfAlias('uploads').DIRECTORY_SEPARATOR.'spendings'.DIRECTORY_SEPARATOR.$this->id.DIRECTORY_SEPARATOR.$this->getCVName();            
+    }
+    
+    public function downloadCV($force_download = false)
+    {
+        $path = $this->getCVPath();
+        $this->download($path, $force_download);
+    }
+    
+    public function deleteCV($tmp = false)
+    {
+        $path = $this->getCVPath($tmp);
+
+        $ret = true;
+        if(file_exists($path))
+            $ret = @unlink($path);
+        
+        if($ret && !$tmp)
+        {
+            $this->cv_name = new CDbExpression('NULL');
+            return $this->save();
+        }        
+        else
+        {
+            return $ret;
+        }
+    }
+    
+    public function getCVSize($tmp = false)
+    {
+        $path = $this->getCVPath($tmp);
+        $size = filesize($path);
+        return sprintf("%.2f", $size/1000.00);
     }
 
-    public function getMainTypeDesc()
+    public function processCVUpload($tmp = false)
     {
-        if(array_key_exists($this->main_document_type, $this->getMainTypeOptions()))
+        if($tmp)
         {
-            $options = $this->getMainTypeOptions();
-            return $options[$this->main_document_type];
+            $path = $this->getTmpPath();
         }
-        return 'n/d';        
-    }
-
-    public function getTypeOptions()
-    {
-        return array(
-            5 => 'Avviso di accertamento',
-            10 => 'Bandi e avvisi',
-            15 => 'Convocazioni',
-            20 => 'Determine e delibere',
-            25 => 'Oggetti e valori ritrovati',
-            30 => 'Ordinanze',
-            35 => 'Pubblicazioni di matrimonio',
-            40 => 'Pubblicazioni di altri enti',
-            45 => 'Pubblicazioni varie'
-        );
-    }
-    
-    public function getTypeDesc($value = -1)
-    {
-        if($value<0)
-            $value = $this->document_type;
-        if(array_key_exists($value, $this->getTypeOptions()))
+        else
         {
-            $options = $this->getTypeOptions();
-            return $options[$value];
+            $path = $this->getPath();
         }
-        return 'n/d';        
+        
+        $old_cv_path = $this->getCVPath($tmp);
+        
+        $dest_path = $path.DIRECTORY_SEPARATOR.'cv_'.$this->cv_file->getName();
+        
+        return $this->processUploadedFile($this->cv_file, $dest_path, $old_cv_path);
     }
     
-    public function getRelativePath()
+    private function processUploadedFile($uploaded_file, $dest_path, $old_file = null)
     {
-        if(is_null($this->relative_path))
+        if($uploaded_file->getHasError())
         {
-            $time = strtotime($this->date_created);
-            $this->relative_path = 'saved'.DIRECTORY_SEPARATOR.date('Y', $time).DIRECTORY_SEPARATOR.date('m', $time).DIRECTORY_SEPARATOR.date('d', $time);        
+            $this->addError('cv_file', $uploaded_file->getError());
+            return false;
         }
-        return $this->relative_path;
+        
+        if(!file_exists(dirname($dest_path)))
+        {
+            if(!@mkdir(dirname($dest_path), 0777))
+            {
+                $this->addError('cv_file', 'Errore durante il caricamento del file: 13');
+                return false;
+            }
+        }
+        
+        if($old_file!==null)
+        {
+            if(!@unlink($old_file))
+            {
+                $this->addError('cv_file', 'Errore durante il caricamento del file: 14');                
+                return false;
+            }
+        }
+        
+        if(!$uploaded_file->saveAs($dest_path))
+        {
+            $this->addError('cv_file', 'Errore durante il caricamento del file: 15');            
+            return false;
+        }
+        return true;
     }
     
-    public function getDocumentName()
+    private function download($path, $force_download)
     {
-        return 'documento_'.$this->id.'.pdf';
-    }
-    
-    public function getPath()
-    {
-        return Yii::getPathOfAlias('uploads').DIRECTORY_SEPARATOR.$this->getRelativePath().DIRECTORY_SEPARATOR.$this->getDocumentName();
-    }
-    
-    public function getCachePath()
-    {
-        return Yii::getPathOfAlias('uploads').DIRECTORY_SEPARATOR.'cache'.DIRECTORY_SEPARATOR.$this->getRelativePath();
-    }
-    
-    public function download($force_download = false)
-    {
-        $path = $this->getPath();
         if(file_exists($path)){
             if($force_download)
-                header('Content-disposition: attachment; filename='.$this->getDocumentName());
+                header('Content-disposition: attachment; filename='.$this->getCVName());
             header('Content-type: application/pdf');
             readfile($path);
             Yii::app()->end();
@@ -527,335 +789,147 @@ class Document extends CActiveRecord
         }
     }
     
-    public function my()
+
+    public function isActive()
+    {
+        return $this->status == self::ENABLED;
+    }
+
+    public function search()
     {
         $this->validate();
-        
-        $params = array();
-        $sql_select = "SELECT d.id, d.name, d.identifier, d.description, d.document_type, d.main_document_type, d.publication_date_from, d.publication_date_to, d.date_received, d.last_updated, u.firstname, u.lastname, u.email ";
-        $sql_count = "SELECT COUNT(DISTINCT(d.id)) ";
-        
-        $sql_group = " GROUP BY d.id";
-        if(Yii::app()->user->isAdmin())
-        {
-            $sql_from = " FROM documents d";
-            $sql_join = " JOIN users u ON u.id = d.creator_id ";
-            $sql_where = " WHERE 1=1 ";
-        }
-        else
-        {
-            $user_groups = Yii::app()->user->getGroups();
-            $user_groups_ids = array_keys($user_groups);
-            if(count($user_groups_ids)==0)
-            {
-                $user_groups_ids = array(0);
-            }
-            $sql_select .= ", MAX(dr.right) as max_right";
-            $sql_from = " FROM documents_rights dr ";
-            $sql_join = " JOIN documents d ON dr.document_id = d.id ";
-            $sql_join .= " LEFT JOIN users u ON u.id = dr.user_id ";
-            $sql_where = " WHERE (dr.user_id = :user_id 
-                            OR dr.group_id IN (".implode(",",$user_groups_ids).") )
-            ";
-            $params[':user_id'] = Yii::app()->user->id;
+        $criteria=new CDbCriteria;
 
-        }
+        if(!$this->hasErrors('spending_date_from') && $this->spending_date_from)
+            $criteria->addCondition("spending_date>='".date('Y-m-d H:i:s', $this->spending_date_from)."'");
         
-        $sql_where .= " AND d.status = :active_status";
-        $sql_where .= " AND d.main_document_type = :main_document_type";
+        if(!$this->hasErrors('spending_date_to') && $this->spending_date_to)
+            $criteria->addCondition("spending_date<='". date('Y-m-d H:i:s', $this->spending_date_to)."'");
         
-        $params[':active_status'] = Document::ACTIVE_STATUS;
-        $params[':main_document_type'] = $this->main_document_type;
-        
-        if($this->identifier)
+        if(!$this->hasErrors('amount_from') && $this->amount_from)
         {
-            $sql_where .= " AND d.identifier = :identifier";
-            $params[':identifier'] = $this->identifier;
+            $criteria->addCondition("amount>='". $this->amount_from."'");            
         }
         
-        if($this->name)
+        if(!$this->hasErrors('amount_to') && $this->amount_to)
         {
-            $sql_where .= " AND d.name LIKE :name";
-            $params[':name'] = '%'.$this->name.'%';
+            $criteria->addCondition("amount<='". $this->amount_to."'");            
         }
         
-        if($this->main_document_type==Document::INTERNAL_USE_TYPE)
-            $attribute = 'date_created';
-        elseif($this->main_document_type==Document::OUTGOING)
-            $attribute = 'publication_date_from';
-        else
-            $attribute = 'date_received';
+        $criteria->compare('title',$this->title,true);
+        $criteria->compare('receiver',$this->receiver,true);
+        $criteria->compare('employee',$this->employee,true);
+        $criteria->compare('attribution_norm',$this->attribution_norm,true);        
+        $criteria->compare('attribution_mod',$this->attribution_mod,true);                
+        $criteria->compare('office', $this->office, true);
         
-        
-        if(!$this->hasErrors('date_from') && $this->date_from)
-        {
-            $sql_where .= " AND d.".$attribute." >= :date_from";
-            $params[':date_from'] = date('Y-m-d', $this->date_from);
-        }
-        
-        if($this->main_document_type==Document::OUTGOING)
-            $attribute = 'publication_date_to';
-        
-        if(!$this->hasErrors('date_to') && $this->date_to)
-        {
-            $sql_where .= " AND d.".$attribute." <= :date_to";
-            $params[':date_to'] = date('Y-m-d', $this->date_to);            
-        }
-        
-        $sql = $sql_select . $sql_from . $sql_join . $sql_where . $sql_group;
-        $qcount = $sql_count . $sql_from . $sql_join . $sql_where;
-
-        $count = Yii::app()->db->createCommand($qcount)->queryScalar($params);
-        
-        return new CSqlDataProvider(
-            $sql,
-            array(
-                'totalItemCount'=>$count,
-                    'sort' => array(
-                        'attributes' => array('name', 'identifier'),
-                        'defaultOrder' => 'd.date_created DESC'
-                ),
-                'pagination' => array(
-                    'pageSize' => 10
-                ),
-                'params'=>$params
-            )
-        );
-
-    }
-    
-    public function disabled()
-    {
-        $this->validate();
-        
-        $params = array();
-        $sql_select = "SELECT d.id, d.name, d.identifier, d.description, d.document_type, d.main_document_type, d.publication_date_from, d.publication_date_to, d.date_received, d.last_updated, u.firstname, u.lastname, u.email ";
-        $sql_count = "SELECT COUNT(DISTINCT(d.id)) ";
-        
-        $sql_group = " GROUP BY d.id";
-        if(Yii::app()->user->isAdmin())
-        {
-            $sql_from = " FROM documents d";
-            $sql_join = " JOIN users u ON u.id=d.creator_id ";
-            $sql_where = " WHERE 1=1 ";
-        }
-        else
-        {
-            $user_groups = Yii::app()->user->getGroups();
-            $user_groups_ids = array_keys($user_groups);
-            if(count($user_groups_ids)==0)
-            {
-                $user_groups_ids = array(0);
-            }            
-            $sql_from = " FROM documents dr ";
-            $sql_join = " JOIN users u ON u.id=dr.user_id ";
-            $sql_join .= " LEFT JOIN documents_rights d ON dr.document_id = d.id ";
-            $sql_where = " WHERE (dr.user_id = :user_id 
-                            OR dr.group_id IN (".implode(",",$user_groups_ids).") AND dr.right = :admin_right)
-                            OR d.creator_id = :user_id
-            ";
-            
-            $params[':user_id'] = Yii::app()->user->id;
-            $params[':admin_right'] = DocumentRight::ADMIN;
-        }
-        
-        $sql_where .= " AND d.status = :inactive_status";
-        $sql_where .= " AND d.main_document_type = :main_document_type";
-        
-        $params[':inactive_status'] = Document::DISABLED_STATUS;
-        $params[':main_document_type'] = $this->main_document_type;
-        
-        if($this->identifier)
-        {
-            $sql_where .= " AND d.identifier = :identifier";
-            $params[':identifier'] = $this->identifier;
-        }
-        
-        if($this->name)
-        {
-            $sql_where .= " AND d.name LIKE :name";
-            $params[':name'] = '%'.$this->name.'%';
-        }
-        
-        if($this->main_document_type==Document::INTERNAL_USE_TYPE)
-            $attribute = 'date_created';
-        elseif($this->main_document_type==Document::OUTGOING)
-            $attribute = 'publication_date_from';
-        else
-            $attribute = 'date_received';
-        
-        
-        if(!$this->hasErrors('date_from') && $this->date_from)
-        {
-            $sql_where .= " AND d.".$attribute." >= :date_from";
-            $params[':date_from'] = date('Y-m-d', $this->date_from);
-        }
-        
-        if($this->main_document_type==Document::OUTGOING)
-            $attribute = 'publication_date_to';
-        
-        if(!$this->hasErrors('date_to') && $this->date_to)
-        {
-            $sql_where .= " AND d.".$attribute." <= :date_to";
-            $params[':date_to'] = date('Y-m-d', $this->date_to);            
-        }
-        
-        $sql = $sql_select . $sql_from . $sql_join . $sql_where . $sql_group;
-        $qcount = $sql_count . $sql_from . $sql_join . $sql_where;
-
-        $count = Yii::app()->db->createCommand($qcount)->queryScalar($params);
-        
-        return new CSqlDataProvider(
-            $sql,
-            array(
-                'totalItemCount'=>$count,
-                    'sort' => array(
-                        'attributes' => array('name', 'identifier'),
-                        'defaultOrder' => 'd.date_created DESC'
-                ),
-                'pagination' => array(
-                    'pageSize' => 10
-                ),
-                'params'=>$params
-            )
-        );
-
-    }    
-    
-    public function created()
-    {
-        $this->validate();
-                
-        $params = array();
-        $sql_select = "SELECT d.id, d.name, d.identifier, d.description, d.document_type, d.main_document_type, d.publication_date_from, d.publication_date_to, d.date_received, d.last_updated, d.last_updater_id ";
-        $sql_count = "SELECT COUNT(d.id) ";
-        
-        $sql_from = " FROM documents d";
-        $sql_where = " WHERE creator_id = :user_id AND status = :active_status";
-        $sql_where .= " AND d.main_document_type = :main_document_type";
-        
-        
-        $params[':user_id'] = Yii::app()->user->id;
-        $params[':active_status'] = Document::ACTIVE_STATUS;
-        $params[':main_document_type'] = $this->main_document_type;
-        
-        if($this->identifier)
-        {
-            $sql_where .= " AND d.identifier = :identifier";
-            $params[':identifier'] = $this->identifier;
-        }
-        
-        if($this->name)
-        {
-            $sql_where .= " AND d.name LIKE :name";
-            $params[':name'] = '%'.$this->name.'%';
-        }
-        
-        if($this->main_document_type==Document::INTERNAL_USE_TYPE)
-            $attribute = 'date_created';
-        elseif($this->main_document_type==Document::OUTGOING)
-            $attribute = 'publication_date_from';
-        else
-            $attribute = 'date_received';
-        
-        
-        if(!$this->hasErrors('date_from') && $this->date_from)
-        {
-            $sql_where .= " AND d.".$attribute." >= :date_from";
-            $params[':date_from'] = date('Y-m-d', $this->date_from);
-        }
-        
-        if($this->main_document_type==Document::OUTGOING)
-            $attribute = 'publication_date_to';
-        
-        if(!$this->hasErrors('date_to') && $this->date_to)
-        {
-            $sql_where .= " AND d.".$attribute." <= :date_to";
-            $params[':date_to'] = date('Y-m-d', $this->date_to);            
-        }
-        
-        $sql = $sql_select . $sql_from . $sql_where;
-        $qcount = $sql_count . $sql_from . $sql_where;
-
-        $count = Yii::app()->db->createCommand($qcount)->queryScalar($params);
-        
-        return new CSqlDataProvider(
-            $sql,
-            array(
-                'totalItemCount'=>$count,
-                    'sort' => array(
-                        'attributes' => array('name', 'identifier'),
-                        'defaultOrder' => 'd.date_created DESC'
-                ),
-                'pagination' => array(
-                    'pageSize' => 10
-                ),
-                'params'=>$params
-            )
-        );
-
-    }    
-    
-    public function loadTagsArray()
-    {
-        $sql = "SELECT t.name FROM tags_documents td JOIN tags t ON t.id=td.tag_id WHERE td.document_id = :document_id";
-        $cmd = Yii::app()->db->createCommand($sql);
-        $rows = $cmd->queryAll(true, array(':document_id'=>$this->id));
-        foreach($rows as $row)
-            $this->tags_array[] = $row['name'];
-        
-        $this->tagsname = implode(',', $this->tags_array);
-    }
-    
-    public function loadSenderData()
-    {
-        if($this->sendername==null)
-        {
-            $this->sendername = $this->sender->name;
-            $this->senderaddress = $this->sender->getFullAddress();
-        }
-    }
-    
-    public function deleteDocument()
-    {
-        $name = $this->getDocumentName();
-        $path = $this->getPath();
-        $cache_path = $this->getCachePath();
-        $db = Yii::app()->db->beginTransaction();
-        
-        if($this->delete())
-        {
-            if(@unlink($path))
-            {
-                @exec('rm -f '.$cache_path.DIRECTORY_SEPARATOR.$name.'_*.jpg');
-                $db->commit();
-                return true;
-
-            }
-        }
-        $db->rollback();
-        return false;
+        return new CActiveDataProvider(get_class($this), array(
+            'criteria'=>$criteria,
+            'sort'=>array(
+                'defaultOrder'=>'t.spending_date DESC',
+            ),
+            'pagination'=>array(
+                'pageSize'=>5
+            ),
+        ));			
     }
     
     public function getTitle()
     {
-        if($this->identifier)
-        {
-            return '#'.$this->identifier;
-        }
-        else
-        {
-            return $this->name;
-        }
+        return $this->title;
     }
     
-    public function getPeriodDesc()
+
+    private function loadTmpFiles()
     {
-        if($this->main_document_type==self::INTERNAL_USE_TYPE)
-            return "Data di archviazione";
-        elseif($this->main_document_type==self::OUTGOING)
-            return "Periodo di pubblicazione";
+        $tmp_path = $this->getTmpPath();
+        if(is_dir($tmp_path))
+            $files = scandir($tmp_path);
         else
-            return "Data di ricezione";
+            $files = array();
+        $result = array();
+        foreach($files as $file)
+        {
+            if($file=='.' || $file=='..')
+                continue;
+            
+            if(strstr($file, "cv_")!==FALSE)
+            {
+                $result['cv'] = $file;
+                continue;
+            }
+
+            if(strstr($file, "ctr_")!==FALSE)
+            {
+                $result['contract'] = $file;
+                continue;
+            }            
+
+            if(strstr($file, "prj_")!==FALSE)
+            {
+                $result['project'] = $file;
+                continue;
+            }            
+            
+            if(strstr($file, "cap_")!==FALSE)
+            {
+                $result['capitulate'] = $file;
+                continue;
+            }            
+            
+            if($file=="others")
+            {
+                $result['others'] = array();
+                $other_files = scandir($tmp_path.DIRECTORY_SEPARATOR.'others');
+                foreach($other_files as $other_file)
+                {
+                    if($other_file!='.' && $other_file!='..')
+                        $result['others'][] = $other_file;
+                }
+            }
+            
+        }
+        
+        return $result;
+    }
+    
+    public function canAddNewOther($tmp = false)
+    {
+        $other_files = $this->listOtherDocuments($tmp);
+        if(count($other_files)<self::MAX_OTHER_DOCUMENTS)
+            return true;
+        return false;
+    }
+    
+    public function getTmpFiles()
+    {
+        if(is_null($this->tmp_files))
+        {
+            $this->tmp_files = $this->loadTmpFiles();
+        }
+        return $this->tmp_files;
+    }
+
+    public function getTmpPath()
+    {
+        return Yii::getPathOfAlias('tmp_files').DIRECTORY_SEPARATOR.'spendings'.DIRECTORY_SEPARATOR.Yii::app()->user->id;
+    }
+    
+    public function getPath()
+    {
+        return Yii::getPathOfAlias('uploads').DIRECTORY_SEPARATOR.'spendings'.DIRECTORY_SEPARATOR.$this->id;
+    }
+    
+    public function getDisplayAmount()
+    {
+        return sprintf("%.2f €", $this->amount);
+    }
+    
+    public function getPublicationRequestedDesc()
+    {
+        if($this->publication_requested==1)
+            return "Si";
+        else
+            return "No";
     }
 }

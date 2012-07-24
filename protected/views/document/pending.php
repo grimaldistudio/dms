@@ -20,24 +20,31 @@
                 <?php foreach($g_documents as $document):?>
                     <tr>
                         <td><?php echo $document['name'] ?></td>
-                        <td><?php echo $document['size'] ?></td>
+                        <td><?php echo $document['size'] ?> Bytes</td>
                         <td><?php echo date('d-m-Y H:i:s', $document['ctime']) ?></td>                    
                         <td>
                             <?php echo CHtml::link('<i class="icon-eye-open icon-white"></i>', '#', array('id'=>  uniqid("thumb"), 'class'=>'btn btn-primary thumbnail_link', 'data-content'=>'<img src="'.Yii::app()->createUrl('/document/thumbnail', array('group_id'=>$g_id, 'document_name'=>$document['name'])).'" />')); ?>
                             <?php if($this->isAllowed('document', 'protocol')): ?>
                                 <?php if($g_id=='user'): ?>
-                                    <?php echo CHtml::link('Protocolla', array('/document/protocol', 'document_name'=>$document['name']), array('class'=>'btn btn-primary', 'data-content'=>'Protocolla il documento', 'rel'=>'tooltip')); ?>
+                                    <?php echo CHtml::link('In entrata', array('/document/protocol', 'document_name'=>$document['name']), array('class'=>'btn btn-primary', 'data-content'=>'Protocolla il documento', 'rel'=>'tooltip')); ?>
                                 <?php else: ?>
-                                    <?php echo CHtml::link('Protocolla', array('/document/protocol', 'group_id'=>$g_id, 'document_name'=>$document['name']), array('class'=>'btn btn-primary', 'data-content'=>'Protocolla il documento', 'rel'=>'tooltip')); ?>
+                                    <?php echo CHtml::link('In entrata', array('/document/protocol', 'group_id'=>$g_id, 'document_name'=>$document['name']), array('class'=>'btn btn-primary', 'data-content'=>'Protocolla il documento', 'rel'=>'tooltip')); ?>
                                 <?php endif; ?>
                             <?php endif; ?>
                             <?php if($this->isAllowed('document', 'archive')): ?>                            
                                 <?php if($g_id=='user'): ?>
-                                    <?php echo CHtml::link('Archivia', array('/document/archive', 'document_name'=>$document['name']), array('class'=>'btn btn-primary', 'data-content'=>'Archivia il documento senza protocollarlo', 'rel'=>'tooltip')); ?>                            
+                                    <?php echo CHtml::link('Archivio', array('/document/archive', 'document_name'=>$document['name']), array('class'=>'btn btn-primary', 'data-content'=>'Archivia il documento senza protocollarlo', 'rel'=>'tooltip')); ?>                            
                                 <?php else:  ?> 
-                                    <?php echo CHtml::link('Archivia', array('/document/archive', 'group_id'=>$g_id, 'document_name'=>$document['name']), array('class'=>'btn btn-primary', 'data-content'=>'Archivia il documento senza protocollarlo', 'rel'=>'tooltip')); ?>
+                                    <?php echo CHtml::link('Archivio', array('/document/archive', 'group_id'=>$g_id, 'document_name'=>$document['name']), array('class'=>'btn btn-primary', 'data-content'=>'Archivia il documento senza protocollarlo', 'rel'=>'tooltip')); ?>
                                 <?php endif; ?>
                             <?php endif; ?>
+                            <?php if($this->isAllowed('document', 'publish')): ?>                            
+                                <?php if($g_id=='user'): ?>
+                                    <?php echo CHtml::link('Pubblico', array('/document/publish', 'document_name'=>$document['name']), array('class'=>'btn btn-primary', 'data-content'=>'Archivia il documento senza protocollarlo', 'rel'=>'tooltip')); ?>                            
+                                <?php else:  ?> 
+                                    <?php echo CHtml::link('Pubblico', array('/document/publish', 'group_id'=>$g_id, 'document_name'=>$document['name']), array('class'=>'btn btn-primary', 'data-content'=>'Archivia il documento senza protocollarlo', 'rel'=>'tooltip')); ?>
+                                <?php endif; ?>
+                            <?php endif; ?>                            
                             <?php if($this->isAllowed('document', 'deletepending')): ?>
                                 <?php echo CHtml::link('<i class="icon-trash icon-white"></i>', array('/document/deletepending', 'group_id'=>$g_id, 'document_name'=>$document['name']), array('class'=>'btn btn-primary delete', 'data-content'=>'Cancella il documento', 'rel'=>'tooltip')); ?>                            
                             <?php endif; ?>

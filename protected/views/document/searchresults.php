@@ -56,7 +56,7 @@
 <?php $this->endWidget(); ?>
 
 <?php
-if($idmodel->hasDataProvider()):
+if(isset($idmodel) && $idmodel->hasDataProvider()):
     $this->widget('bootstrap.widgets.BootListView', array(
 		'dataProvider'=> $idmodel->getDataProvider(),
 		'itemView'=>$result_template,   // refers to the partial view named '_proficiency'

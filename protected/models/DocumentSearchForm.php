@@ -141,7 +141,7 @@ class DocumentSearchForm extends CFormModel{
                 
                 $date_field = "date_received";
                 if($doc_type==Document::INTERNAL_USE_TYPE)
-                    $date_field = "date_created";
+                    $date_field = "d.date_created";
                 elseif($doc_type==Document::OUTGOING)
                     $date_field = "publication_date_from";
                 
@@ -154,7 +154,7 @@ class DocumentSearchForm extends CFormModel{
                 
                 $date_field = "date_received";
                 if($doc_type==Document::INTERNAL_USE_TYPE)
-                    $date_field = "date_created";
+                    $date_field = "d.date_created";
                 elseif($doc_type==Document::OUTGOING)
                     $date_field = "publication_date_to";                
 
@@ -170,7 +170,7 @@ class DocumentSearchForm extends CFormModel{
 
             $date_field = "date_received";
             if($doc_type==Document::INTERNAL_USE_TYPE)
-                $date_field = "date_created";
+                $date_field = "d.date_created";
             elseif($doc_type==Document::OUTGOING)
                 $date_field = "publication_date_from";                
                 

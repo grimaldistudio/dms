@@ -63,7 +63,7 @@ class Group extends CActiveRecord
             'email' => 'E-mail',
             'telephone' => 'Telefono',
             'fax' => 'Fax',
-            'date_crated' => 'Data di creazione',
+            'date_created' => 'Data di creazione',
             'last_updated' => 'Ultimo aggiornamento',
             'status' => 'Stato',
             'folder_name' => 'Nome directory'

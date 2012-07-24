@@ -22,6 +22,12 @@ class UploadDocumentForm extends CFormModel{
         );
     }
  
+    public function attributeLabels() {
+        return array(
+            'document_file' => 'Documento da caricare'
+        );
+    }
+    
     public function upload()
     {
         if($this->validate())

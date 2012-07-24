@@ -27,7 +27,9 @@
 <?php echo $form->errorSummary($model); ?>
 	
 <?php echo $form->fileFieldRow($model, 'document_file'); ?>
-
+    <div class="help-block">
+        E' possibile caricare un file PDF di dimensioni massime <?php echo UploadDocumentForm::MAX_SIZE; ?> MB.
+    </div>
 </div>
 
 <div class="modal-footer">

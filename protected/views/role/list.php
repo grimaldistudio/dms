@@ -14,7 +14,6 @@
     'columns'=>array(
         array('name'=>'name'),
         array('name'=>'description'),
-        array('name'=>'is_locked'),
         array(
             'class'=>'bootstrap.widgets.BootButtonColumn',
             'htmlOptions'=>array('style'=>'width: 50px'),

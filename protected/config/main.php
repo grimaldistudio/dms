@@ -2,6 +2,7 @@
 
 // uncomment the following to define a path alias
 Yii::setPathOfAlias('uploads',dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'uploads');
+Yii::setPathOfAlias('tmp_files',dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'tmp_files');
 
 // This is the main Web application configuration. Any writable
 // CWebApplication properties can be configured here.

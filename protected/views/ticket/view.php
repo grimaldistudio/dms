@@ -14,6 +14,11 @@ $this->widget('bootstrap.widgets.BootDetailView', array(
                         ),
                         array(
                             'type'=>'raw',
+                            'value' => $model->document->getTitle(),
+                            'label' => $model->getAttributeLabel('document_id')
+                        ),
+                        array(
+                            'type'=>'raw',
                             'value'=>$model->getAccessLevelDesc(),
                             'label'=>$model->getAttributeLabel('access_level')
                         ),    

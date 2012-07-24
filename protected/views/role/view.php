@@ -10,7 +10,7 @@ $this->widget('bootstrap.widgets.BootDetailView', array(
                         'name', 
                         'description', 
                         'right_ids'=>array(
-                            'label'=>Role::model()->getAttributeLabel('role_ids'),
+                            'label'=>Role::model()->getAttributeLabel('right_ids'),
                             'type'=>'raw',
                             'value'=>ESHtml::unorderedList($model->rights)
                         )

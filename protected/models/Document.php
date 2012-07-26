@@ -824,17 +824,24 @@ class Document extends CActiveRecord
         $name = $this->getDocumentName();
         $path = $this->getPath();
         $cache_path = $this->getCachePath();
+        $document_id = $this->id;
+        $document_title = $this->name;
+        $document_identifier = $this->identifier;
+        $publication_status = $this->publication_status;
+
+                
         $db = Yii::app()->db->beginTransaction();
 
         if($this->isSynched())
         {
-            $sql = "INSERT INTO documents_deleted (document_id, document_title, document_identifier, deleted_by, deletion_date, is_synched) VALUES(:document_id, :document_title, :document_identifier, :deleted_by, CURRENT_TIMESTAMP, :is_synched)";
+            $sql = "INSERT INTO documents_deleted (document_id, document_title, document_identifier, deleted_by, deletion_date, is_synched, publication_status) VALUES(:document_id, :document_title, :document_identifier, :deleted_by, CURRENT_TIMESTAMP, :is_synched, :publication_status)";
             if(Yii::app()->db->createCommand($sql)->execute(array(
-                ':document_id' => $this->id,
-                ':document_title' => $this->name,
-                ':document_identifier' => $this->identifier,
+                ':document_id' => $document_id,
+                ':document_title' => $document_title,
+                ':document_identifier' => $document_identifier,
                 ':deleted_by' => Yii::app()->user->id,
-                ':is_synched' => 0
+                ':is_synched' => 0,
+                ':publication_status' => $publication_status
             )))
             {
                 if($this->delete())

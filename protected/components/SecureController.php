@@ -184,17 +184,42 @@ class SecureController extends CController
                         'active'=>$this->id=='profile'
                     );
 
+            $spending_list = array(
+                        'label'=>'Spese', 
+                        'url'=>Yii::app()->createUrl('/spending/search'), 
+                        'active'=>$this->id=='spending' && $this->action->id=='search'
+                    );
+            
+            $spending_owned = array(
+                        'label'=>'Create da me', 
+                        'url'=>Yii::app()->createUrl('/spending/owned'), 
+                        'visible'=>Yii::app()->authgateway->isAllowed('spending', 'owned'),
+                        'active'=>$this->id=='spending' && $this->action->id=='owned'
+                    );            
+            
+            $spending_disabled = array(
+                        'label'=>'Cestino', 
+                        'url'=>Yii::app()->createUrl('/spending/disabled'), 
+                        'visible'=>Yii::app()->authgateway->isAllowed('spending', 'disabled'),
+                        'active'=>$this->id=='spending' && $this->action->id=='disabled'
+            );            
+            
             $items[] = $home;
             $items[] = array('label'=>'Cerca in', 'icon'=>'zoom-in', 'itemOptions'=>array('class'=>'nav-header'));
             $items[] = $archive_search;
             $items[] = $protocol_search;
             $items[] = $publish_search;
+            $items[] = $spending_list; 
             
             $items[] = array('label'=>'Documenti', 'icon'=>'book', 'itemOptions'=>array('class'=>'nav-header'));
             $items[] = $pending;
             $items[] = $my;
             $items[] = $owned;
             $items[] = $disabled;
+            
+            $items[] = array('label'=>'Spese', 'icon'=>'shopping-cart', 'itemOptions'=>array('class'=>'nav-header'));
+            $items[] = $spending_owned;
+            $items[] = $spending_disabled;
 
             $items[] = array('label'=>'Amministrazione', 'icon'=>'tags', 'itemOptions'=>array('class'=>'nav-header'));            
             $items[] = $tickets;            
@@ -220,10 +245,11 @@ class SecureController extends CController
         {
             $items = array();
             $home = array('label'=>'Home', 'url'=>Yii::app()->homeUrl, 'active'=>($this->id=='site' && $this->action->id=='index'));
-            $document = array('label'=>'Documenti', 'url'=>'#', 'active'=>$this->id=='document', 'items'=>array(
+            $document = array('label'=>'Cerca in', 'url'=>'#', 'active'=>$this->id=='document', 'items'=>array(
                 array('label' => 'Archivio', 'url' => Yii::app()->createUrl('/document/search', array('doc_type'=>Document::INTERNAL_USE_TYPE))),
                 array('label' => 'Posta in entrata', 'url' => Yii::app()->createUrl('/document/search', array('doc_type'=>Document::INBOX))),                
                 array('label' => 'Document pubblici', 'url' => Yii::app()->createUrl('/document/search', array('doc_type'=>Document::OUTGOING))),
+                array('label' => 'Spese', 'url' => Yii::app()->createUrl('/spending/search'))                
             ));            
 
             $admin = array('label'=>'Amministrazione', 'url'=>Yii::app()->createUrl('/ticket'), 'active'=>in_array($this->id, array('ticket', 'tag', 'sender')));            

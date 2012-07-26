@@ -49,7 +49,15 @@
         $upload_document_item = '';
         if($this->isAllowed('document', 'upload'))
         {
-            $upload_document_item = CHtml::link('<i class="icon-plus icon-white"></i>', '#', array('class'=>'btn btn-primary upload-new-document', 'rel'=>'tooltip', 'title'=>'Carica Nuovo Documento'));
+            $upload_document_item = CHtml::link('<i class="icon-plus icon-white"></i>Documento', '#', array('class'=>'btn btn-primary upload-new-document', 'rel'=>'tooltip', 'title'=>'Carica Nuovo Documento'));
+        }
+    ?>
+      
+    <?php
+        $new_spending = '';
+        if($this->isAllowed('document', 'upload'))
+        {
+            $new_spending = CHtml::link('<i class="icon-plus icon-white"></i>Spesa', array('/spending/create'), array('class'=>'btn btn-primary', 'rel'=>'tooltip', 'title'=>'Carica Nuova Spesa'));
         }
     ?>
     <?php $this->widget('bootstrap.widgets.BootNavbar', array(
@@ -71,6 +79,7 @@
                 ),
             ),
             $upload_document_item,
+            $new_spending,
             array(
                 'class'=>'bootstrap.widgets.BootMenu',
                 'htmlOptions' => array('class'=>'pull-right'),

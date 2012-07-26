@@ -6,8 +6,7 @@ class Spending extends CActiveRecord
     const DISABLED_STATUS = 0;
     const ACTIVE_STATUS = 1;
     
-    const PUBLISHED = 2;
-    const PUBLISHING = 1;
+    const PUBLISHED = 1;
     const NOT_PUBLISHED = 0;
     
     const MAX_OTHER_DOCUMENTS = 3;
@@ -18,9 +17,15 @@ class Spending extends CActiveRecord
     const CAPITULATE_MAX_SIZE = 8; 
     const OTHER_MAX_SIZE = 8;
     
+    const SEARCH_ALL = 1;
+    const SEARCH_MY = 2;
+    const SEARCH_DISABLED = 3;
+    
     public $spending_date_from;
     public $spending_date_to;
-
+    public $amount_from;
+    public $amount_to;
+    
     public $cv_file;
     public $contract_file;
     public $capitulate_file;
@@ -64,7 +69,7 @@ class Spending extends CActiveRecord
             array('spending_date', 'date', 'format'=>'dd/MM/yyyy', 'timestampAttribute'=>'spending_date', 'on'=>'create,update'),            
             array('description','filter','filter'=>array($obj=new CHtmlPurifier(),'purify'), 'on'=>'create,update'),            
             array('receiver', 'length', 'max'=>1024, 'on'=>'create,update'),
-            array('title,receiver,attribution_norm,attribution_mod,office,employee,amount_from,amount_to', 'safe', 'on'=>'search'),
+            array('title,receiver,amount_from,amount_to', 'safe', 'on'=>'search'),
             array('spending_date_from', 'date', 'format'=>'dd/MM/yyyy', 'timestampAttribute'=>'spending_date_from', 'on'=>'search'),            
             array('spending_date_to', 'date', 'format'=>'dd/MM/yyyy', 'timestampAttribute'=>'spending_date_to', 'on'=>'search'),   
             array('amount_from,amount_to', 'match', 'pattern'=>'/^[0-9]+(\.[0-9]{0,2})?$/', 'on'=>'search'),
@@ -110,6 +115,7 @@ class Spending extends CActiveRecord
             'project_name' => 'Progetto',
             'capitulate_file' => 'Capitolato',
             'capitulate_name' => 'Capitolato',
+            'other_file' => 'Altra documentazione',
             'status' => 'Stato',
             'spending_date' => 'Data', 
             'date_created' => 'Data di creazione',
@@ -120,7 +126,8 @@ class Spending extends CActiveRecord
             'amount_to' => 'Importo max',
             'publication_status' => 'Pubblicazione albo',
             'publication_requested' => 'Pubblicazione su albo',
-            'creator_id' => 'Creato da'
+            'creator_id' => 'Creato da',
+            'search_type' => 'Cerca in:'
         );
     }
 
@@ -183,8 +190,37 @@ class Spending extends CActiveRecord
     public function enable()
     {
         $this->is_dirty = 1;        
-        $this->status = self::ENABLED_STATUS;
+        $this->status = self::ACTIVE_STATUS;
         return $this->save();
+    }
+    
+    public function deleteSpending()
+    {
+        $path = $this->getPath();
+        $spending_title = $this->title;
+        $spending_id = $this->id;
+        $spending_amount = $this->amount;
+        $publication_status = $this->publication_status;
+        $t = Yii::app()->db->beginTransaction();
+        if($this->delete())
+        {
+            $sql = "INSERT INTO spendings_deleted (spending_id, spending_title, spending_amount, deleted_by, deletion_date, is_synched) VALUES(:spending_id, :spending_title, :spending_amount, :deleted_by, CURRENT_TIMESTAMP, :is_synched, :publication_status)";
+            if(Yii::app()->db->createCommand($sql)->execute(array(
+                ':spending_id' => $spending_id,
+                ':spending_title' => $spending_title,
+                ':document_identifier' => $spending_amount,
+                ':deleted_by' => Yii::app()->user->id,
+                ':is_synched' => 0,
+                ':publication_status' => $publication_status
+            )))
+            {
+                $t->commit();
+                @$this->rrmdir($path);
+                return true;
+            }
+        }
+        $t->rollback();
+        return false;
     }
     
     public function moveFiles()
@@ -204,7 +240,7 @@ class Spending extends CActiveRecord
         
         // if has cv
         $cv_path = $this->getCVPath(true);
-        if(file_exists($cv_path))
+        if($cv_path!==null)
         {
             if(!@copy($cv_path, $this->getPath().DIRECTORY_SEPARATOR.$this->cv_name))
             {
@@ -215,7 +251,7 @@ class Spending extends CActiveRecord
         
         // if has contract
         $contract_path = $this->getContractPath(true);
-        if(file_exists($contract_path))
+        if($contract_path!==null)
         {
             if(!@copy($contract_path, $this->getPath().DIRECTORY_SEPARATOR.$this->contract_name))
             {
@@ -226,7 +262,7 @@ class Spending extends CActiveRecord
         
         // if has project
         $project_path = $this->getProjectPath(true);
-        if(file_exists($project_path))
+        if($project_path!==null)
         {
             if(!@copy($project_path, $this->getPath().DIRECTORY_SEPARATOR.$this->project_name))
             {
@@ -237,7 +273,7 @@ class Spending extends CActiveRecord
         
         // if has capitulate
         $capitulate_path = $this->getCapitulatePath(true);
-        if(file_exists($capitulate_path))
+        if($capitulate_path!==null)
         {
             if(!@copy($capitulate_path, $this->getPath().DIRECTORY_SEPARATOR.$this->capitulate_name))
             {
@@ -269,6 +305,23 @@ class Spending extends CActiveRecord
         return true;
     }
     
+    public function getSearchTypeArray()
+    {
+        return array(
+            self::SEARCH_ALL => 'Tutte le spese',
+            self::SEARCH_MY => 'Spese create da me',
+            self::SEARCH_DISABLED => 'Spese rimosse da elenco'            
+        );
+    }
+
+    public function getSearchTypeDesc($search_type)
+    {
+        $search_type_array = $this->getSearchTypeArray();
+        if(array_key_exists($search_type, $search_type_array))
+            return $search_type_array[$search_type];
+        return 'Non definito';
+    }
+    
     public function getStatusArray()
     {
         return array(
@@ -291,7 +344,6 @@ class Spending extends CActiveRecord
         return array(
             '' => 'Seleziona',		
             self::NOT_PUBLISHED => 'Non pubblicato',
-            self::PUBLISHING => 'Da pubblicare',
             self::PUBLISHED => 'Pubblicato'
         );
     }
@@ -373,22 +425,13 @@ class Spending extends CActiveRecord
         
         $dest_path = $this->getOtherPath($this->other_file->name, $tmp);
         
-        return $this->processUploadedFile($this->other_file, $dest_path);
+        return $this->processUploadedFile($this->other_file, $dest_path, null, 'other_file');
     }
     
-    public function hasCapitulate()
+    public function hasCapitulate($tmp = false)
     {
-        if($this->id>0)
-        {
-            if($this->capitulate_name!=null && $this->capitulate_name!="")
-                return true;
-        }
-        else
-        {
-            if($this->getCapitulatePath(true))
-                return true;            
-        }
-        return false;
+        if($this->getCapitulatePath($tmp))
+            return true;            
     }
     
     public function getCapitulateName($tmp = false)
@@ -414,7 +457,12 @@ class Spending extends CActiveRecord
             }
         }
         else
-            return Yii::getPathOfAlias('uploads').DIRECTORY_SEPARATOR.'spendings'.DIRECTORY_SEPARATOR.$this->id.DIRECTORY_SEPARATOR.$this->getCapitulateName();            
+        {
+            $path = Yii::getPathOfAlias('uploads').DIRECTORY_SEPARATOR.'spendings'.DIRECTORY_SEPARATOR.$this->id.DIRECTORY_SEPARATOR.$this->getCapitulateName();            
+            if($this->getCapitulateName()!==null && $this->getCapitulateName()!=='' && file_exists($path))
+                return $path;
+            return null;
+        }
     }    
     
     public function getCapitulateSize($tmp = false)
@@ -435,6 +483,7 @@ class Spending extends CActiveRecord
         if($ret && !$tmp)
         {
             $this->capitulate_name = new CDbExpression('NULL');
+            $this->is_dirty = 1;
             return $this->save();
         }
         else
@@ -462,23 +511,32 @@ class Spending extends CActiveRecord
         
         $old_path = $this->getCapitulatePath($tmp);
         
-        $dest_path = $path.DIRECTORY_SEPARATOR.'cap_'.$this->capitulate_file->getName();
-        
-        return $this->processUploadedFile($this->capitulate_file, $dest_path, $old_path);
-    }
-    
-    public function hasContract()
-    {
-        if($this->id>0)
-        {
-            if($this->contract_name!=null && $this->contract_name!="")
-                return true;
-        }
+        if($tmp)
+            $dest_path = $path.DIRECTORY_SEPARATOR.'cap_'.$this->capitulate_file->getName();
+        else
+            $dest_path = $path.DIRECTORY_SEPARATOR.$this->capitulate_file->getName();            
+
+        if($tmp)
+            return $this->processUploadedFile($this->capitulate_file, $dest_path, $old_path, 'capitulate_file');
         else
         {
-            if($this->getContractPath(true))
-                return true;            
+            $t = Yii::app()->db->beginTransaction();
+            $this->project_name = $this->capitulate_file->getName();
+            $this->is_dirty = 1;
+            if($this->save() && $this->processUploadedFile($this->capitulate_file, $dest_path, $old_path, 'capitulate_file'))
+            {
+                $t->commit();
+                return true;
+            }
+            $t->rollback();
+            return false;
         }
+    }
+    
+    public function hasContract($tmp = false)
+    {
+        if($this->getContractPath($tmp))
+            return true;            
         return false;
     }    
     
@@ -504,8 +562,12 @@ class Spending extends CActiveRecord
                 return null;
             }
         }
-        else
-            return Yii::getPathOfAlias('uploads').DIRECTORY_SEPARATOR.'spendings'.DIRECTORY_SEPARATOR.$this->id.DIRECTORY_SEPARATOR.$this->getContractName();            
+        else{
+            $path = Yii::getPathOfAlias('uploads').DIRECTORY_SEPARATOR.'spendings'.DIRECTORY_SEPARATOR.$this->id.DIRECTORY_SEPARATOR.$this->getContractName();            
+            if($this->getContractName()!==null && $this->getContractName()!=='' && file_exists($path))
+                return $path;
+            return null;
+        }
     }
     
     public function downloadContract($force_download = false)
@@ -532,6 +594,7 @@ class Spending extends CActiveRecord
         if($ret && !$tmp)
         {
             $this->contract_name = new CDbExpression('NULL');
+            $this->is_dirty = 1;
             return $this->save();
         }
         else
@@ -553,23 +616,32 @@ class Spending extends CActiveRecord
         
         $old_path = $this->getContractPath($tmp);
         
-        $dest_path = $path.DIRECTORY_SEPARATOR.'ctr_'.$this->contract_file->getName();
-        
-        return $this->processUploadedFile($this->contract_file, $dest_path, $old_path);
-    }
+        if($tmp)
+            $dest_path = $path.DIRECTORY_SEPARATOR.'ctr_'.$this->contract_file->getName();
+        else
+            $dest_path = $path.DIRECTORY_SEPARATOR.$this->contract_file->getName();            
     
-    public function hasProject()
-    {
-        if($this->id>0)
-        {
-            if($this->project_name!=null && $this->project_name!="")
-                return true;
-        }
+        if($tmp)
+            return $this->processUploadedFile($this->contract_file, $dest_path, $old_path, 'contract_file');
         else
         {
-            if($this->getProjectPath(true))
-                return true;            
+            $t = Yii::app()->db->beginTransaction();
+            $this->contract_name = $this->contract_file->getName();
+            $this->is_dirty = 1;
+            if($this->save() && $this->processUploadedFile($this->contract_file, $dest_path, $old_path, 'contract_file'))
+            {
+                $t->commit();
+                return true;
+            }
+            $t->rollback();
+            return false;
         }
+    }
+    
+    public function hasProject($tmp = false)
+    {
+        if($this->getProjectPath($tmp))
+            return true;            
         return false;
     }
     
@@ -595,8 +667,12 @@ class Spending extends CActiveRecord
                 return null;
             }
         }
-        else
-            return Yii::getPathOfAlias('uploads').DIRECTORY_SEPARATOR.'spendings'.DIRECTORY_SEPARATOR.$this->id.DIRECTORY_SEPARATOR.$this->getProjectName();            
+        else{
+            $path = Yii::getPathOfAlias('uploads').DIRECTORY_SEPARATOR.'spendings'.DIRECTORY_SEPARATOR.$this->id.DIRECTORY_SEPARATOR.$this->getProjectName();            
+            if($this->getProjectName()!=="" && $this->getProjectName()!==null && file_exists($path))
+                return $path;
+            return null;
+        }
     }
     
     public function downloadProject($force_download = false)
@@ -624,6 +700,7 @@ class Spending extends CActiveRecord
         if($ret && !$tmp)
         {
             $this->project_name = new CDbExpression('NULL');
+            $this->is_dirty = 1;            
             return $this->save();
         }
         else
@@ -645,23 +722,32 @@ class Spending extends CActiveRecord
         
         $old_path = $this->getProjectPath($tmp);
         
-        $dest_path = $path.DIRECTORY_SEPARATOR.'prj_'.$this->project_file->getName();
-        
-        return $this->processUploadedFile($this->project_file, $dest_path, $old_path);
-    }
-    
-    public function hasCV()
-    {
-        if($this->id>0)
-        {
-            if($this->cv_name!=null && $this->cv_name!="")
-                return true;
-        }
+        if($tmp)
+            $dest_path = $path.DIRECTORY_SEPARATOR.'prj_'.$this->project_file->getName();
+        else
+            $dest_path = $path.DIRECTORY_SEPARATOR.$this->project_file->getName();
+             
+        if($tmp)
+            return $this->processUploadedFile($this->project_file, $dest_path, $old_path, 'project_file');
         else
         {
-            if($this->getCVPath(true))
-                return true;            
+            $t = Yii::app()->db->beginTransaction();
+            $this->project_name = $this->project_file->getName();
+            $this->is_dirty = 1;
+            if($this->save() && $this->processUploadedFile($this->project_file, $dest_path, $old_path, 'project_file'))
+            {
+                $t->commit();
+                return true;
+            }
+            $t->rollback();
+            return false;
         }
+    }
+    
+    public function hasCV($tmp = false)
+    {
+        if($this->getCVPath($tmp))
+            return true;            
         return false;
     }
     
@@ -688,7 +774,13 @@ class Spending extends CActiveRecord
             }
         }
         else
-            return Yii::getPathOfAlias('uploads').DIRECTORY_SEPARATOR.'spendings'.DIRECTORY_SEPARATOR.$this->id.DIRECTORY_SEPARATOR.$this->getCVName();            
+        {
+           $path = Yii::getPathOfAlias('uploads').DIRECTORY_SEPARATOR.'spendings'.DIRECTORY_SEPARATOR.$this->id.DIRECTORY_SEPARATOR.$this->getCVName();                        
+           if($this->getCVName()!==null && $this->getCVName()!=='' && file_exists($path))
+               return $path;
+           return null;
+        }
+
     }
     
     public function downloadCV($force_download = false)
@@ -708,6 +800,7 @@ class Spending extends CActiveRecord
         if($ret && !$tmp)
         {
             $this->cv_name = new CDbExpression('NULL');
+            $this->is_dirty = 1;            
             return $this->save();
         }        
         else
@@ -736,16 +829,40 @@ class Spending extends CActiveRecord
         
         $old_cv_path = $this->getCVPath($tmp);
         
-        $dest_path = $path.DIRECTORY_SEPARATOR.'cv_'.$this->cv_file->getName();
+        if($tmp)
+            $dest_path = $path.DIRECTORY_SEPARATOR.'cv_'.$this->cv_file->getName();
+        else
+            $dest_path = $path.DIRECTORY_SEPARATOR.$this->cv_file->getName();
         
-        return $this->processUploadedFile($this->cv_file, $dest_path, $old_cv_path);
+        if($tmp)
+            return $this->processUploadedFile($this->cv_file, $dest_path, $old_cv_path, 'cv_file');
+        else
+        {
+            $t = Yii::app()->db->beginTransaction();
+            $this->cv_name = $this->cv_file->getName();
+            $this->is_dirty = 1;
+            if($this->save() && $this->processUploadedFile($this->cv_file, $dest_path, $old_cv_path, 'cv_file'))
+            {
+                $t->commit();
+                return true;
+            }
+            $t->rollback();
+            return false;
+        }
     }
     
-    private function processUploadedFile($uploaded_file, $dest_path, $old_file = null)
+    private function processUploadedFile($uploaded_file, $dest_path, $old_file = null, $file_attribute = 'cv_file')
     {
         if($uploaded_file->getHasError())
         {
-            $this->addError('cv_file', $uploaded_file->getError());
+            $this->addError($file_attribute, $uploaded_file->getError());
+            return false;
+        }
+        
+        if(file_exists($dest_path) && $dest_path!==$old_file)
+        {
+            // duplicate file
+            $this->addError($file_attribute, 'E\' già stato caricato un file con lo stesso nome: 09');
             return false;
         }
         
@@ -753,7 +870,7 @@ class Spending extends CActiveRecord
         {
             if(!@mkdir(dirname($dest_path), 0777))
             {
-                $this->addError('cv_file', 'Errore durante il caricamento del file: 13');
+                $this->addError($file_attribute, 'Errore durante il caricamento del file: 13');
                 return false;
             }
         }
@@ -762,14 +879,14 @@ class Spending extends CActiveRecord
         {
             if(!@unlink($old_file))
             {
-                $this->addError('cv_file', 'Errore durante il caricamento del file: 14');                
+                $this->addError($file_attribute, 'Errore durante il caricamento del file: 14');                
                 return false;
             }
         }
         
         if(!$uploaded_file->saveAs($dest_path))
         {
-            $this->addError('cv_file', 'Errore durante il caricamento del file: 15');            
+            $this->addError($file_attribute, 'Errore durante il caricamento del file: 15');            
             return false;
         }
         return true;
@@ -792,10 +909,10 @@ class Spending extends CActiveRecord
 
     public function isActive()
     {
-        return $this->status == self::ENABLED;
+        return $this->status == self::ACTIVE_STATUS;
     }
 
-    public function search()
+    public function search($search_type = self::SEARCH_ALL)
     {
         $this->validate();
         $criteria=new CDbCriteria;
@@ -818,11 +935,19 @@ class Spending extends CActiveRecord
         
         $criteria->compare('title',$this->title,true);
         $criteria->compare('receiver',$this->receiver,true);
-        $criteria->compare('employee',$this->employee,true);
-        $criteria->compare('attribution_norm',$this->attribution_norm,true);        
-        $criteria->compare('attribution_mod',$this->attribution_mod,true);                
-        $criteria->compare('office', $this->office, true);
-        
+
+        if($search_type == self::SEARCH_DISABLED)
+        {
+            if(!Yii::app()->user->isAdmin())
+                $criteria->compare('creator_id', Yii::app()->user->id);
+            $criteria->compare('status', self::DISABLED_STATUS);
+        }
+        elseif($search_type == self::SEARCH_MY)
+        {
+            if(!Yii::app()->user->isAdmin())
+                $criteria->compare('creator_id', Yii::app()->user->id);
+        }
+
         return new CActiveDataProvider(get_class($this), array(
             'criteria'=>$criteria,
             'sort'=>array(
@@ -922,7 +1047,7 @@ class Spending extends CActiveRecord
     
     public function getDisplayAmount()
     {
-        return sprintf("%.2f €", $this->amount);
+        return sprintf("€ %.2f", $this->amount);
     }
     
     public function getPublicationRequestedDesc()
@@ -931,5 +1056,15 @@ class Spending extends CActiveRecord
             return "Si";
         else
             return "No";
+    }
+
+    protected function rrmdir($dir) {
+        foreach(glob($dir . '/*') as $file) {
+            if(is_dir($file))
+                return rrmdir($file);
+            else
+                return unlink($file);
+        }
+        return rmdir($dir);
     }
 }

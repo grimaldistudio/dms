@@ -36,24 +36,112 @@ class SpendingController extends SecureController{
     public function actionUpdate()
     {
         $model = $this->loadModel();
+        $model->scenario = 'update';
+        $this->checkAuth($model);
+        if(isset($_POST['Spending']))
+        {
+            $model->attributes = $_POST['Spending'];
+            if($model->updateSpending())
+            {
+                Yii::app()->user->setFlash('success', 'Spesa aggiornata con successo');
+                $this->redirect(array('/spending/view', 'id'=>$model->id));
+            }
+        }
+        $this->render('update', array('model'=>$model));
     }
     
     public function actionDisable()
     {
         $model = $this->loadModel();
+        $this->checkAuth($model);        
         $model->scenario = 'x';
+        if($model->disable())
+        {
+            if(Yii::app()->request->isAjaxRequest)
+            {
+                $this->ajaxSuccess('Spesa rimossa con successo');
+            }
+            else
+            {
+                Yii::app()->user->setFlash('success', 'Spesa rimossa dall\'elenco con successo');
+                $this->redirect(array('/spending/view', 'id'=>$model->id));
+            }
+        }
+        else
+        {
+            if(Yii::app()->request->isAjaxRequest)
+            {
+                $this->ajaxError();
+            }
+            else
+            {
+                Yii::app()->user->setFlash('error', 'Non è stato possibile rimuovere la spesa dall\'elenco');
+                $this->redirect(array('/spending/update', 'id'=>$model->id));
+            }            
+        }
+        
     }
     
     public function actionDelete()
     {
         $model = $this->loadModel();
+        $this->checkAuth($model);
         $model->scenario = 'x';
+        if($model->deleteSpending())
+        {
+            if(Yii::app()->request->isAjaxRequest)
+            {
+                $this->ajaxSuccess('Spesa rimossa definitivamente');
+            }
+            else
+            {
+                Yii::app()->user->setFlash('success', 'Spesa rimossa definitivamente');
+                $this->redirect(array('/spending/index'));
+            }
+        }
+        else
+        {
+            if(Yii::app()->request->isAjaxRequest)
+            {
+                $this->ajaxError();
+            }
+            else
+            {
+                Yii::app()->user->setFlash('error', 'Non è stato possibile rimuovere definitivamente la spesa');
+                $this->redirect(array('/spending/update', 'id'=>$model->id));
+            }                        
+        }
     }    
     
     public function actionEnable()
     {
         $model = $this->loadModel();
+        $this->checkAuth($model);        
         $model->scenario = 'x';
+        if($model->enable())
+        {
+            if(Yii::app()->request->isAjaxRequest)
+            {
+                $this->ajaxSuccess('Spesa ripristinata con successo');
+            }
+            else
+            {
+                Yii::app()->user->setFlash('success', 'Spesa ripristinata nell\'elenco con successo');
+                $this->redirect(array('/spending/view', 'id'=>$model->id));
+            }
+        }
+        else
+        {
+            if(Yii::app()->request->isAjaxRequest)
+            {
+                $this->ajaxError();
+            }
+            else
+            {
+                Yii::app()->user->setFlash('error', 'Non è stato possibile ripristinare la spesa nell\'elenco');
+                $this->redirect(array('/spending/update', 'id'=>$model->id));
+            }            
+        }
         
     }
     
@@ -62,7 +150,7 @@ class SpendingController extends SecureController{
         if(isset($_GET['id']))
         {
             $model = $this->loadModel();
-            $model->checkAuth();            
+            $this->checkAuth($model);            
             $model->scenario = 'cv_upload';
             $tmp = false;
         }
@@ -95,7 +183,7 @@ class SpendingController extends SecureController{
         if(isset($_GET['id']))
         {
             $model = $this->loadModel();
-            $model->checkAuth();            
+            $this->checkAuth($model);            
             $model->scenario = 'project_upload';
             $tmp = false;
         }
@@ -128,7 +216,7 @@ class SpendingController extends SecureController{
         if(isset($_GET['id']))
         {
             $model = $this->loadModel();
-            $model->checkAuth();            
+            $this->checkAuth($model);            
             $model->scenario = 'contract_upload';
             $tmp = false;
         }
@@ -161,7 +249,7 @@ class SpendingController extends SecureController{
         if(isset($_GET['id']))
         {
             $model = $this->loadModel();
-            $model->checkAuth();            
+            $this->checkAuth($model);            
             $model->scenario = 'capitulate_upload';
             $tmp = false;
         }
@@ -194,7 +282,7 @@ class SpendingController extends SecureController{
         if(isset($_GET['id']))
         {
             $model = $this->loadModel();
-            $model->checkAuth();
+            $this->checkAuth($model);            
             $model->scenario = 'other_upload';
             $tmp = false;
         }
@@ -222,10 +310,6 @@ class SpendingController extends SecureController{
         }
                         
     }    
-    
-    public function actionSearch()
-    {
-    }
     
     public function actionDownloadCV()
     {
@@ -357,13 +441,59 @@ class SpendingController extends SecureController{
             $this->ajaxError();                
     }    
     
-    public function actionMy()
+    public function actionSearch()
     {
+        $model = new Spending('search');
+        $model->unsetAttributes();
+        if(isset($_GET['Spending']))
+            $model->attributes = $_GET['Spending'];
+
+        $params =array(
+            'model'=>$model,
+            'search_type' => Spending::SEARCH_ALL            
+        );
+
+        if(!isset($_GET['ajax']))
+            $this->render('list', $params);
+        else
+            $this->renderPartial('list', $params);  
+    }
+    
+    public function actionOwned()
+    {
+        $model = new Spending('search');
+        $model->unsetAttributes();
+        if(isset($_GET['Spending']))
+            $model->attributes = $_GET['Spending'];
+
+        $params =array(
+            'model'=>$model,
+            'search_type' => Spending::SEARCH_MY
+        );
+
+        if(!isset($_GET['ajax']))
+            $this->render('list', $params);
+        else
+            $this->renderPartial('list', $params);  
     }
     
     public function actionDisabled()
     {
-    }    
+        $model = new Spending('search');
+        $model->unsetAttributes();
+        if(isset($_GET['Spending']))
+            $model->attributes = $_GET['Spending'];
+
+        $params =array(
+            'model'=>$model,
+            'search_type' => Spending::SEARCH_DISABLED
+        );
+
+        if(!isset($_GET['ajax']))
+            $this->render('list', $params);
+        else
+            $this->renderPartial('list', $params);  
+    }
     
     protected function loadModel()
     {

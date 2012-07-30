@@ -204,11 +204,11 @@ class Spending extends CActiveRecord
         $t = Yii::app()->db->beginTransaction();
         if($this->delete())
         {
-            $sql = "INSERT INTO spendings_deleted (spending_id, spending_title, spending_amount, deleted_by, deletion_date, is_synched) VALUES(:spending_id, :spending_title, :spending_amount, :deleted_by, CURRENT_TIMESTAMP, :is_synched, :publication_status)";
+            $sql = "INSERT INTO spendings_deleted (spending_id, spending_title, spending_amount, deleted_by, deletion_date, is_synched, publication_status) VALUES(:spending_id, :spending_title, :spending_amount, :deleted_by, CURRENT_TIMESTAMP, :is_synched, :publication_status)";
             if(Yii::app()->db->createCommand($sql)->execute(array(
                 ':spending_id' => $spending_id,
                 ':spending_title' => $spending_title,
-                ':document_identifier' => $spending_amount,
+                ':spending_amount' => $spending_amount,
                 ':deleted_by' => Yii::app()->user->id,
                 ':is_synched' => 0,
                 ':publication_status' => $publication_status

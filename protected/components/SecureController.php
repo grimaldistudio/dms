@@ -185,7 +185,8 @@ class SecureController extends CController
                     );
 
             $spending_list = array(
-                        'label'=>'Spese', 
+                        'label'=>'Spese',       
+                        'visible'=>Yii::app()->authgateway->isAllowed('spending', 'disabled'),                
                         'url'=>Yii::app()->createUrl('/spending/search'), 
                         'active'=>$this->id=='spending' && $this->action->id=='search'
                     );
@@ -217,10 +218,13 @@ class SecureController extends CController
             $items[] = $owned;
             $items[] = $disabled;
             
-            $items[] = array('label'=>'Spese', 'icon'=>'shopping-cart', 'itemOptions'=>array('class'=>'nav-header'));
-            $items[] = $spending_owned;
-            $items[] = $spending_disabled;
-
+            if(Yii::app()->authgateway->isAllowed('spending', 'owned'))
+            {
+                $items[] = array('label'=>'Spese', 'icon'=>'shopping-cart', 'itemOptions'=>array('class'=>'nav-header'));
+                $items[] = $spending_owned;
+                $items[] = $spending_disabled;
+            }
+            
             $items[] = array('label'=>'Amministrazione', 'icon'=>'tags', 'itemOptions'=>array('class'=>'nav-header'));            
             $items[] = $tickets;            
             $items[] = $my_tickets;
@@ -249,7 +253,7 @@ class SecureController extends CController
                 array('label' => 'Archivio', 'url' => Yii::app()->createUrl('/document/search', array('doc_type'=>Document::INTERNAL_USE_TYPE))),
                 array('label' => 'Posta in entrata', 'url' => Yii::app()->createUrl('/document/search', array('doc_type'=>Document::INBOX))),                
                 array('label' => 'Document pubblici', 'url' => Yii::app()->createUrl('/document/search', array('doc_type'=>Document::OUTGOING))),
-                array('label' => 'Spese', 'url' => Yii::app()->createUrl('/spending/search'))                
+                array('label' => 'Spese', 'url' => Yii::app()->createUrl('/spending/search'), 'visible'=>Yii::app()->authgateway->isAllowed('spending', 'search'))                
             ));            
 
             $admin = array('label'=>'Amministrazione', 'url'=>Yii::app()->createUrl('/ticket'), 'active'=>in_array($this->id, array('ticket', 'tag', 'sender')));            

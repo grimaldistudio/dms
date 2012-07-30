@@ -24,13 +24,13 @@ return array(
 			'routes'=>array(
 				array(
 					'class'=>'CFileLogRoute',
-                                        'logFile'=>'dms_cron.log',
+                                        'logFile'=>'dms_cron_error.log',
 					'levels'=>'error, warning'
 				),
 				array(
 					'class'=>'CFileLogRoute',
                                         'logFile'=>'dms_cron_messages.log',
-					'levels'=>'trace'
+					'levels'=>'info'
 				)
 			),
 		),            
@@ -41,7 +41,7 @@ return array(
 	'params'=>array(
 		'supportEmail'=>'api@dms.engisolution.it',
 		'entity' => 'Comune XXX',
-                'api_url' => 'http://demo.noticeboard.it/api',
+                'api_url' => 'http://demo.noticeboard.it',
                 'api_username' => 'API_USERNAME',
                 'api_password' => 'API_KEY',
                 'api_timeout'  => 20, // seconds

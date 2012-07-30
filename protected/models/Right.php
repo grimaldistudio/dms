@@ -90,7 +90,7 @@ class Right extends CActiveRecord
         $criteria=new CDbCriteria;
 
         $criteria->compare('name',$this->name,true);
-        $criteria->compare('key',$this->key,true);
+        $criteria->compare('`key`',$this->key,true);
         
         return new CActiveDataProvider(get_class($this), array(
             'criteria'=>$criteria,

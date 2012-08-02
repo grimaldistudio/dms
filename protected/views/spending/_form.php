@@ -50,6 +50,10 @@ else
                     <?php echo $model->getCVName($tmp); ?> (<?php echo $model->getCVSize($tmp); ?>) KB <?php echo CHtml::link('  ', array_merge(array('/spending/deletecv'), $id_array), array('class'=>'icon-trash delete-file-button')); ?>
                 <?php endif; ?>
             </div>
+            <div class="help-block">
+                E' possibile selezionare solo un file in formato PDF di dimensioni massime <?php echo Spending::CV_MAX_SIZE; ?> MB. <br/>
+                Il caricamento di un nuovo file comporterà la cancellazione del precedente.
+            </div>
         </div>
 
         <br/>
@@ -63,6 +67,10 @@ else
                     <?php echo $model->getContractName($tmp); ?> (<?php echo $model->getContractSize($tmp); ?> KB) <?php echo CHtml::link('  ', array_merge(array('/spending/deletecontract'), $id_array), array('class'=>'icon-trash delete-file-button')); ?>
                 <?php endif; ?>
             </div>
+            <div class="help-block">
+                E' possibile selezionare solo un file in formato PDF di dimensioni massime <?php echo Spending::CONTRACT_MAX_SIZE; ?> MB. <br/>
+                Il caricamento di un nuovo file comporterà la cancellazione del precedente.
+            </div>            
         </div>
              
         <br/>
@@ -76,6 +84,10 @@ else
                     <?php echo $model->getProjectName($tmp); ?> (<?php echo $model->getProjectSize($tmp); ?> KB) <?php echo CHtml::link('  ', array_merge(array('/spending/deleteproject'), $id_array), array('class'=>'icon-trash delete-file-button')); ?>
                 <?php endif; ?>
             </div>
+            <div class="help-block">
+                E' possibile selezionare solo un file in formato PDF di dimensioni massime <?php echo Spending::PROJECT_MAX_SIZE; ?> MB. <br/>
+                Il caricamento di un nuovo file comporterà la cancellazione del precedente.
+            </div>            
         </div>
         
         <br/>
@@ -89,6 +101,10 @@ else
                     <?php echo $model->getCapitulateName($tmp); ?> (<?php echo $model->getCapitulateSize($tmp); ?> KB) <?php echo CHtml::link('  ', array_merge(array('/spending/deletecapitulate'), $id_array), array('class'=>'icon-trash delete-file-button')); ?>
                 <?php endif; ?>
             </div>
+            <div class="help-block">
+                E' possibile selezionare solo un file in formato PDF di dimensioni massime <?php echo Spending::CAPITULATE_MAX_SIZE; ?> MB. <br/>
+                Il caricamento di un nuovo file comporterà la cancellazione del precedente.
+            </div>            
         </div>
 
         <br/>
@@ -101,6 +117,9 @@ else
                     <div class="other-file-item"><?php echo $other; ?> (<?php echo $model->getOtherSize($other, $tmp); ?> KB) <?php echo CHtml::link('  ', array_merge(array('/spending/deleteother', 'filename'=>$other), $id_array), array('class'=>'icon-trash delete-other-file-button')); ?></div>
                 <?php endforeach; ?>
             </div>
+            <div class="help-block">
+                E' possibile caricare fino ad un massimo di <?php echo Spending::MAX_OTHER_DOCUMENTS; ?> files in formato PDF di dimensioni massime <?php echo Spending::OTHER_MAX_SIZE; ?> MB. <br/>
+            </div>            
             <?php $style = ''; ?>
             <?php if(!$model->canAddNewOther($tmp)) $style = 'display:none'; ?>
             <?php echo CHtml::button('Carica', array('id'=>'other-upload-button', 'class'=>'btn btn-primary', 'style'=>$style)); ?>
@@ -290,14 +309,12 @@ Yii::app()->clientScript->registerScript('spending-create-upload-scripts', "
                 },
                 success: function(rawData)
                 {
-                    console.log(rawData);
                     try
                     {
                         data = $.parseJSON(rawData);
                     }
                     catch(e)
                     {
-                        console.log(e);
                         alert('Errore durante il caricamento del file');
                         return false;
                     }
@@ -317,7 +334,6 @@ Yii::app()->clientScript->registerScript('spending-create-upload-scripts', "
                 },
                 error: function(xhr)
                 {
-                    console.log(xhr);
                     $('#'+summaryID).html('Impossibile completare l\'operazione');
                     $('#'+summaryID).show();
                 }
@@ -339,14 +355,12 @@ Yii::app()->clientScript->registerScript('spending-create-upload-scripts', "
                 },
                 success: function(rawData)
                 {
-                    console.log(rawData);
                     try
                     {
                         data = $.parseJSON(rawData);
                     }
                     catch(e)
                     {
-                        console.log(e);
                         alert('Errore durante il caricamento del file');
                         return false;
                     }
@@ -366,7 +380,6 @@ Yii::app()->clientScript->registerScript('spending-create-upload-scripts', "
                 },
                 error: function(xhr)
                 {
-                    console.log(xhr);
                     $('#'+summaryID).html('Impossibile completare l\'operazione');
                     $('#'+summaryID).show();
                 }
@@ -388,14 +401,12 @@ Yii::app()->clientScript->registerScript('spending-create-upload-scripts', "
                 },
                 success: function(rawData)
                 {
-                    console.log(rawData);
-                    try
+                     try
                     {
                         data = $.parseJSON(rawData);
                     }
                     catch(e)
                     {
-                        console.log(e);
                         alert('Errore durante il caricamento del file');
                         return false;
                     }
@@ -415,7 +426,6 @@ Yii::app()->clientScript->registerScript('spending-create-upload-scripts', "
                 },
                 error: function(xhr)
                 {
-                    console.log(xhr);
                     $('#'+summaryID).html('Impossibile completare l\'operazione');
                     $('#'+summaryID).show();
                 }
@@ -437,14 +447,12 @@ Yii::app()->clientScript->registerScript('spending-create-upload-scripts', "
                 },
                 success: function(rawData)
                 {
-                    console.log(rawData);
                     try
                     {
                         data = $.parseJSON(rawData);
                     }
                     catch(e)
                     {
-                        console.log(e);
                         alert('Errore durante il caricamento del file');
                         return false;
                     }
@@ -464,7 +472,6 @@ Yii::app()->clientScript->registerScript('spending-create-upload-scripts', "
                 },
                 error: function(xhr)
                 {
-                    console.log(xhr);
                     $('#'+summaryID).html('Impossibile completare l\'operazione');
                     $('#'+summaryID).show();
                 }
@@ -486,14 +493,12 @@ Yii::app()->clientScript->registerScript('spending-create-upload-scripts', "
                 },
                 success: function(rawData)
                 {
-                    console.log(rawData);
                     try
                     {
                         data = $.parseJSON(rawData);
                     }
                     catch(e)
                     {
-                        console.log(e);
                         alert('Errore durante il caricamento del file');
                         return false;
                     }
@@ -513,7 +518,6 @@ Yii::app()->clientScript->registerScript('spending-create-upload-scripts', "
                 },
                 error: function(xhr)
                 {
-                    console.log(xhr);
                     $('#'+summaryID).html('Impossibile completare l\'operazione');
                     $('#'+summaryID).show();
                 }
@@ -570,7 +574,6 @@ Yii::app()->clientScript->registerScript('spending-form', "
                     alert('Impossibile cancellare il file');
             },
             error: function(xhr){
-                console.log(xhr);
                 alert('Impossibile cancellare il file');
             }
         });
@@ -600,7 +603,6 @@ Yii::app()->clientScript->registerScript('spending-form', "
                     alert('Impossibile cancellare il file');
             },
             error: function(xhr){
-                console.log(xhr);
                 alert('Impossibile cancellare il file');
             }
         });

@@ -116,6 +116,7 @@ class Spending extends CActiveRecord
             'capitulate_file' => 'Capitolato',
             'capitulate_name' => 'Capitolato',
             'other_file' => 'Altra documentazione',
+            'other' => 'Altra documentazione',
             'status' => 'Stato',
             'spending_date' => 'Data', 
             'date_created' => 'Data di creazione',

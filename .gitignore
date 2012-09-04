@@ -15,3 +15,4 @@ protected/uploads/**/*
 protected/uploads/*
 protected/tmp_files/*
 protected/runtime/*
+protected/config/main.php

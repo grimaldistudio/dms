@@ -140,7 +140,7 @@ class AuthController extends Controller{
                 if($user->resetPassword($model->password))
                 {
                     Yii::app()->user->setFlash('success', 'La password è stata cambiata con successo.');
-                    $this->redirect('auth/login');
+                    $this->redirect('login');
                 }
                 else
                 {

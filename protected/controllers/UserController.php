@@ -34,6 +34,12 @@ class UserController extends SecureController{
     {
         $model = $this->loadModel();
         $model->scenario = 'view';
+
+        if($model->is_admin && !Yii::app()->user->isSuperadmin())
+        {
+            throw new CHttpException(403, 'Azione non consentita');
+        }
+
         if($model->disable())
         {
             if(Yii::app()->request->isAjaxRequest)
@@ -60,6 +66,12 @@ class UserController extends SecureController{
     {
         $model = $this->loadModel();
         $model->scenario = 'view';
+
+        if($model->is_admin && !Yii::app()->user->isSuperadmin())
+        {
+            throw new CHttpException(403, 'Azione non consentita');
+        }
+        
         if($model->enable())
         {
             if(Yii::app()->request->isAjaxRequest)
@@ -86,6 +98,12 @@ class UserController extends SecureController{
     {
         $model = $this->loadModel();
         $model->setScenario('update');
+
+        if($model->is_admin && !Yii::app()->user->isSuperadmin())
+        {
+            throw new CHttpException(403, 'Azione non consentita');
+        }
+
         $model->loadGroupIds();
         $model->loadRoleIds();
         

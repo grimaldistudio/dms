@@ -23,7 +23,9 @@
         <?php echo $form->textFieldRow($model, 'firstname'); ?>
         <?php echo $form->textFieldRow($model, 'lastname'); ?>
         <?php echo $form->textFieldRow($model, 'telephone'); ?>
+        <?php if(Yii::app()->user->isSuperadmin()): ?> 
         <?php echo $form->checkBoxRow($model, 'is_admin');  ?>
+        <?php endif; ?>
         </div>
 
         <div class="span4">

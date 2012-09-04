@@ -14,8 +14,12 @@
 <?php echo $form->textFieldRow($model, 'email'); ?>
 <?php echo $form->textFieldRow($model, 'firstname'); ?>
 <?php echo $form->textFieldRow($model, 'lastname'); ?>
-<?php echo $form->textFieldRow($model, 'telephone'); ?> 
+<?php echo $form->textFieldRow($model, 'telephone'); ?>
+
+<?php if(Yii::app()->user->isSuperadmin()): ?> 
 <?php echo $form->checkBoxRow($model, 'is_admin');  ?>
+<?php endif; ?>
+
 <?php echo $form->dropDownListRow($model, 'group_ids', CHtml::listData(Group::model()->findAll(), 'id', 'name'), array('multiple'=>'multiple', 'key'=>'group_ids', 'class'=>'multiselect')); ?>
 <?php echo $form->dropDownListRow($model, 'role_ids', CHtml::listData(Role::model()->findAll(), 'id', 'name'), array('multiple'=>'multiple','key'=>'role_ids', 'class'=>'multiselect')); ?>
 

@@ -213,6 +213,9 @@ class User extends CActiveRecord
         $criteria->addNotInCondition('email', Yii::app()->params['superadmins']);
         $criteria->compare('status',$this->status);
         
+        if(!Yii::app()->user->isSuperadmin())
+            $criteria->compare('is_admin', 0);
+
         return new CActiveDataProvider(get_class($this), array(
             'criteria'=>$criteria,
             'sort'=>array(
@@ -339,6 +342,7 @@ class User extends CActiveRecord
         catch(Exception $e)
         {
             Yii::log('Error Forgot Password E-mail to: '. $user->email, 'error');
+            Yii::log($e->getMessage(), 'error');            
             return false;
         }
     }
@@ -358,6 +362,7 @@ class User extends CActiveRecord
         catch(Exception $e)
         {
             Yii::log('Error New Account E-mail to: '. $this->email, 'error');
+            Yii::log($e->getMessage(), 'error');
             return false;
         }	
     }

@@ -119,7 +119,7 @@ CREATE TABLE `document_history` (
   KEY `log_document_id` (`document_id`) USING BTREE,
   CONSTRAINT `document_history_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `document_history_ibfk_2` FOREIGN KEY (`document_id`) REFERENCES `documents` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -173,7 +173,7 @@ CREATE TABLE `documents` (
   CONSTRAINT `documents_creator_id` FOREIGN KEY (`creator_id`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `documents_last_updater_id` FOREIGN KEY (`last_updater_id`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `documents_sender_id` FOREIGN KEY (`sender_id`) REFERENCES `senders` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -182,7 +182,6 @@ CREATE TABLE `documents` (
 
 LOCK TABLES `documents` WRITE;
 /*!40000 ALTER TABLE `documents` DISABLE KEYS */;
-INSERT INTO `documents` VALUES (1,'123123/12','Avviso 12345',5,5,1,'2012-08-03 08:55:49','2012-08-03 08:55:49',0,1,1,1,0,NULL,'0000-00-00 00:00:00',1,'','Ufficio XXX','',NULL,'2012-07-31 22:00:00','2012-08-30 22:00:00',NULL,'<p>Descrizione avviso</p>',1,0),(2,'9999/12','Bando YYY',10,5,1,'2012-08-03 08:56:54','2012-08-03 08:56:54',0,1,1,1,0,NULL,'0000-00-00 00:00:00',1,'','Ufficio ICT','',NULL,'2012-08-14 22:00:00','2012-09-29 22:00:00',NULL,'<p>Descrizione Bando</p>',1,0);
 /*!40000 ALTER TABLE `documents` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -268,7 +267,7 @@ CREATE TABLE `documents_rights` (
   CONSTRAINT `documents_rights_ibfk_1` FOREIGN KEY (`document_id`) REFERENCES `documents` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `documents_rights_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `documents_rights_ibfk_3` FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -300,7 +299,7 @@ CREATE TABLE `groups` (
   `status` int(4) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uffici_nome_UNIQUE` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -309,7 +308,6 @@ CREATE TABLE `groups` (
 
 LOCK TABLES `groups` WRITE;
 /*!40000 ALTER TABLE `groups` DISABLE KEYS */;
-INSERT INTO `groups` VALUES (1,'Test gruppo','Gruppo xxx','12312312312','','test@comune1.fr.it','test_gruppo','2012-09-04 07:27:58','2012-09-04 07:27:58',1);
 /*!40000 ALTER TABLE `groups` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -404,7 +402,7 @@ CREATE TABLE `roles` (
   `description` tinytext NOT NULL,
   `is_locked` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -470,7 +468,7 @@ CREATE TABLE `senders` (
   KEY `city_id` (`city_id`) USING BTREE,
   CONSTRAINT `senders_city_id_fk` FOREIGN KEY (`city_id`) REFERENCES `cities` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `senders_country_id_fk` FOREIGN KEY (`country_id`) REFERENCES `countries` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -514,7 +512,7 @@ CREATE TABLE `spendings` (
   PRIMARY KEY (`id`),
   KEY `creator_id` (`creator_id`),
   CONSTRAINT `spendings_ibfk_1` FOREIGN KEY (`creator_id`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -523,7 +521,6 @@ CREATE TABLE `spendings` (
 
 LOCK TABLES `spendings` WRITE;
 /*!40000 ALTER TABLE `spendings` DISABLE KEYS */;
-INSERT INTO `spendings` VALUES (2,'Test','<p>Incarico per la realizzazione del sistema di gestione documentale.</p>','Engineering Solution srl',1000.00,'Modalità YYY','Norma XXX','Ufficio WWW','Mario Rossi','2012-07-31 22:00:00','','','','',1,1,0,1,1,'2012-08-03 08:28:28','2012-08-03 08:28:28');
 /*!40000 ALTER TABLE `spendings` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -569,7 +566,7 @@ CREATE TABLE `tags` (
   `name` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `tags_name_UNIQUE` (`name`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -578,7 +575,6 @@ CREATE TABLE `tags` (
 
 LOCK TABLES `tags` WRITE;
 /*!40000 ALTER TABLE `tags` DISABLE KEYS */;
-INSERT INTO `tags` VALUES (1,'avviso'),(2,'bando'),(3,'ict');
 /*!40000 ALTER TABLE `tags` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -606,7 +602,6 @@ CREATE TABLE `tags_documents` (
 
 LOCK TABLES `tags_documents` WRITE;
 /*!40000 ALTER TABLE `tags_documents` DISABLE KEYS */;
-INSERT INTO `tags_documents` VALUES (1,1),(2,2),(3,2);
 /*!40000 ALTER TABLE `tags_documents` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -697,7 +692,7 @@ CREATE TABLE `users` (
   `num_logins` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `users_email_UNIQUE` (`email`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -706,7 +701,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'Super','Amministratore','1111111111','superadmin@comune1.fr.it','36141bd2c2ab79c464b385d882c91048','4facc2e801e8b2.36790855',1,'2012-03-01 16:31:00','2012-09-04 07:27:11',1,'192.168.1.102','2012-09-04 07:27:11',NULL,'0000-00-00 00:00:00',103),(2,'Fabrizio','D\'Ammassa','3482792935','fabrizio.dammassa+1@gmail.com','7b6d3f4123594fba3ebef222e1d6ab1a','5045a9325c8764.65523696',1,'2012-09-04 07:09:38','2012-09-04 07:28:34',0,'','0000-00-00 00:00:00',NULL,'0000-00-00 00:00:00',0),(3,'Fabrizio','D\'Ammassa','12312312','fabrizio.dammassa+2@gmail.com','8678d2403719f79d0e4e85819759a29f','5045ab6506c650.91892123',1,'2012-09-04 07:12:12','2012-09-04 07:28:24',1,'192.168.1.102','2012-09-04 07:28:24','06020e479958ed403488a0ef61ac8d86','2012-09-04 07:18:44',2),(4,'Fabrizio','D\'Ammassa','12312312','fabrizio.dammassa+3@gmail.com','f66137893a66853acde06df51da2cfc0','5045ab39baa225.80176662',1,'2012-09-04 07:18:17','2012-09-04 07:18:17',1,'','0000-00-00 00:00:00',NULL,'0000-00-00 00:00:00',0);
+INSERT INTO `users` VALUES (1,'Super','Amministratore','1111111111','superadmin@comune1.fr.it','36141bd2c2ab79c464b385d882c91048','4facc2e801e8b2.36790855',1,'2012-03-01 16:31:00','2012-09-04 07:27:11',1,'192.168.1.102','2012-09-04 07:27:11',NULL,'0000-00-00 00:00:00',103);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -736,7 +731,7 @@ CREATE TABLE `users_document_requests` (
   CONSTRAINT `users_doc_request_document_id` FOREIGN KEY (`document_id`) REFERENCES `documents` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `users_doc_request_replier_id_fk` FOREIGN KEY (`replier_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `users_doc_request_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -772,7 +767,6 @@ CREATE TABLE `users_groups` (
 
 LOCK TABLES `users_groups` WRITE;
 /*!40000 ALTER TABLE `users_groups` DISABLE KEYS */;
-INSERT INTO `users_groups` VALUES (1,2);
 /*!40000 ALTER TABLE `users_groups` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -800,7 +794,6 @@ CREATE TABLE `users_roles` (
 
 LOCK TABLES `users_roles` WRITE;
 /*!40000 ALTER TABLE `users_roles` DISABLE KEYS */;
-INSERT INTO `users_roles` VALUES (2,2),(2,3);
 /*!40000 ALTER TABLE `users_roles` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -813,4 +806,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2012-09-04 14:39:38
+-- Dump completed on 2012-09-04 14:42:21

@@ -76,7 +76,10 @@ class PreviewManager {
         try{
             $pdf = $this->path.'['.$page.']';
             exec("convert -scale ".self::FULL_MAX_WIDTH."x".self::FULL_MAX_HEIGHT." -density 200x200 -quality 70 ".escapeshellarg($pdf)." ".escapeshellarg($this->getPagedCachePath($page)));
-            return true;
+            if(file_exists(($this->getPagedCachePath($page))))
+                return true;
+            else
+                return false;
         }
         catch(Exception $e)
         {
@@ -89,7 +92,10 @@ class PreviewManager {
         try{
             $pdf = $this->path.'[0]';
             exec("convert -scale ".self::THUMBNAIL_MAX_WIDTH."x".self::THUMBNAIL_MAX_HEIGHT." -density 200x200 -quality 70 ".escapeshellarg($pdf)." ".escapeshellarg($this->getThumbnailCachePath()));
-            return true;
+            if(file_exists(($this->getThumbnailCachePath())))
+                return true;
+            else
+                return false;
         }
         catch(Exception $e)
         {

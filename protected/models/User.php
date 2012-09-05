@@ -191,14 +191,20 @@ class User extends CActiveRecord
             $this->plain_password = $this->createRandomPassword();
         $this->status = self::ACTIVE_STATUS;            
         $this->password = $this->hashPassword($this->plain_password, $this->salt);
+
+        $t = Yii::app()->db->beginTransaction();
+
         $ret = $this->save();
-        
+
         if($ret)
         {
             if(Yii::app()->params['isDemo']===false)
                 $this->sendNewAccountEmail();
+
+            $t->commit();
             return TRUE;
         }
+        $t->rollback();
         return FALSE;
     }
 

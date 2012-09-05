@@ -127,7 +127,7 @@ else
     <?php echo $form->error($model, 'sender_id'); ?>
 </div>
 
-<?php echo $form->textFieldRow($model, 'date_received', array('id'=>'date_received', 'value'=>date('d/m/Y', is_int($model->date_received)?$model->date_received:strtotime($model->date_received)))); ?>
+<?php echo $form->textFieldRow($model, 'date_received', array('id'=>'date_received', 'value'=>$model->date_received?date('d/m/Y', is_int($model->date_received)?$model->date_received:strtotime($model->date_received)):'')); ?>
 
 <?php endif; ?>
 

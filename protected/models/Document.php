@@ -856,6 +856,18 @@ class Document extends CActiveRecord
                 }
             }
         }
+        else
+        {
+            if($this->delete())
+            {
+                if(@unlink($path))
+                {
+                    @exec('rm -f '.$cache_path.DIRECTORY_SEPARATOR.$name.'_*.jpg');
+                    $db->commit();
+                    return true;
+                }
+            }
+        }
         $db->rollback();
         return false;
     }

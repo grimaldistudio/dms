@@ -16,3 +16,4 @@ protected/uploads/*
 protected/tmp_files/*
 protected/runtime/*
 protected/config/main.php
+protected/config/console.php

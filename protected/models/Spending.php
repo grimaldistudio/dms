@@ -178,21 +178,33 @@ class Spending extends CActiveRecord
     public function updateSpending()
     {
         $this->is_dirty = 1;
-        return $this->save();
+        $t = Yii::app()->db->beginTransaction();
+        $ret = $this->save();
+        if($ret && $this->syncSymlink())
+        {
+            $t->commit();
+            return true;
+        }
+        $t->rollback();
+        return false;
     }
     
     public function disable()
     {
         $this->is_dirty = 1;
         $this->status = self::DISABLED_STATUS;
-        return $this->save();
+        if($this->publication_requested && $this->removePublicSymlink())
+            return $this->save();
+        return false;
     }
     
     public function enable()
     {
         $this->is_dirty = 1;        
         $this->status = self::ACTIVE_STATUS;
-        return $this->save();
+        if($this->publication_requested && $this->addPublicSymlink())
+            return $this->save();
+        return false;
     }
     
     public function deleteSpending()
@@ -213,7 +225,7 @@ class Spending extends CActiveRecord
                 ':deleted_by' => Yii::app()->user->id,
                 ':is_synched' => 0,
                 ':publication_status' => $publication_status
-            )))
+            )) && $this->removePublicSymlink())
             {
                 $t->commit();
                 @$this->rrmdir($path);
@@ -294,6 +306,12 @@ class Spending extends CActiveRecord
             }
         }
         
+        if($this->publication_requested && !$this->addPublicSymlink())
+        {
+            $this->addError('id', 'Errore durante la creazione: 18');
+            return false;
+        }
+
         @unlink($cv_path);
         @unlink($capitulate_path);
         @unlink($contract_path);
@@ -305,7 +323,44 @@ class Spending extends CActiveRecord
         
         return true;
     }
-    
+
+    public function addPublicSymlink()
+    {
+        $source = $this->getPath();
+        $target = $this->getPublicPath();
+
+        if(is_link($target) || @symlink($source, $target))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function removePublicSymlink()
+    {
+        $target = $this->getPublicPath();
+        if(is_link($target))
+        {
+            if(@unlink($target))
+                return true;
+
+            return false;
+        }
+        return true;
+    }
+
+    public function syncSymlink()
+    {
+        $target = $this->getPublicPath();
+        if($this->publication_requested && !file_exists($target))
+            return $this->addPublicSymlink();
+        elseif(!$this->publication_requested && file_exists($target))
+            return $this->removePublicSymlink();
+
+        return true;
+    }
+
     public function getSearchTypeArray()
     {
         return array(
@@ -965,7 +1020,6 @@ class Spending extends CActiveRecord
         return $this->title;
     }
     
-
     private function loadTmpFiles()
     {
         $tmp_path = $this->getTmpPath();
@@ -1044,6 +1098,11 @@ class Spending extends CActiveRecord
     public function getPath()
     {
         return Yii::getPathOfAlias('uploads').DIRECTORY_SEPARATOR.'spendings'.DIRECTORY_SEPARATOR.$this->id;
+    }
+
+    public function getPublicPath()
+    {
+        return Yii::getPathOfAlias('uploads').DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'spendings'.DIRECTORY_SEPARATOR.$this->id;
     }
     
     public function getDisplayAmount()

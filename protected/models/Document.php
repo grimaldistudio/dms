@@ -254,9 +254,13 @@ class Document extends CActiveRecord
             {
                 if($this->saveHistory())
                 {
-                    // commit
-                    $t->commit();
-                    return true;
+                    // TODO
+                    if(($this->document_type==self::OUTGOING && $this->syncFile()) || $this->document_type!=self::OUTGOING)
+                    {
+                        // commit
+                        $t->commit();
+                        return true;
+                    }
                 }
             }
         }
@@ -337,12 +341,14 @@ class Document extends CActiveRecord
         {
             $time = strtotime($this->date_created);
             $dst_path = Yii::getPathOfAlias('uploads').DIRECTORY_SEPARATOR.'saved'.DIRECTORY_SEPARATOR.date('Y', $time).DIRECTORY_SEPARATOR.date('m', $time).DIRECTORY_SEPARATOR.date('d', $time);
+            
             if(file_exists($dst_path) || mkdir($dst_path, 0777, true))
             {
                 if(rename($this->tmp_path, $dst_path.DIRECTORY_SEPARATOR.'documento_'.$this->id.'.pdf'))
                 {
                     $this->document_manager->deleteCacheFiles();
-                    return true;
+                    if(($this->publication_requested && $this->addPublishedFile()) || !$this->publication_requested)
+                        return true;
                 }
                 
             }
@@ -361,8 +367,11 @@ class Document extends CActiveRecord
         {
             if($this->saveHistory())
             {
-                $t->commit();
-                return true;
+                if(($this->isSynched() && $this->removePublishedFile()) || !$this->isSynched())
+                {
+                    $t->commit();
+                    return true;
+                }
             }
         }
         $t->rollback();
@@ -379,8 +388,11 @@ class Document extends CActiveRecord
         {
             if($this->saveHistory())
             {
-                $t->commit();
-                return true;
+                if(($this->isSynched() && $this->addPublishedFile()) || !$this->isSynched())
+                {
+                    $t->commit();
+                    return true;
+                }
             }
         }
         $t->rollback();
@@ -846,7 +858,7 @@ class Document extends CActiveRecord
             {
                 if($this->delete())
                 {
-                    if(@unlink($path))
+                    if(@unlink($path) && $this->removePublishedFile())
                     {
                         @exec('rm -f '.$cache_path.DIRECTORY_SEPARATOR.$name.'_*.jpg');
                         $db->commit();
@@ -897,5 +909,55 @@ class Document extends CActiveRecord
     public function isSynched()
     {
         return $this->publication_status == self::PUBLISHED;
+    }
+
+    public function removePublishedFile()
+    {
+        $public_path = $this->getPublicPath();
+        if(file_exists($public_path))
+        {
+            if(@unlink($public_path))
+            {
+                return true;
+            }
+            return false;
+        }
+        return true;
+    }
+
+    public function addPublishedFile()
+    {
+        $public_path = $this->getPublicPath();
+        $path = $this->getPath();
+
+        $dirname = dirname($public_path);
+
+        if(file_exists($path))
+        {
+            if(is_dir($dirname) || (!is_dir($dirname) && mkdir($dirname, 0777, true)))
+            {
+                if(copy($path, $public_path))
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    public function syncFile()
+    {
+        if($this->publication_requested && !file_exists($this->getPublicPath()))
+        {
+            return $this->addPublishedFile();
+        }
+        elseif(!$this->publication_requested && file_exists($this->getPublicPath()))
+        {
+            return $this->removePublishedFile();
+        }
+        return true;
+    }
+
+    protected function getPublicPath()
+    {
+        return Yii::getPathOfAlias('uploads').DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.$this->getRelativePath().DIRECTORY_SEPARATOR.$this->getDocumentName();
     }
 }

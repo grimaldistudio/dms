@@ -98,7 +98,7 @@ else
 
 <?php echo $form->checkBoxRow($model, 'publication_requested'); ?>
 
-<?php echo $form->checkBoxRow($model, 'sync_files'); ?>
+<?php echo $form->checkBoxRow($model, 'sync_file'); ?>
 
 <?php endif; ?>
 

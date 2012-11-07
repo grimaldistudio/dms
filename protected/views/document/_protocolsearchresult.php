@@ -13,6 +13,11 @@
     </tr>
 
     <tr>
+        <th><label><?php echo Document::model()->getAttributeLabel('is_inbound'); ?></label></th>
+        <td><p><?php echo Document::model()->getProtocolDesc($data['is_inbound']); ?></p></td>
+    </tr>
+
+    <tr>
         <th><label><?php echo Document::model()->getAttributeLabel('date_received'); ?></label></th>
         <td><p><?php echo date('d-m-Y', strtotime($data['date_received'])); ?></p></td>
     </tr>

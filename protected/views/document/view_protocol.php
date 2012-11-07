@@ -18,11 +18,17 @@ if(Yii::app()->user->hasDocumentPrivilege($model->id, AclManager::PERMISSION_ADM
                 <th><?php echo $model->getAttributeLabel('main_document_type'); ?></th>
                 <td><?php echo $model->getMainTypeDesc(); ?></td>
             </tr>          
+            
             <tr>
                 <th width="30%"><?php echo $model->getAttributeLabel('identifier'); ?></th>
                 <td>#<?php echo CHtml::encode($model->identifier); ?></td>
             </tr>
             
+            <tr>
+                <th><?php echo $model->getAttributeLabel('is_inbound'); ?></th>
+                <td><?php echo $model->getProtocolDesc(); ?></td>
+            </tr>          
+
             <tr>
                 <th><?php echo $model->getAttributeLabel('name'); ?></th>
                 <td><?php echo CHtml::encode($model->name); ?></td>

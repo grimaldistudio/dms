@@ -78,7 +78,7 @@ class DocumentSearchForm extends CFormModel{
                 $params = array(':identifier'=>$this->identifier, ':main_document_type'=>$doc_type);                
                 $count = Yii::app()->db->createCommand("SELECT count(d.id) FROM documents d WHERE d.status = 1 AND d.identifier = :identifier")->queryScalar($params);
 
-                $sql = "SELECT d.id, d.name, d.identifier, d.description, d.document_type, d.date_received, d.last_updated, d.publication_date_from, d.publication_date_to, d.publication_requested, d.publication_status,  FROM documents d
+                $sql = "SELECT d.id, d.name, d.identifier, d.publication_number, d.is_inbound, d.description, d.document_type, d.date_received, d.last_updated, d.publication_date_from, d.publication_date_to, d.publication_requested, d.publication_status,  FROM documents d
                                                             WHERE d.status = 1
                                                                 AND d.identifier = :identifier  
                                                                 AND d.main_document_type = :main_document_type
@@ -89,7 +89,7 @@ class DocumentSearchForm extends CFormModel{
                 $this->buildTagsArray();
                 $num_tags = count($this->tags_array);
                 $params = array(':main_document_type'=>$doc_type);
-                $sql_select = "SELECT i2t" . ($num_tags - 1) . ".document_id as id, d.identifier, d.name, d.description, d.document_type, d.date_received, d.publication_date_from, d.publication_date_to, d.publication_requested, d.publication_status, d.last_updated, u.firstname, u.lastname, u.email ";
+                $sql_select = "SELECT i2t" . ($num_tags - 1) . ".document_id as id, d.identifier, d.publication_number, d.is_inbound, d.name, d.description, d.document_type, d.date_received, d.publication_date_from, d.publication_date_to, d.publication_requested, d.publication_status, d.last_updated, u.firstname, u.lastname, u.email ";
                 $sql_count_select = "SELECT count(DISTINCT(i2t" . ($num_tags - 1) . ".document_id)) ";
                 $sql_from = " FROM ";
                 $sql_where = " WHERE ";
@@ -133,7 +133,7 @@ class DocumentSearchForm extends CFormModel{
             {
                 $params = array(':main_document_type'=>$doc_type);
                 $sql_count = "SELECT count(d.id) FROM documents d WHERE d.status = 1 ";
-                $sql = "SELECT d.id, d.name, d.identifier, d.description, d.document_type, d.date_received, d.publication_date_from, d.publication_date_to, d.publication_requested, d.publication_status, d.last_updated, u.firstname, u.lastname, u.email 
+                $sql = "SELECT d.id, d.name, d.identifier, d.publication_number, d.is_inbound, d.description, d.document_type, d.date_received, d.publication_date_from, d.publication_date_to, d.publication_requested, d.publication_status, d.last_updated, u.firstname, u.lastname, u.email 
                                                             FROM documents d
                                                             JOIN users u ON u.id = d.creator_id
                                                             WHERE d.status = 1

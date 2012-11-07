@@ -119,7 +119,7 @@ CREATE TABLE `document_history` (
   KEY `log_document_id` (`document_id`) USING BTREE,
   CONSTRAINT `document_history_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `document_history_ibfk_2` FOREIGN KEY (`document_id`) REFERENCES `documents` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -128,7 +128,6 @@ CREATE TABLE `document_history` (
 
 LOCK TABLES `document_history` WRITE;
 /*!40000 ALTER TABLE `document_history` DISABLE KEYS */;
-INSERT INTO `document_history` VALUES (1,1,1,'Documento rimosso dall\'elenco',1,'2012-09-06 12:44:38'),(3,1,7,'Pubblicato su albo',2,'2012-09-12 12:27:41'),(4,1,10,'asdasdasd',2,'2012-09-12 12:33:55'),(5,1,7,'asdasdasd',4,'2012-11-07 13:51:34'),(6,1,7,'asdasdas',6,'2012-11-07 13:56:02'),(7,1,11,'Visibile a tutti',2,'2012-11-07 14:22:23'),(8,1,11,'Visibile a tutti',4,'2012-11-07 18:04:55'),(9,1,11,'Visibile a tutti',6,'2012-11-07 18:12:24');
 /*!40000 ALTER TABLE `document_history` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -144,7 +143,7 @@ CREATE TABLE `documents` (
   `identifier` varchar(64) DEFAULT NULL,
   `name` varchar(255) NOT NULL,
   `document_type` tinyint(4) NOT NULL,
-  `main_document_type` tinyint(4) NOT NULL DEFAULT '3',
+  `main_document_type` tinyint(4) NOT NULL DEFAULT '0',
   `creator_id` int(11) NOT NULL,
   `date_created` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `last_updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -154,7 +153,7 @@ CREATE TABLE `documents` (
   `publication_requested` tinyint(4) NOT NULL DEFAULT '0',
   `is_dirty` tinyint(4) NOT NULL DEFAULT '0',
   `sender_id` int(11) DEFAULT NULL,
-  `date_received` timestamp NULL DEFAULT NULL,
+  `date_received` timestamp NULL DEFAULT '0000-00-00 00:00:00',
   `priority` int(11) DEFAULT '1',
   `entity` varchar(128) DEFAULT NULL,
   `proposer_service` varchar(128) DEFAULT NULL,
@@ -162,10 +161,6 @@ CREATE TABLE `documents` (
   `act_date` date DEFAULT NULL,
   `publication_date_from` timestamp NULL DEFAULT NULL,
   `publication_date_to` timestamp NULL DEFAULT NULL,
-  `is_visible_to_all` tinyint(1) NOT NULL DEFAULT '0',
-  `sync_file` tinyint(1) NOT NULL DEFAULT '1',
-  `is_inbound` tinyint(1) NOT NULL DEFAULT '1',
-  `publication_number` varchar(128) DEFAULT NULL,
   `last_updater_id` int(11) DEFAULT NULL,
   `description` text NOT NULL,
   `num_pages` int(11) NOT NULL,
@@ -178,7 +173,7 @@ CREATE TABLE `documents` (
   CONSTRAINT `documents_creator_id` FOREIGN KEY (`creator_id`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `documents_last_updater_id` FOREIGN KEY (`last_updater_id`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `documents_sender_id` FOREIGN KEY (`sender_id`) REFERENCES `senders` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -187,7 +182,6 @@ CREATE TABLE `documents` (
 
 LOCK TABLES `documents` WRITE;
 /*!40000 ALTER TABLE `documents` DISABLE KEYS */;
-INSERT INTO `documents` VALUES (1,'123123123','adasdasda',5,5,1,'2012-09-06 12:44:29','2012-09-06 12:44:38',1,0,0,0,1,NULL,NULL,1,'','','',NULL,'2012-09-03 22:00:00','2012-09-28 22:00:00',0,1,1,NULL,1,'<p>asdad</p>',3,0),(7,'12314','aasasd',5,5,1,'2012-09-12 12:16:51','2012-11-07 13:56:02',6,1,0,1,1,NULL,NULL,1,'','','',NULL,NULL,NULL,0,1,0,'12312312',1,'<p>asdkasdaskd</p>',2,0),(10,'35425','adasd',5,5,1,'2012-09-12 12:20:23','2012-09-12 12:33:55',2,1,0,0,1,NULL,NULL,1,'','','',NULL,NULL,NULL,0,1,1,NULL,1,'<p>asdasd</p>',2,0),(11,'812309123091239','askasdkasdk',0,3,1,'2012-11-07 13:28:34','2012-11-07 18:12:24',6,1,0,0,1,1,'2012-01-08 23:00:00',1,NULL,NULL,NULL,NULL,NULL,NULL,1,0,1,NULL,1,'<p>asklasdklasdklasdklasd</p>',1,0);
 /*!40000 ALTER TABLE `documents` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -273,7 +267,7 @@ CREATE TABLE `documents_rights` (
   CONSTRAINT `documents_rights_ibfk_1` FOREIGN KEY (`document_id`) REFERENCES `documents` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `documents_rights_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `documents_rights_ibfk_3` FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -305,7 +299,7 @@ CREATE TABLE `groups` (
   `status` int(4) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uffici_nome_UNIQUE` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -314,7 +308,6 @@ CREATE TABLE `groups` (
 
 LOCK TABLES `groups` WRITE;
 /*!40000 ALTER TABLE `groups` DISABLE KEYS */;
-INSERT INTO `groups` VALUES (2,'test','asdadas','1231312','123123','test@test.com','test','2012-11-07 14:08:59','2012-11-07 14:08:59',1),(3,'asdadas','asdasdas','1231312','1231112','test1@test.com','asdadas','2012-11-07 14:09:34','2012-11-07 14:09:34',1),(4,'Test ufficio','asdasasd','1232312','12312312','test3234@test.com','test_ufficio','2012-11-07 14:09:47','2012-11-07 14:09:47',1);
 /*!40000 ALTER TABLE `groups` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -383,7 +376,7 @@ CREATE TABLE `rights` (
   `name` varchar(100) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `rights_key` (`key`)
-) ENGINE=InnoDB AUTO_INCREMENT=1028 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1026 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -392,7 +385,7 @@ CREATE TABLE `rights` (
 
 LOCK TABLES `rights` WRITE;
 /*!40000 ALTER TABLE `rights` DISABLE KEYS */;
-INSERT INTO `rights` VALUES (19,'tag/index','Elenco Tags'),(20,'tag/create','Creazione nuovo Tag da pannello'),(21,'tag/update','Aggiornamento tag'),(22,'tag/delete','Cancellazione tag'),(23,'document/protocol','Protocollare documento'),(24,'sender/delete','Cancellazione mittente'),(25,'sender/enable','Ripristino mittente'),(26,'document/index','Documenti assegnati'),(27,'document/pending','Documenti da protocollare/archiviare'),(28,'document/deletepending','Rimuovere documento in attesa'),(29,'document/preview','Preview documento in attesa'),(30,'document/thumbnail','Thumbnail documento in attesa'),(31,'document/archive','Archiviazione documento'),(32,'document/previewpdf','Preview pdf documento in attesa'),(33,'document/update','Aggiornamento documento'),(34,'document/disable','Cestina documento'),(35,'document/delete','Cancellazione documento'),(36,'document/enable','Ripristino documento'),(37,'document/updaterights','Aggiorna permessi documento'),(38,'document/rights','Vedi permessi documento'),(39,'document/upload','Carica nuovo documento'),(40,'document/removeuser','Rimuovi permesso utente'),(41,'document/removegroup','Rimuovi permesso gruppo'),(42,'document/disabled','Elenco documenti cestinati'),(43,'document/owned','Elenco documenti creati'),(44,'ticket/index','Elenco tickets da gestire'),(45,'ticket/update','Aggiornamento ticket'),(46,'sender/index','Rubrica mittenti'),(47,'sender/update','Aggiornamento mittente'),(48,'sender/create','Creazione mittente'),(49,'sender/view','Vedi mittente'),(50,'document/search','Cerca documenti'),(51,'document/history','History documento'),(52,'document/my','Documenti assegnati'),(53,'document/view','Visualizzazione documento'),(54,'document/viewpdf','Visualizzazione pdf documento'),(55,'document/previewdoc','Preview pdf documento'),(56,'document/newticket','Creazione nuovo ticket'),(57,'notification/index','Elenco notifiche'),(58,'notification/markread','Lettura notifica'),(59,'notification/view','Visualizzazione notifica'),(60,'notification/new','Elenco ultime notifiche'),(61,'ticket/my','Elenco propri tickets'),(62,'ticket/delete','Cancellazione ticket'),(63,'ticket/view','Visualizzazione ticket'),(64,'notification/markall','Leggi tutte le notifiche'),(1000,'document/publish','Nuovo documento pubblico'),(1001,'spending/index','Home Spese'),(1002,'spending/create','Creazione Spesa'),(1003,'spending/update','Aggiornamento Spesa'),(1004,'spending/enable','Ripristinare Spesa'),(1005,'spending/disable','Disabilitare Spesa'),(1006,'spending/view','Visualizzazione spesa'),(1007,'spending/delete','Cancellare Spesa'),(1008,'spending/uploadcv','Upload CV Spesa'),(1009,'spending/uploadcontract','Upload Contratto Spesa'),(1010,'spending/uploadproject','Upload Progetto Spesa'),(1011,'spending/uploadcapitulate','Upload Capitolato Spesa'),(1012,'spending/uploadother','Upload Altra Documentazione'),(1013,'spending/downloadcv','Download CV Spesa'),(1014,'spending/downloadcontract','Download Contratto Spesa'),(1015,'spending/downloadproject','Download Progetto Spesa'),(1016,'spending/downloadcapitulate','Download Capitolato Spesa'),(1017,'spending/downloadother','Download Altra Documentazione'),(1018,'spending/deletecv','Cancellare CV Spesa'),(1019,'spending/deletecontract','Cancellare Contratto Spesa'),(1020,'spending/deleteproject','Cancellare Progetto Spesa'),(1021,'spending/deletecapitulate','Cancellare Capitolato Spesa'),(1022,'spending/deleteother','Cancellare Altra Documentazione'),(1023,'spending/owned','Elenco Proprie Spese'),(1024,'spending/disabled','Cestino Spese'),(1025,'spending/search','Ricerca Spese'),(1026,'document/public','Documenti visibili a tutti');
+INSERT INTO `rights` VALUES (19,'tag/index','Elenco Tags'),(20,'tag/create','Creazione nuovo Tag da pannello'),(21,'tag/update','Aggiornamento tag'),(22,'tag/delete','Cancellazione tag'),(23,'document/protocol','Protocollare documento'),(24,'sender/delete','Cancellazione mittente'),(25,'sender/enable','Ripristino mittente'),(26,'document/index','Documenti assegnati'),(27,'document/pending','Documenti da protocollare/archiviare'),(28,'document/deletepending','Rimuovere documento in attesa'),(29,'document/preview','Preview documento in attesa'),(30,'document/thumbnail','Thumbnail documento in attesa'),(31,'document/archive','Archiviazione documento'),(32,'document/previewpdf','Preview pdf documento in attesa'),(33,'document/update','Aggiornamento documento'),(34,'document/disable','Cestina documento'),(35,'document/delete','Cancellazione documento'),(36,'document/enable','Ripristino documento'),(37,'document/updaterights','Aggiorna permessi documento'),(38,'document/rights','Vedi permessi documento'),(39,'document/upload','Carica nuovo documento'),(40,'document/removeuser','Rimuovi permesso utente'),(41,'document/removegroup','Rimuovi permesso gruppo'),(42,'document/disabled','Elenco documenti cestinati'),(43,'document/owned','Elenco documenti creati'),(44,'ticket/index','Elenco tickets da gestire'),(45,'ticket/update','Aggiornamento ticket'),(46,'sender/index','Rubrica mittenti'),(47,'sender/update','Aggiornamento mittente'),(48,'sender/create','Creazione mittente'),(49,'sender/view','Vedi mittente'),(50,'document/search','Cerca documenti'),(51,'document/history','History documento'),(52,'document/my','Documenti assegnati'),(53,'document/view','Visualizzazione documento'),(54,'document/viewpdf','Visualizzazione pdf documento'),(55,'document/previewdoc','Preview pdf documento'),(56,'document/newticket','Creazione nuovo ticket'),(57,'notification/index','Elenco notifiche'),(58,'notification/markread','Lettura notifica'),(59,'notification/view','Visualizzazione notifica'),(60,'notification/new','Elenco ultime notifiche'),(61,'ticket/my','Elenco propri tickets'),(62,'ticket/delete','Cancellazione ticket'),(63,'ticket/view','Visualizzazione ticket'),(64,'notification/markall','Leggi tutte le notifiche'),(1000,'document/publish','Nuovo documento pubblico'),(1001,'spending/index','Home Spese'),(1002,'spending/create','Creazione Spesa'),(1003,'spending/update','Aggiornamento Spesa'),(1004,'spending/enable','Ripristinare Spesa'),(1005,'spending/disable','Disabilitare Spesa'),(1006,'spending/view','Visualizzazione spesa'),(1007,'spending/delete','Cancellare Spesa'),(1008,'spending/uploadcv','Upload CV Spesa'),(1009,'spending/uploadcontract','Upload Contratto Spesa'),(1010,'spending/uploadproject','Upload Progetto Spesa'),(1011,'spending/uploadcapitulate','Upload Capitolato Spesa'),(1012,'spending/uploadother','Upload Altra Documentazione'),(1013,'spending/downloadcv','Download CV Spesa'),(1014,'spending/downloadcontract','Download Contratto Spesa'),(1015,'spending/downloadproject','Download Progetto Spesa'),(1016,'spending/downloadcapitulate','Download Capitolato Spesa'),(1017,'spending/downloadother','Download Altra Documentazione'),(1018,'spending/deletecv','Cancellare CV Spesa'),(1019,'spending/deletecontract','Cancellare Contratto Spesa'),(1020,'spending/deleteproject','Cancellare Progetto Spesa'),(1021,'spending/deletecapitulate','Cancellare Capitolato Spesa'),(1022,'spending/deleteother','Cancellare Altra Documentazione'),(1023,'spending/owned','Elenco Proprie Spese'),(1024,'spending/disabled','Cestino Spese'),(1025,'spending/search','Ricerca Spese');
 /*!40000 ALTER TABLE `rights` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -409,7 +402,7 @@ CREATE TABLE `roles` (
   `description` tinytext NOT NULL,
   `is_locked` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -447,7 +440,7 @@ CREATE TABLE `roles_rights` (
 
 LOCK TABLES `roles_rights` WRITE;
 /*!40000 ALTER TABLE `roles_rights` DISABLE KEYS */;
-INSERT INTO `roles_rights` VALUES (1,26),(1,27),(1,28),(1,29),(1,30),(1,31),(1,32),(1,33),(1,34),(1,35),(1,36),(1,37),(1,38),(1,39),(1,40),(1,41),(1,42),(1,43),(1,44),(1,45),(1,46),(1,47),(1,48),(1,49),(1,50),(1,51),(1,52),(1,53),(1,54),(1,55),(1,56),(1,57),(1,58),(1,59),(1,60),(1,61),(1,62),(1,63),(1,64),(1,1001),(1,1006),(1,1013),(1,1014),(1,1015),(1,1016),(1,1017),(1,1025),(1,1026),(2,26),(2,50),(2,51),(2,52),(2,53),(2,54),(2,55),(2,56),(2,57),(2,58),(2,59),(2,60),(2,61),(2,62),(2,63),(2,64),(2,1026),(3,19),(3,20),(3,21),(3,22),(3,23),(3,24),(3,25),(3,26),(3,27),(3,28),(3,29),(3,30),(3,31),(3,32),(3,33),(3,34),(3,35),(3,36),(3,37),(3,38),(3,39),(3,40),(3,41),(3,42),(3,43),(3,44),(3,45),(3,46),(3,47),(3,48),(3,49),(3,50),(3,51),(3,52),(3,53),(3,54),(3,55),(3,56),(3,57),(3,58),(3,59),(3,60),(3,61),(3,62),(3,63),(3,64),(3,1000),(3,1001),(3,1002),(3,1003),(3,1004),(3,1005),(3,1006),(3,1007),(3,1008),(3,1009),(3,1010),(3,1011),(3,1012),(3,1013),(3,1014),(3,1015),(3,1016),(3,1017),(3,1018),(3,1019),(3,1020),(3,1021),(3,1022),(3,1023),(3,1024),(3,1025),(3,1026);
+INSERT INTO `roles_rights` VALUES (1,26),(1,27),(1,28),(1,29),(1,30),(1,31),(1,32),(1,33),(1,34),(1,35),(1,36),(1,37),(1,38),(1,39),(1,40),(1,41),(1,42),(1,43),(1,44),(1,45),(1,46),(1,47),(1,48),(1,49),(1,50),(1,51),(1,52),(1,53),(1,54),(1,55),(1,56),(1,57),(1,58),(1,59),(1,60),(1,61),(1,62),(1,63),(1,64),(1,1001),(1,1006),(1,1013),(1,1014),(1,1015),(1,1016),(1,1017),(1,1025),(2,50),(2,51),(2,52),(2,53),(2,54),(2,55),(2,56),(2,57),(2,58),(2,59),(2,60),(2,61),(2,62),(2,63),(2,64),(3,19),(3,20),(3,21),(3,22),(3,23),(3,24),(3,25),(3,26),(3,27),(3,28),(3,29),(3,30),(3,31),(3,32),(3,33),(3,34),(3,35),(3,36),(3,37),(3,38),(3,39),(3,40),(3,41),(3,42),(3,43),(3,44),(3,45),(3,46),(3,47),(3,48),(3,49),(3,50),(3,51),(3,52),(3,53),(3,54),(3,55),(3,56),(3,57),(3,58),(3,59),(3,60),(3,61),(3,62),(3,63),(3,64),(3,1000),(3,1001),(3,1002),(3,1003),(3,1004),(3,1005),(3,1006),(3,1007),(3,1008),(3,1009),(3,1010),(3,1011),(3,1012),(3,1013),(3,1014),(3,1015),(3,1016),(3,1017),(3,1018),(3,1019),(3,1020),(3,1021),(3,1022),(3,1023),(3,1024),(3,1025);
 /*!40000 ALTER TABLE `roles_rights` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -475,7 +468,7 @@ CREATE TABLE `senders` (
   KEY `city_id` (`city_id`) USING BTREE,
   CONSTRAINT `senders_city_id_fk` FOREIGN KEY (`city_id`) REFERENCES `cities` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `senders_country_id_fk` FOREIGN KEY (`country_id`) REFERENCES `countries` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -484,7 +477,6 @@ CREATE TABLE `senders` (
 
 LOCK TABLES `senders` WRITE;
 /*!40000 ALTER TABLE `senders` DISABLE KEYS */;
-INSERT INTO `senders` VALUES (1,'Mario Rossi','via Lungoliri','',110,5030,'','2012-11-07 13:28:10','2012-11-07 13:28:10',1,'');
 /*!40000 ALTER TABLE `senders` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -520,7 +512,7 @@ CREATE TABLE `spendings` (
   PRIMARY KEY (`id`),
   KEY `creator_id` (`creator_id`),
   CONSTRAINT `spendings_ibfk_1` FOREIGN KEY (`creator_id`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -529,7 +521,6 @@ CREATE TABLE `spendings` (
 
 LOCK TABLES `spendings` WRITE;
 /*!40000 ALTER TABLE `spendings` DISABLE KEYS */;
-INSERT INTO `spendings` VALUES (1,'Test','<p>asdasdsad</p>','sssdfsd',1000.00,'asdad','asdas','Ufficio 1','mario rossi','2012-09-04 22:00:00','CV-DAmmassa-EN.pdf','','','',1,1,0,1,1,'2012-09-10 09:11:11','2012-09-10 09:11:11'),(3,'asasdasd','<p>asdasasd</p>','asasdasd',1000.00,'asdads','asasd','asdasdasd','daads','2012-09-25 22:00:00','CV-DAmmassa-EN.pdf','','CV-DAmmassa - NEXTANT.pdf','',1,0,1,1,1,'2012-09-12 13:17:51','2012-09-12 13:23:35'),(4,'askak','','asdasdas',100.00,'sdsad','asd','sdasda','sdaasd','2012-09-03 22:00:00','','CV-DAmmassa-IT.pdf','','',1,0,1,1,1,'2012-09-12 13:22:20','2012-09-12 13:22:20');
 /*!40000 ALTER TABLE `spendings` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -575,7 +566,7 @@ CREATE TABLE `tags` (
   `name` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `tags_name_UNIQUE` (`name`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -584,7 +575,6 @@ CREATE TABLE `tags` (
 
 LOCK TABLES `tags` WRITE;
 /*!40000 ALTER TABLE `tags` DISABLE KEYS */;
-INSERT INTO `tags` VALUES (17,'anagrafe'),(2,'curriculum'),(11,'groupalia'),(16,'parkingo'),(1,'test');
 /*!40000 ALTER TABLE `tags` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -612,7 +602,6 @@ CREATE TABLE `tags_documents` (
 
 LOCK TABLES `tags_documents` WRITE;
 /*!40000 ALTER TABLE `tags_documents` DISABLE KEYS */;
-INSERT INTO `tags_documents` VALUES (1,1),(2,1),(11,7),(16,10),(17,11);
 /*!40000 ALTER TABLE `tags_documents` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -703,7 +692,7 @@ CREATE TABLE `users` (
   `num_logins` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `users_email_UNIQUE` (`email`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -712,7 +701,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'Super','Amministratore','1111111111','superadmin@comune1.fr.it','36141bd2c2ab79c464b385d882c91048','4facc2e801e8b2.36790855',1,'2012-03-01 16:31:00','2012-11-07 17:34:27',1,'192.168.1.102','2012-11-07 17:34:27',NULL,'0000-00-00 00:00:00',111),(3,'Fabrizio','D\'Ammassa','393482792933','fabrizio.dammassa@gmail.com','8757cc525d170613c474981cc482d6e4','5047b2f873dcf6.93154704',1,'2012-09-05 20:15:52','2012-09-05 20:15:52',1,'','0000-00-00 00:00:00',NULL,'0000-00-00 00:00:00',0),(4,'Mario','Rossi','1212312312','mario.rossi@gmail.com','a52e06e1256c072f743a5ea9ad336232','509a6bc5db8480.32160075',1,'2012-11-07 14:10:13','2012-11-07 14:10:13',0,'','0000-00-00 00:00:00',NULL,'0000-00-00 00:00:00',0);
+INSERT INTO `users` VALUES (1,'Super','Amministratore','1111111111','superadmin@comune1.fr.it','36141bd2c2ab79c464b385d882c91048','4facc2e801e8b2.36790855',1,'2012-03-01 16:31:00','2012-09-04 07:27:11',1,'192.168.1.102','2012-09-04 07:27:11',NULL,'0000-00-00 00:00:00',103);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -742,7 +731,7 @@ CREATE TABLE `users_document_requests` (
   CONSTRAINT `users_doc_request_document_id` FOREIGN KEY (`document_id`) REFERENCES `documents` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `users_doc_request_replier_id_fk` FOREIGN KEY (`replier_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `users_doc_request_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -778,7 +767,6 @@ CREATE TABLE `users_groups` (
 
 LOCK TABLES `users_groups` WRITE;
 /*!40000 ALTER TABLE `users_groups` DISABLE KEYS */;
-INSERT INTO `users_groups` VALUES (2,4),(3,4);
 /*!40000 ALTER TABLE `users_groups` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -806,7 +794,6 @@ CREATE TABLE `users_roles` (
 
 LOCK TABLES `users_roles` WRITE;
 /*!40000 ALTER TABLE `users_roles` DISABLE KEYS */;
-INSERT INTO `users_roles` VALUES (4,2);
 /*!40000 ALTER TABLE `users_roles` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -819,4 +806,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2012-11-07 19:53:50
+-- Dump completed on 2012-09-04 14:42:21

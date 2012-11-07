@@ -79,7 +79,7 @@ $this->endWidget();
 <?php echo CHtml::hiddenField('s_type', 'date'); ?>
 
 <div class="control-group">
-<label class="big">Data di ricezione</label>
+<label class="big">Data di invio/ricezione</label>
 <?php echo $form->textField($datemodel, 'date_from', array('class'=>'span3 big-input', 'id'=>'from')); ?> 
 <?php echo $form->textField($datemodel, 'date_to', array('class'=>'span3 big-input', 'id'=>'to')); ?> 
 <?php echo CHtml::htmlButton('Cerca', array('class' => 'btn btn-primary', 'type'=>'submit')); ?>

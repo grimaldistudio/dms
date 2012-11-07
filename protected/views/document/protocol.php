@@ -2,12 +2,12 @@
 $action_name = ""; 
 if($scenario=='archive')
 {
-    $action_name = 'Archivia per uso interno';
-    $breadcrumb = 'Uso interno';
+    $action_name = 'Archivia per uso personale';
+    $breadcrumb = 'Archivio personale';
 }
 elseif($scenario == 'protocol')
 {
-    $action_name = 'Crea posta in entrata';
+    $action_name = 'Crea posta in entrata/uscita';
     $breadcrumb = 'In entrata';
 }
 else
@@ -24,14 +24,14 @@ else
 
 <div class="btn-group">
         <?php if($scenario=='archive'): ?>
-            <?php if(Yii::app()->authgateway->isAllowed('document', 'protocol')) echo CHtml::link('Passa a Posta in entrata', array('/document/protocol', 'document_name'=>$document_name, 'group_id'=>$group_id), array('class' => 'btn')); ?>
+            <?php if(Yii::app()->authgateway->isAllowed('document', 'protocol')) echo CHtml::link('Passa a Posta in entrata/uscita', array('/document/protocol', 'document_name'=>$document_name, 'group_id'=>$group_id), array('class' => 'btn')); ?>
             <?php if(Yii::app()->authgateway->isAllowed('document', 'publish')) echo CHtml::link('Passa a Documento pubblico', array('/document/publish', 'document_name'=>$document_name, 'group_id'=>$group_id), array('class' => 'btn')); ?>
         <?php elseif($scenario=='protocol'): ?>
-            <?php if(Yii::app()->authgateway->isAllowed('document', 'archive')) echo CHtml::link('Passa a Uso interno', array('/document/archive', 'document_name'=>$document_name, 'group_id'=>$group_id), array('class' => 'btn')); ?>
+            <?php if(Yii::app()->authgateway->isAllowed('document', 'archive')) echo CHtml::link('Passa a Archivio personale', array('/document/archive', 'document_name'=>$document_name, 'group_id'=>$group_id), array('class' => 'btn')); ?>
             <?php if(Yii::app()->authgateway->isAllowed('document', 'publish')) echo CHtml::link('Passa a Documento pubblico', array('/document/publish', 'document_name'=>$document_name, 'group_id'=>$group_id), array('class' => 'btn')); ?>        
         <?php else: ?>
-            <?php if(Yii::app()->authgateway->isAllowed('document', 'archive')) echo CHtml::link('Passa a Uso interno', array('/document/archive', 'document_name'=>$document_name, 'group_id'=>$group_id), array('class' => 'btn')); ?>
-            <?php if(Yii::app()->authgateway->isAllowed('document', 'protocol')) echo CHtml::link('Passa a Posta in entrata', array('/document/protocol', 'document_name'=>$document_name, 'group_id'=>$group_id), array('class' => 'btn')); ?>        
+            <?php if(Yii::app()->authgateway->isAllowed('document', 'archive')) echo CHtml::link('Passa a Archivio personale', array('/document/archive', 'document_name'=>$document_name, 'group_id'=>$group_id), array('class' => 'btn')); ?>
+            <?php if(Yii::app()->authgateway->isAllowed('document', 'protocol')) echo CHtml::link('Passa a Posta in entrata/uscita', array('/document/protocol', 'document_name'=>$document_name, 'group_id'=>$group_id), array('class' => 'btn')); ?>        
         <?php endif; ?>
 </div>
 
@@ -75,6 +75,8 @@ else
 
 <?php if($model->scenario=='publish'): ?>
 
+<?php echo $form->textFieldRow($model, 'publication_number'); ?>
+
 <?php echo $form->dropDownListRow($model, 'document_type', $model->getTypeOptions()); ?>
 
 <div class="control-group">
@@ -95,6 +97,8 @@ else
 <?php echo $form->textFieldRow($model, 'publication_date_to', array('class' => 'date_field', 'value'=>$model->publication_date_to?date('d/m/Y', is_int($model->publication_date_to)?$model->publication_date_to:strtotime($model->publication_date_to)):'')); ?>
 
 <?php echo $form->checkBoxRow($model, 'publication_requested'); ?>
+
+<?php echo $form->checkBoxRow($model, 'sync_files'); ?>
 
 <?php endif; ?>
 
@@ -129,7 +133,13 @@ else
 
 <?php echo $form->textFieldRow($model, 'date_received', array('id'=>'date_received', 'value'=>$model->date_received?date('d/m/Y', is_int($model->date_received)?$model->date_received:strtotime($model->date_received)):'')); ?>
 
+<?php echo $form->dropDownListRow($model, 'is_inbound', array(0=>'Posta in uscita', 1=>'Posta in entrata')); ?>
+
 <?php endif; ?>
+
+<?php echo $form->checkBoxRow($model, 'is_visible_to_all'); ?>
+<span class="help-block">Se si spunta questa opzione, il documento sarà visibile in lettura a tutti gli utenti del sistema.</span>
+<br/>
 
 <?php echo CHtml::htmlButton('<i class="icon-ok icon-white"></i> '.$action_name, array('class'=>'btn btn-primary', 'type'=>'submit')); ?>
 

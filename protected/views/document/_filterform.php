@@ -73,7 +73,7 @@ $('#".CHtml::activeId($model, 'main_document_type')."').change(function(e){
     else if(elem.val()==".Document::OUTGOING.")
         range_label.text('Periodo di pubblicazione');        
     else
-        range_label.text('Data di ricezione');
+        range_label.text('Data di invio/ricezione');
 });
 
 $('#filter-document-form').submit(function(){

@@ -210,6 +210,9 @@ class WebUser extends CWebUser{
     
     public function hasDocumentPrivilege($document_id, $privilege = AclManager::PERMISSION_READ)
     {
+        if($privilege==AclManager::PERMISSION_READ && AclManager::isDocumentVisible($document_id))
+            return true;
+
         if(!isset($this->_documents_privileges[$document_id]))
         {
             $this->_documents_privileges[$document_id] = AclManager::getDocumentPrivilege($this->id, array_keys($this->getGroups()), $document_id, $this->isAdmin());
@@ -218,6 +221,7 @@ class WebUser extends CWebUser{
         if(isset($this->_documents_privileges[$document_id]))
             return $this->_documents_privileges[$document_id] & $privilege;
         
+
         return false;
     }
     

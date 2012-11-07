@@ -87,6 +87,13 @@ if($model->scenario=='protocol_admin')
 )); ?>
 <?php echo $form->error($model, 'priority'); ?>
 </div>
+
+<?php echo $form->dropDownListRow($model, 'is_inbound', array(0=>'Posta in uscita', 1=>'Posta in entrata'), array('disabled'=>$disabled)); ?>
+
+<?php echo $form->checkBoxRow($model, 'is_visible_to_all', array('disabled'=>$disabled)); ?>
+<span class="help-block">Se si spunta questa opzione, il documento sarà visibile in lettura a tutti gli utenti del sistema.</span>
+<br/>
+
 <div class="buttons_bar">
 <?php echo CHtml::htmlButton('<i class="icon-ok icon-white"></i> Salva', array('class'=>'btn btn-primary', 'type'=>'submit')); ?>
     <span>&nbsp;</span>
@@ -114,6 +121,7 @@ if($model->scenario=='protocol_admin')
     <h3>Aggiungi Mittente</h3>
 </div>
 <?php $this->renderPartial('//sender/_ajaxform', array('model'=>new Sender('create'))); ?>
+
 <?php $this->endWidget(); ?>
 
 

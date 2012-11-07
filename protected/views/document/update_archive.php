@@ -47,6 +47,10 @@ if($model->scenario=='archive_admin')
 <p class="help-block">Inserisci al massimo 5 parole che identificano al meglio il documento ad es. "anagrafe, certificato, richiesta, nascita"</p>
 </div>
 
+<?php echo $form->checkBoxRow($model, 'is_visible_to_all'); ?>
+<span class="help-block">Se si spunta questa opzione, il documento sarà visibile in lettura a tutti gli utenti del sistema.</span>
+<br/>
+
 <div class="buttons_bar">
 <?php echo CHtml::htmlButton('<i class="icon-ok icon-white"></i> Salva', array('class'=>'btn btn-primary', 'type'=>'submit')); ?>
     <span>&nbsp;</span>

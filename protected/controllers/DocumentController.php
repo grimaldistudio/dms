@@ -7,7 +7,19 @@ class DocumentController extends SecureController{
     
     public function actionIndex()
     {
-        $this->redirect(array('/document/search'));
+        $model = new Document('dashboard');
+        $model->unsetAttributes();
+        if(isset($_GET['Document']))
+            $model->attributes = $_GET['Document'];
+
+        $params =array(
+            'model'=>$model,
+        );
+
+        if(!isset($_GET['ajax']))
+            $this->render('dashboard', $params);
+        else
+            $this->renderPartial('dashboard', $params);          
     }
     
     public function actionPending($force_reload = 0)
@@ -639,7 +651,7 @@ class DocumentController extends SecureController{
     public function actionMy()
     {
         $model = new Document('my');
-        $model->unsetAttributes();
+        //$model->unsetAttributes();
         if(isset($_GET['Document']))
             $model->attributes = $_GET['Document'];
 
@@ -653,10 +665,27 @@ class DocumentController extends SecureController{
             $this->renderPartial('my', $params);  
     }
     
+    public function actionPublic()
+    {
+        $model = new Document('public');
+        //$model->unsetAttributes();
+        if(isset($_GET['Document']))
+            $model->attributes = $_GET['Document'];
+
+        $params =array(
+            'model'=>$model,
+        );
+
+        if(!isset($_GET['ajax']))
+            $this->render('public', $params);
+        else
+            $this->renderPartial('public', $params);  
+    }
+
     public function actionDisabled()
     {
         $model = new Document('disabled');
-        $model->unsetAttributes();
+//        $model->unsetAttributes();
         if(isset($_GET['Document']))
             $model->attributes = $_GET['Document'];
 
@@ -673,7 +702,7 @@ class DocumentController extends SecureController{
     public function actionOwned()
     {
         $model = new Document('created');
-        $model->unsetAttributes();
+        //$model->unsetAttributes();
         if(isset($_GET['Document']))
             $model->attributes = $_GET['Document'];
 

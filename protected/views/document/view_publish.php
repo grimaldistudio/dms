@@ -23,6 +23,11 @@ if(Yii::app()->user->hasDocumentPrivilege($model->id, AclManager::PERMISSION_ADM
                 <th width="30%"><?php echo $model->getAttributeLabel('identifier'); ?></th>
                 <td><?php echo CHtml::encode($model->identifier?'#'.$model->identifier:'n/d'); ?></td>
             </tr>
+
+            <tr>
+                <th width="30%"><?php echo $model->getAttributeLabel('publication_number'); ?></th>
+                <td><?php echo CHtml::encode($model->publication_number?'#'.$model->publication_number:'n/d'); ?></td>
+            </tr>
             
             <tr>
                 <th><?php echo $model->getAttributeLabel('name'); ?></th>
@@ -90,11 +95,19 @@ if(Yii::app()->user->hasDocumentPrivilege($model->id, AclManager::PERMISSION_ADM
                 <td><?php echo $model->publication_requested?'Si':'No'; ?></td>
             </tr>
             
+            <?php if($model->publication_requested): ?>
+            <tr>
+                <th>Pubblicazione file su albo richiesta</th>
+                <td><?php echo $model->sync_file?'Si':'No'; ?></td>
+            </tr>
+            <?php endif; ?>
+
             <tr>
                 <th><?php echo $model->getAttributeLabel('publication_status'); ?></th>
                 <td><?php echo $model->getPublicationStatusDesc(); ?></td>
             </tr>
-            
+
+
             <?php if($model->last_updater_id>0): ?>
             <tr>
                 <th><?php echo $model->getAttributeLabel('last_updater_id'); ?></th>

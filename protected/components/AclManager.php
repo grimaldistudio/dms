@@ -28,9 +28,22 @@ class AclManager {
         return false;
     }
     
+    static function isDocumentVisible($document_id)
+    {
+        $query = "SELECT is_visible_to_all FROM documents d WHERE d.id=:document_id";
+        $is_visible_to_all = Yii::app()->db->createCommand($query)->queryScalar(array(':document_id'=>$document_id));
+
+        if($is_visible_to_all==1 || $is_visible_to_all=='1')
+            return true;
+        return false;
+    }
+
     static function hasReadPrivilege($user_id, $group_ids = array(), $document_id, $is_admin = false)
     {
         if($is_admin)
+            return true;
+
+        if(self::isDocumentVisible($document_id))
             return true;
 
         $query = "SELECT count(1) FROM documents d WHERE d.id=:document_id AND d.creator_id=:user_id";

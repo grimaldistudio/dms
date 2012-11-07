@@ -14,6 +14,7 @@ class SyncDocumentCommand extends CConsoleCommand{
                                     'identifier' => '', 
                                     'description' => '', 
                                     'status' => '', 
+                                    'publication_number' => '',
                                     'publication_date_from' => '',
                                     'publication_date_to' => '',
                                     'act_date' => '',
@@ -21,7 +22,8 @@ class SyncDocumentCommand extends CConsoleCommand{
                                     'entity' => '',
                                     'proposer_service' => '',
                                     'document_type' => '',
-                                    'publication_requested' => ''
+                                    'publication_requested' => '',
+                                    'sync_file' => ''
                                     );
         
         $apiClient = new APIClient(Yii::app()->params['api_url']);

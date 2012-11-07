@@ -56,19 +56,19 @@ class SecureController extends CController
                         'label'=>'Home', 
                         'icon'=>'home', 
                         'url'=>Yii::app()->homeUrl, 
-                        'active'=>$this->id=='site' && $this->action->id=='index'
+                        'active'=>$this->id=='document' && $this->action->id=='index'
                     );
             
             // documents
             $archive_search = array(
-                        'label'=>'Archivio', 
+                        'label'=>'Archivio personale', 
                         'url'=>array('/document/search', 'doc_type'=>Document::INTERNAL_USE_TYPE),                
                         'visible'=>Yii::app()->authgateway->isAllowed('document', 'search'),
                         'active'=>$this->id=='document' && $this->action->id=='search' && (isset($_GET['doc_type']) && $_GET['doc_type']==Document::INTERNAL_USE_TYPE)
                     );
             
             $protocol_search = array(
-                        'label'=>'Posta in entrata', 
+                        'label'=>'Posta in entrata/uscita', 
                         'url'=>array('/document/search', 'doc_type'=>Document::INBOX),                
                         'visible'=>Yii::app()->authgateway->isAllowed('document', 'search'),
                         'active'=>$this->id=='document' && $this->action->id=='search' && (!isset($_GET['doc_type']) || $_GET['doc_type']==Document::INBOX)
@@ -95,6 +95,13 @@ class SecureController extends CController
                         'active'=>$this->id=='document' && $this->action->id=='owned'
                     );            
             
+            $public = array(
+                        'label'=>'Visibili a tutti', 
+                        'url'=>Yii::app()->createUrl('/document/public'), 
+                        'visible'=>Yii::app()->authgateway->isAllowed('document', 'public'),
+                        'active'=>$this->id=='document' && $this->action->id=='public'
+                    );            
+
             $disabled = array(
                         'label'=>'Cestino', 
                         'url'=>Yii::app()->createUrl('/document/disabled'), 
@@ -207,15 +214,16 @@ class SecureController extends CController
             
             $items[] = $home;
             $items[] = array('label'=>'Cerca in', 'icon'=>'zoom-in', 'itemOptions'=>array('class'=>'nav-header'));
-            $items[] = $archive_search;
             $items[] = $protocol_search;
             $items[] = $publish_search;
+            $items[] = $archive_search;
             $items[] = $spending_list; 
             
             $items[] = array('label'=>'Documenti', 'icon'=>'book', 'itemOptions'=>array('class'=>'nav-header'));
             $items[] = $pending;
             $items[] = $my;
             $items[] = $owned;
+            $items[] = $public;
             $items[] = $disabled;
             
             if(Yii::app()->authgateway->isAllowed('spending', 'owned'))
@@ -250,10 +258,10 @@ class SecureController extends CController
             $items = array();
             $home = array('label'=>'Home', 'url'=>Yii::app()->homeUrl, 'active'=>($this->id=='site' && $this->action->id=='index'));
             $document = array('label'=>'Cerca in', 'url'=>'#', 'active'=>$this->id=='document', 'items'=>array(
-                array('label' => 'Archivio', 'url' => Yii::app()->createUrl('/document/search', array('doc_type'=>Document::INTERNAL_USE_TYPE))),
-                array('label' => 'Posta in entrata', 'url' => Yii::app()->createUrl('/document/search', array('doc_type'=>Document::INBOX))),                
+                array('label' => 'Posta in entrata/uscita', 'url' => Yii::app()->createUrl('/document/search', array('doc_type'=>Document::INBOX))),                
                 array('label' => 'Document pubblici', 'url' => Yii::app()->createUrl('/document/search', array('doc_type'=>Document::OUTGOING))),
-                array('label' => 'Spese', 'url' => Yii::app()->createUrl('/spending/search'), 'visible'=>Yii::app()->authgateway->isAllowed('spending', 'search'))                
+                array('label' => 'Spese', 'url' => Yii::app()->createUrl('/spending/search'), 'visible'=>Yii::app()->authgateway->isAllowed('spending', 'search')),
+                array('label' => 'Archivio personale', 'url' => Yii::app()->createUrl('/document/search', array('doc_type'=>Document::INTERNAL_USE_TYPE))),
             ));            
 
             $admin = array('label'=>'Amministrazione', 'url'=>Yii::app()->createUrl('/ticket'), 'active'=>in_array($this->id, array('ticket', 'tag', 'sender')));            

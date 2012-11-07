@@ -30,6 +30,7 @@ if($model->scenario == 'publish_admin')
     $disabled = "";
 ?>
 <?php echo $form->textFieldRow($model, 'identifier', array('disabled'=>$disabled)); ?>
+<?php echo $form->textFieldRow($model, 'publication_number', array('disabled'=>$disabled)); ?>
 <?php echo $form->textFieldRow($model, 'name', array('disabled'=>$disabled)); ?>
 
 <?php echo $form->hiddenField($model, 'revision'); ?>
@@ -65,9 +66,15 @@ if($model->scenario == 'publish_admin')
 
 <?php echo $form->textFieldRow($model, 'publication_date_to', array('class' => 'date_field', 'value'=>$model->publication_date_to?date('d/m/Y', is_int($model->publication_date_to)?$model->publication_date_to:strtotime($model->publication_date_to)):'')); ?>
 
+<?php echo $form->dropDownListRow($model, 'document_type', $model->getTypeOptions()); ?>
+
 <?php echo $form->checkBoxRow($model, 'publication_requested'); ?>
 
-<?php echo $form->dropDownListRow($model, 'document_type', $model->getTypeOptions()); ?>
+<?php echo $form->checkBoxRow($model, 'sync_file'); ?>
+
+<?php echo $form->checkBoxRow($model, 'is_visible_to_all'); ?>
+<span class="help-block">Se si spunta questa opzione, il documento sarà visibile in lettura a tutti gli utenti del sistema.</span>
+<br/>
 
 <div class="buttons_bar">
 <?php echo CHtml::htmlButton('<i class="icon-ok icon-white"></i> Salva', array('class'=>'btn btn-primary', 'type'=>'submit')); ?>

@@ -66,8 +66,14 @@ class Document extends CActiveRecord
             array('name,identifier,sender_id,description,sendername,tagsname,priority,date_received', 'required', 'on'=>'protocol'),
             array('name,description,tagsname', 'required', 'on'=>'archive'),
             array('name,description,tagsname,document_type', 'required', 'on'=>'publish'),
-            array('publication_requested', 'safe', 'on'=>'publish,publish_admin'),
+            array('is_inbound', 'safe', 'on'=>'protocol,protocol_admin'),
+            array('is_visible_to_all', 'safe', 'on'=>'protocol,protocol_admin,archive,archive_admin,publish,publish_admin'),
+            array('is_visible_to_all', 'default', 'setOnEmpty'=>true, 'value'=>0, 'on'=>'protocol,protocol_admin,archive,archive_admin,publish,publish_admin'),            
+            array('publication_number', 'unique', 'on'=>'publish,publish_admin'),
+            array('publication_requested,sync_file', 'safe', 'on'=>'publish,publish_admin'),
             array('publication_requested', 'default', 'setOnEmpty'=>true, 'value'=>0, 'on'=>'publish,publish_admin'),            
+            array('sync_file', 'default', 'setOnEmpty'=>true, 'value'=>0, 'on'=>'publish,publish_admin'),  
+            array('is_inbound', 'default', 'setOnEmpty'=>true, 'value'=>0, 'on'=>'protocol,protocol_admin'),                                              
             array('entity,proposer_service,publication_date_from,publication_date_to,act_number,act_date', 'safe', 'on'=>'publish,publish_update,publish_admin'),
             array('description,tagsname,priority,sender_id,sendername', 'required', 'on'=>'protocol_update,protocol_admin'),
             array('description,tagsname', 'required', 'on'=>'publish_admin,publish_update,archive_update,archive_admin'),
@@ -84,9 +90,10 @@ class Document extends CActiveRecord
             array('date_received,act_date,publication_date_from,publication_date_to', 'default', 'setOnEmpty'=>true, 'value'=>new CDbExpression('NULL')),
             array('description', 'length', 'max'=>2048, 'on'=>'protocol,archive,publish,protocol_update,protocol_admin,publish_update,publish_admin,archive_update,archive_admin'),
             array('description','filter','filter'=>array($obj=new CHtmlPurifier(),'purify'), 'on'=>'protocol,archive,publish,protocol_update,protocol_admin,publish_update,publish_admin,archive_update,archive_admin'),
-            array('identifier,name,date_from,date_to,main_document_type', 'safe', 'on'=>'my,disabled,created'),
-            array('date_from', 'date', 'format'=>'dd/MM/yyyy', 'timestampAttribute'=>'date_from', 'on'=>'my,created,disabled'),
-            array('date_to', 'date', 'format'=>'dd/MM/yyyy', 'timestampAttribute'=>'date_to', 'on'=>'my,created,disabled')
+            array('identifier,name,date_from,date_to,main_document_type', 'safe', 'on'=>'my,disabled,created,public'),
+            array('date_from', 'date', 'format'=>'dd/MM/yyyy', 'timestampAttribute'=>'date_from', 'on'=>'my,created,disabled,public'),
+            array('date_to', 'date', 'format'=>'dd/MM/yyyy', 'timestampAttribute'=>'date_to', 'on'=>'my,created,disabled,public'),
+            array('identifier,name, main_document_type', 'safe', 'on'=>'dashboard')
         );
     }
 
@@ -117,7 +124,11 @@ class Document extends CActiveRecord
             'id' => 'Id',
             'name' => 'Titolo',
             'description' => 'Descrizione',
-            'date_received'=> 'Data di ricezione',
+            'is_inbound' => 'Tipologia',
+            'is_visible_to_all' => 'Visibile a tutti',
+            'sync_file' => 'Pubblicazione file su albo',
+            'publication_number' => 'Numero di pubblicazione',
+            'date_received'=> 'Data di invio/ricezione',
             'date_created' => 'Data di creazione',
             'last_updated' => 'Ultimo aggiornamento',
             'status' => 'Stato',
@@ -144,7 +155,7 @@ class Document extends CActiveRecord
             'publication_date_from' => 'Data inizio pubblicazione',
             'publication_date_to' => 'Data fine pubblicazione',
             'publication_status' => 'Pubblicazione albo',
-            'publication_requested' => 'Pubblicazione su albo'
+            'publication_requested' => 'Pubblicazione su albo',
         );
     }
 
@@ -436,6 +447,17 @@ class Document extends CActiveRecord
         return 'Non definito';
     }
 
+    public function getProtocolDesc($value = -1)
+    {
+        if($value<0)
+            $value = $this->is_inbound;
+        
+        if($value==0)
+            return "In uscita";
+        else
+            return "In entrata";
+    }
+
     public function getPriorityOptions()
     {
         return array(
@@ -459,9 +481,9 @@ class Document extends CActiveRecord
     public function getMainTypeOptions()
     {
         return array(
-            self::INTERNAL_USE_TYPE => 'Archiviazione uso interno',
-            self::INBOX => 'Posta in entrata',
-            self::OUTGOING => 'Documenti pubblici'
+            self::INBOX => 'Posta in entrata/uscita',
+            self::OUTGOING => 'Documenti pubblici',
+            self::INTERNAL_USE_TYPE => 'Archivio personale'
         );        
     }
 
@@ -547,7 +569,7 @@ class Document extends CActiveRecord
         $this->validate();
         
         $params = array();
-        $sql_select = "SELECT d.id, d.name, d.identifier, d.description, d.document_type, d.main_document_type, d.publication_date_from, d.publication_date_to, d.date_received, d.last_updated, u.firstname, u.lastname, u.email ";
+        $sql_select = "SELECT d.id, d.name, d.identifier, d.publication_number, d.is_inbound, d.description, d.document_type, d.main_document_type, d.publication_date_from, d.publication_date_to, d.date_received, d.last_updated, u.firstname, u.lastname, u.email ";
         $sql_count = "SELECT COUNT(DISTINCT(d.id)) ";
         
         $sql_group = " GROUP BY d.id";
@@ -558,7 +580,7 @@ class Document extends CActiveRecord
             $sql_where = " WHERE 1=1 ";
         }
         else
-        {
+        { 
             $user_groups = Yii::app()->user->getGroups();
             $user_groups_ids = array_keys($user_groups);
             if(count($user_groups_ids)==0)
@@ -644,7 +666,7 @@ class Document extends CActiveRecord
         $this->validate();
         
         $params = array();
-        $sql_select = "SELECT d.id, d.name, d.identifier, d.description, d.document_type, d.main_document_type, d.publication_date_from, d.publication_date_to, d.date_received, d.last_updated, u.firstname, u.lastname, u.email ";
+        $sql_select = "SELECT d.id, d.name, d.identifier, d.publication_number, d.is_inbound, d.description, d.document_type, d.main_document_type, d.publication_date_from, d.publication_date_to, d.date_received, d.last_updated, u.firstname, u.lastname, u.email ";
         $sql_count = "SELECT COUNT(DISTINCT(d.id)) ";
         
         $sql_group = " GROUP BY d.id";
@@ -737,12 +759,87 @@ class Document extends CActiveRecord
 
     }    
     
+    public function publicd()
+    {
+        $this->validate();
+        
+        $params = array();
+        $sql_select = "SELECT d.id, d.name, d.identifier, d.publication_number, d.is_inbound, d.description, d.document_type, d.main_document_type, d.publication_date_from, d.publication_date_to, d.date_received, d.last_updated, u.firstname, u.lastname, u.email ";
+        $sql_count = "SELECT COUNT(DISTINCT(d.id)) ";
+        
+        $sql_group = " GROUP BY d.id";
+        $sql_from = " FROM documents d";
+        $sql_join = " JOIN users u ON u.id=d.creator_id ";
+        $sql_where = " WHERE d.is_visible_to_all = 1";
+        $sql_where .= " AND d.status = :active_status";
+        $sql_where .= " AND d.main_document_type = :main_document_type";
+        
+        $params[':active_status'] = Document::ACTIVE_STATUS;
+        $params[':main_document_type'] = $this->main_document_type;
+        
+        if($this->identifier)
+        {
+            $sql_where .= " AND d.identifier = :identifier";
+            $params[':identifier'] = $this->identifier;
+        }
+        
+        if($this->name)
+        {
+            $sql_where .= " AND d.name LIKE :name";
+            $params[':name'] = '%'.$this->name.'%';
+        }
+        
+        if($this->main_document_type==Document::INTERNAL_USE_TYPE)
+            $attribute = 'date_created';
+        elseif($this->main_document_type==Document::OUTGOING)
+            $attribute = 'publication_date_from';
+        else
+            $attribute = 'date_received';
+        
+        
+        if(!$this->hasErrors('date_from') && $this->date_from)
+        {
+            $sql_where .= " AND d.".$attribute." >= :date_from";
+            $params[':date_from'] = date('Y-m-d', $this->date_from);
+        }
+        
+        if($this->main_document_type==Document::OUTGOING)
+            $attribute = 'publication_date_to';
+        
+        if(!$this->hasErrors('date_to') && $this->date_to)
+        {
+            $sql_where .= " AND d.".$attribute." <= :date_to";
+            $params[':date_to'] = date('Y-m-d', $this->date_to);            
+        }
+        
+        $sql = $sql_select . $sql_from . $sql_join . $sql_where . $sql_group;
+        $qcount = $sql_count . $sql_from . $sql_join . $sql_where;
+
+        $count = Yii::app()->db->createCommand($qcount)->queryScalar($params);
+        
+        return new CSqlDataProvider(
+            $sql,
+            array(
+                'totalItemCount'=>$count,
+                    'sort' => array(
+                        'attributes' => array('name', 'identifier'),
+                        'defaultOrder' => 'd.date_created DESC'
+                ),
+                'pagination' => array(
+                    'pageSize' => 10
+                ),
+                'params'=>$params
+            )
+        );
+
+    }    
+
     public function created()
     {
         $this->validate();
                 
         $params = array();
-        $sql_select = "SELECT d.id, d.name, d.identifier, d.description, d.document_type, d.main_document_type, d.publication_date_from, d.publication_date_to, d.date_received, d.last_updated, d.last_updater_id ";
+        $sql_select = "SELECT d.id, d.name, d.identifier, d.publication_number, d.is_inbound, d.description, d.document_type, d.main_document_type, d.publication_date_from, d.publication_date_to, d.date_received, d.last_updated, d.last_updater_id ";
         $sql_count = "SELECT COUNT(d.id) ";
         
         $sql_from = " FROM documents d";
@@ -810,6 +907,26 @@ class Document extends CActiveRecord
         );
 
     }    
+
+    public function dashboard()
+    {
+        $criteria=new CDbCriteria;
+
+        $criteria->compare('identifier',$this->identifier);
+        $criteria->compare('title',$this->title,true);
+        $criteria->compare('main_document_type',$this->main_document_type);
+        
+        $criteria->compare('status', self::ACTIVE_STATUS);
+        return new CActiveDataProvider(get_class($this), array(
+            'criteria'=>$criteria,
+            'sort'=>array(
+                'defaultOrder'=>'date_created DESC',
+            ),
+            'pagination'=>array(
+                'pageSize'=>20
+            ),
+        ));         
+    }
     
     public function loadTagsArray()
     {
@@ -903,7 +1020,7 @@ class Document extends CActiveRecord
         elseif($this->main_document_type==self::OUTGOING)
             return "Periodo di pubblicazione";
         else
-            return "Data di ricezione";
+            return "Data di invio/ricezione";
     }
     
     public function isSynched()

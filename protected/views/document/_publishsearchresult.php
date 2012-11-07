@@ -6,6 +6,11 @@
         <td style="width: 30%"><p><?php echo CHtml::encode($data['identifier']!==null?$data['identifier']:'n/d'); ?></p></td>
         <td rowspan="8"><div class="richtext limited"><?php echo $data['description']; ?></div></td>
     </tr>    
+
+    <tr>
+        <th><label><?php echo Document::model()->getAttributeLabel('publication_number'); ?></label></th>
+        <td><p><?php echo CHtml::encode($data['publication_number']!==null?$data['publication_number']:'n/d'); ?></p></td>
+    </tr>        
     
     <tr>
         <th><label><?php echo Document::model()->getAttributeLabel('name'); ?></label></th>
@@ -14,7 +19,7 @@
     
     <tr>
         <th><label><?php echo Document::model()->getAttributeLabel('document_type'); ?></label></th>
-        <td><p><?php echo Document::model()->getDocumentTypeDesc($data['document_type']); ?></p></td>
+        <td><p><?php echo Document::model()->getTypeDesc($data['document_type']); ?></p></td>
     </tr>
 
     <tr>

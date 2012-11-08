@@ -7,5 +7,5 @@ ALTER TABLE  `documents` CHANGE  `main_document_type`  `main_document_type` TINY
 
 INSERT INTO  `rights` (`id`, `key`, `name`) VALUES (NULL ,  'document/public',  'Documenti visibili a tutti');
 
-INSERT INTO `roles_rights` SELECT `id`, 1026 FROM `roles`; 
+INSERT IGNORE INTO `roles_rights` SELECT roles.id, rights.id FROM roles, rights WHERE rights.`key`='document/public'; 
 INSERT IGNORE INTO `roles_rights` SELECT roles.id, rights.id FROM roles, rights WHERE rights.`key` = 'document/index';

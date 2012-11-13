@@ -175,6 +175,7 @@ return array(
 		'supportEmail'=>'support@dms.engisolution.it', // verificare
 		'superadmins'=>array('superadmin@comune1.fr.it'), // modificare
 		'entity' => 'Comune XXX', // modificare
-		'isDemo' => false
+		'isDemo' => false,
+		'dashboard_list_len' => 20			
 	),
 );

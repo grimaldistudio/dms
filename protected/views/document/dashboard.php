@@ -1,16 +1,18 @@
 <?php $this->pageTitle = "Dashboard"; ?>
 <h1><?php echo $this->pageTitle; ?></h1>
-<h3>Ultimi 20 documenti caricati nel sistema</h3>
+<h3>Ultimi <?php echo Yii::app()->params['dashboard_list_len'];?> documenti caricati nel sistema</h3>
 <?php $this->widget('bootstrap.widgets.BootGridView', array(
     'id'=>'dashboard_gridview',
     'dataProvider'=>$model->dashboard(),
     'template'=>"{items}",
+    'enableSorting' => false,
+    'enablePagination' => false,   
     'itemsCssClass'=>'table table-striped table-bordered table-condensed',
     'nullDisplay' => 'n/d',
     'columns'=>array(
-        array('name'=>'identifier', ),
-        array('name'=>'name'),
-		array('filter' =>$model->getMainTypeOptions(),
+        array('name'=>'identifier', 'filter'=>false),
+        array('name'=>'name', 'filter'=>false),
+		array('filter' =>false,
             'name' => 'main_document_type',
             'value' => '$data->getMainTypeDesc()'),
 		array(

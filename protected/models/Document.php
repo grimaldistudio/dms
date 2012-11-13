@@ -923,7 +923,7 @@ class Document extends CActiveRecord
                 'defaultOrder'=>'date_created DESC',
             ),
             'pagination'=>array(
-                'pageSize'=>20
+                'pageSize'=>Yii::app()->params['dashboard_list_len']
             ),
         ));         
     }

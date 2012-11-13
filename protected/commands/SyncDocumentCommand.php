@@ -36,21 +36,21 @@ class SyncDocumentCommand extends CConsoleCommand{
             $data['relative_path'] = 'saved'.DIRECTORY_SEPARATOR.date('Y', $time).DIRECTORY_SEPARATOR.date('m', $time).DIRECTORY_SEPARATOR.date('d', $time);
             if($apiClient->sendRequest('POST', '/api/syncdocument', $data, Yii::app()->params['api_username'], Yii::app()->params['api_password']))
             {
-                Yii::log('Spending '.$result['id'].': '.$apiClient->getResponse()->getStatusCode(), 'info');
-                Yii::log('Spending '.$result['id'].': '.$apiClient->getResponse()->getBody(), 'info');                
+                Yii::log('Document '.$result['id'].': '.$apiClient->getResponse()->getStatusCode(), 'info');
+                Yii::log('Document '.$result['id'].': '.$apiClient->getResponse()->getBody(), 'info');                
                 try{
                     Yii::app()->db->createCommand("UPDATE documents SET is_dirty = 0, publication_status = :published_status WHERE id=:id")->execute(array(':published_status'=>Document::PUBLISHED, ':id'=>$result['id']));
                 }
                 catch(Exception $e)
                 {
-                    Yii::log('Spending '.$result['id'].': DB Error - '.$e->getMessage(), 'error');                    
+                    Yii::log('Document '.$result['id'].': DB Error - '.$e->getMessage(), 'error');                    
                 }
             }
             else
             {
                 foreach($apiClient->getErrors() as $error)
                 {
-                    Yii::log('Spending '.$result['id'].': '.$error, 'error');
+                    Yii::log('Document '.$result['id'].': '.$error, 'error');
                 }
             }
         }

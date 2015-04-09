@@ -360,7 +360,8 @@ class DocumentController extends SecureController{
         if(isset($_POST['Document']))
         {
             $model->attributes = $_POST['Document'];
-            $model->document_type = $_POST['Document']['document_type'];
+            $model->document_type = $_POST['Document']['document_type']; //patched
+            
             if($model->revision>$_POST['Document']['revision'])
             {
                 Yii::app()->user->setFlash('warning', 'Hai provato ad aggiornare una versione del documento più vecchia della recente. Riapplica i cambiamenti ora.');

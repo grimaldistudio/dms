@@ -41,7 +41,7 @@ return array(
 		'user'=>array(
 			// enable cookie-based authentication
 			'allowAutoLogin'=>true,
-			'loginUrl'=>'/auth/login',
+			'loginUrl'=>'auth/login',
 			'class'=>'WebUser'                    
 		),
                 'authgateway'=>array(

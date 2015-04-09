@@ -268,6 +268,7 @@ class Document extends CActiveRecord
                     // TODO
                     if(($this->document_type==self::OUTGOING && $this->syncFile()) || $this->document_type!=self::OUTGOING)
                     {
+                        die("debug ".$this->document_type." - ".$this->description);
                         // commit
                         $t->commit();
                         return true;

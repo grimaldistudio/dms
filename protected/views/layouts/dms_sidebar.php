@@ -42,7 +42,7 @@
         $right_link .= CHtml::link("Logout", array('/auth/logout'));
     }
     else
-        $right_link = CHtml::link('Login', array(Yii::app()->createUrl('/auth/login')));
+        $right_link = CHtml::link('Login', array(Yii::app()->createUrl('/auth/login'))); 
     ?>
       
     <?php

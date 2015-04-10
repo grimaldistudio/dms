@@ -81,7 +81,7 @@ class Document extends CActiveRecord
             array('change_description,revision', 'required', 'on'=>'protocol_update,protocol_admin,archive_update,archive_admin,publish_update,publish_admin'),            
             array('identifier', 'safe', 'on'=>'publish,publish_admin'),
             array('identifier,date_received', 'required', 'on' => 'protocol_admin'),
-            array('identifier', 'unique', 'on'=>'protocol,publish,protocol_admin,publish_admin'),
+           // array('identifier', 'unique', 'on'=>'protocol,publish,protocol_admin,publish_admin'),
             array('senderaddress', 'safe', 'on'=>'protocol,protocol_update,protocol_admin'),
             array('date_received', 'date', 'format'=>'dd/MM/yyyy', 'timestampAttribute'=>'date_received', 'on'=>'protocol,protocol_admin'),
             array('act_date', 'date', 'format'=>'dd/MM/yyyy', 'timestampAttribute'=>'act_date', 'allowEmpty' =>true, 'on'=>'publish,publish_update,publish_admin'),          

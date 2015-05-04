@@ -7,7 +7,8 @@ class SyncDocumentCommand extends CConsoleCommand{
     public function run($args)
     {
         $max_documents = Yii::app()->params['max_documents'];
-        $cmd = Yii::app()->db->createCommand("SELECT * FROM documents WHERE main_document_type = :public_document_type AND is_dirty=1 AND (publication_requested=1 OR publication_status= :published_status) ORDER BY last_updated ASC LIMIT ".$max_documents);
+       // $cmd = Yii::app()->db->createCommand("SELECT * FROM documents WHERE main_document_type = :public_document_type AND is_dirty=1 AND (publication_requested=1 OR publication_status= :published_status) ORDER BY last_updated ASC LIMIT ".$max_documents);
+        $cmd = Yii::app()->db->createCommand("SELECT * FROM documents WHERE main_document_type = :public_document_type AND is_dirty=1 AND (publication_status= :published_status) ORDER BY last_updated ASC LIMIT ".$max_documents);
         $results = $cmd->queryAll(true, array(':public_document_type'=> Document::OUTGOING, ':published_status'=>Document::PUBLISHED));
         $attributes_to_sync = array('id' => '', 
                                     'name' => '', 

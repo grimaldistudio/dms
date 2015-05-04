@@ -686,12 +686,12 @@ class Document extends CActiveRecord
             {
                 $user_groups_ids = array(0);
             }            
-            $sql_from = " FROM documents dr ";
-            $sql_join = " JOIN users u ON u.id=dr.user_id ";
-            $sql_join .= " LEFT JOIN documents_rights d ON dr.document_id = d.id ";
-            $sql_where = " WHERE (dr.user_id = :user_id 
-                            OR dr.group_id IN (".implode(",",$user_groups_ids).") AND dr.right = :admin_right)
-                            OR d.creator_id = :user_id
+            $sql_from = " FROM documents d ";
+            $sql_join = " JOIN users u ON u.id=d.creator_id ";
+            $sql_join .= " LEFT JOIN documents_rights dr ON dr.document_id = d.id ";
+            $sql_join .= " LEFT JOIN users_groups ug ON ug.user_id = d.creator_id ";
+            $sql_where = " WHERE (d.creator_id = :user_id OR ug.group_id IN (".implode(",",$user_groups_ids).") )
+                                        OR d.creator_id = :user_id 
             ";
             
             $params[':user_id'] = Yii::app()->user->id;

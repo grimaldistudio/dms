@@ -70,7 +70,7 @@ if($model->scenario == 'publish_admin')
 
 
 <?php
-if (Yii::app()->user->hasRole()) echo "OK"; 
+if (Yii::app()->user->hasRole(4)) echo "OK"; 
 
 ?>
 

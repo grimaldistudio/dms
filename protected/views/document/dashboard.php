@@ -28,7 +28,7 @@
                 'update'=>array(
                     'label'=>'Modifica',
                     'icon'=>'icon-edit',
-                    'visible'=>'Yii::app()->user->hasDocumentPrivilege($data->id, AclManager::PERMISSION_WRITE) && Role::model()->findRole(4)'
+                    'visible'=>'Yii::app()->user->hasDocumentPrivilege($data->id, AclManager::PERMISSION_WRITE) || Role::model()->findRole(4)'
                 ),
                 'lock'=>array(
                     'label'=>'Richiedi accesso',

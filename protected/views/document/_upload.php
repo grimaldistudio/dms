@@ -58,7 +58,7 @@ Yii::app()->clientScript->registerScript('documentuploadform', "
         if(!hasError)
         {
             $(form).ajaxSubmit({
-                timeout: 20000,                
+               // timeout: 20000,                
                 beforeSubmit: function()
                 {
                     $('#'+summaryID).html('');
@@ -83,13 +83,13 @@ Yii::app()->clientScript->registerScript('documentuploadform', "
                     }
                     catch(e)
                     {
-                        $('#'+summaryID).html('Impossibile completare l\'operazione');
+                        $('#'+summaryID).html('Impossibile completare l\'operazione'+e);
                         $('#'+summaryID).show();                        
                     }
                 },
                 error: function(xhr)
                 {
-                    $('#'+summaryID).html('Impossibile completare l\'operazione');
+                    $('#'+summaryID).html('Impossibile completare l\'operazione'+xhr);
                     $('#'+summaryID).show();
                 }
             });

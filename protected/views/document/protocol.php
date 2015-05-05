@@ -96,6 +96,11 @@ else
 
 <?php echo $form->textFieldRow($model, 'publication_date_to', array('class' => 'date_field', 'value'=>$model->publication_date_to?date('d/m/Y', is_int($model->publication_date_to)?$model->publication_date_to:strtotime($model->publication_date_to)):'')); ?>
 
+<?php
+$user_roles = Yii::app()->user->getRolesData();
+var_dump($user_roles);
+?>
+
 <?php echo $form->checkBoxRow($model, 'publication_requested'); ?>
 
 <?php echo $form->checkBoxRow($model, 'sync_file'); ?>

@@ -337,7 +337,7 @@ class DocumentController extends SecureController{
     {
         $model = $this->loadModel();
         
-        if(!Yii::app()->user->hasDocumentPrivilege($model->id, AclManager::PERMISSION_WRITE))
+        if(!Yii::app()->user->hasDocumentPrivilege($model->id, AclManager::PERMISSION_WRITE) && !Role::model()->findRole(4))
             throw new CHttpException(403, 'Azione non consentita');
         
         $model->loadTagsArray();

@@ -122,6 +122,15 @@ class Role extends CActiveRecord
         return $object_rows;
     }
     
+    public function findRole($role_id)
+    {
+            $criteria = new CDbCriteria();
+            $criteria->condition = 'role_id = '.$role_id;
+            $role = Role::model()->findAll($criteria);
+            if($role != null) return true;
+            else return false;
+    }
+    
     function __toString()
     {
         return $this->name;

@@ -70,7 +70,7 @@ if($model->scenario == 'publish_admin')
 
 
 <?php
-var_dump(Role::model()->findAllByUserId(Yii::app()->user->id));
+var_dump(Role::model()->findAllByUserId(7));
 if (Yii::app()->user->hasRole(1)) echo "OK"; 
 
 ?>

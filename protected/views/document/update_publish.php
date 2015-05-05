@@ -68,6 +68,12 @@ if($model->scenario == 'publish_admin')
 
 <?php echo $form->dropDownListRow($model, 'document_type', $model->getTypeOptions()); ?>
 
+
+<?php
+$user_roles = Yii::app()->user->getRolesData();
+var_dump($user_roles);
+?>
+
 <?php echo $form->checkBoxRow($model, 'publication_requested'); ?>
 
 <?php echo $form->checkBoxRow($model, 'sync_file'); ?>

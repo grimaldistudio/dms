@@ -130,7 +130,7 @@ class Role extends CActiveRecord
             ";
             $db = Yii::app()->db;
             $command = $db->createCommand($sql);
-            $rows = $command->queryAll(true, array(':user_id'=>7,'role_id'=>$role_id));
+            $rows = $command->queryAll(true, array(':user_id'=>Yii::app()->user->getId(),'role_id'=>$role_id));
             
             
             if($rows != null) return true;

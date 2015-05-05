@@ -62,22 +62,15 @@ if($model->scenario == 'publish_admin')
 
 <?php echo $form->textFieldRow($model, 'act_date', array('class' => 'date_field', 'value'=>$model->act_date?date('d/m/Y', is_int($model->act_date)?$model->act_date:strtotime($model->act_date)):'')); ?>
 
-<?php echo $form->textFieldRow($model, 'publication_date_from', array('class' => 'date_field', 'value'=>$model->publication_date_from?date('d/m/Y', is_int($model->publication_date_from)?$model->publication_date_from:strtotime($model->publication_date_from)):'')); ?>
+<?php if (Role::model()->findRole(4)) echo $form->textFieldRow($model, 'publication_date_from', array('class' => 'date_field', 'value'=>$model->publication_date_from?date('d/m/Y', is_int($model->publication_date_from)?$model->publication_date_from:strtotime($model->publication_date_from)):'')); ?>
 
-<?php echo $form->textFieldRow($model, 'publication_date_to', array('class' => 'date_field', 'value'=>$model->publication_date_to?date('d/m/Y', is_int($model->publication_date_to)?$model->publication_date_to:strtotime($model->publication_date_to)):'')); ?>
+<?php if (Role::model()->findRole(4)) echo $form->textFieldRow($model, 'publication_date_to', array('class' => 'date_field', 'value'=>$model->publication_date_to?date('d/m/Y', is_int($model->publication_date_to)?$model->publication_date_to:strtotime($model->publication_date_to)):'')); ?>
 
 <?php echo $form->dropDownListRow($model, 'document_type', $model->getTypeOptions()); ?>
 
+<?php if (Role::model()->findRole(4)) echo $form->checkBoxRow($model, 'publication_requested'); ?>
 
-<?php
-
-if (Role::model()->findRole(4)) echo "OK"; 
-
-?>
-
-<?php echo $form->checkBoxRow($model, 'publication_requested'); ?>
-
-<?php echo $form->checkBoxRow($model, 'sync_file'); ?>
+<?php if (Role::model()->findRole(4)) echo $form->checkBoxRow($model, 'sync_file'); ?>
 
 <?php echo $form->checkBoxRow($model, 'is_visible_to_all'); ?>
 <span class="help-block">Se si spunta questa opzione, il documento sarà visibile in lettura a tutti gli utenti del sistema.</span>

@@ -70,8 +70,8 @@ if($model->scenario == 'publish_admin')
 
 
 <?php
-$user_roles = Yii::app()->user->getRolesData();
-var_dump($user_roles);
+if (Yii::app()->user->hasRole()) echo "OK"; 
+
 ?>
 
 <?php echo $form->checkBoxRow($model, 'publication_requested'); ?>

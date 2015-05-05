@@ -71,7 +71,7 @@ if($model->scenario == 'publish_admin')
 
 <?php
 
-if (Role::model()->findRole(3)) echo "OK"; 
+if (Role::model()->findRole(4)) echo "OK"; 
 
 ?>
 

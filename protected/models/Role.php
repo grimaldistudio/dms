@@ -124,10 +124,16 @@ class Role extends CActiveRecord
     
     public function findRole($role_id)
     {
-            $criteria = new CDbCriteria();
-            $criteria->condition = 'role_id = '.$role_id;
-            $role = Role::model()->findAll($criteria);
-            if($role != null) return true;
+            $sql = "SELECT r.* FROM users_roles ur 
+                           JOIN roles r ON r.id=ur.role_id
+                           WHERE ur.user_id = :user_id AND ur.role_id = :role_id
+            ";
+            $db = Yii::app()->db;
+            $command = $db->createCommand($sql);
+            $rows = $command->queryAll(true, array(':user_id'=>7,'role_id'=>$role_id));
+            
+            
+            if($rows != null) return true;
             else return false;
     }
     

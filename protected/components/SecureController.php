@@ -67,12 +67,12 @@ class SecureController extends CController
                         'active'=>$this->id=='document' && $this->action->id=='search' && (isset($_GET['doc_type']) && $_GET['doc_type']==Document::INTERNAL_USE_TYPE)
                     );
             
-            $protocol_search = array(
-                        'label'=>'Posta in entrata/uscita', 
-                        'url'=>array('/document/search', 'doc_type'=>Document::INBOX),                
-                        'visible'=>Yii::app()->authgateway->isAllowed('document', 'search'),
-                        'active'=>$this->id=='document' && $this->action->id=='search' && (!isset($_GET['doc_type']) || $_GET['doc_type']==Document::INBOX)
-                    );
+         //   $protocol_search = array(
+          //              'label'=>'Posta in entrata/uscita', 
+          //              'url'=>array('/document/search', 'doc_type'=>Document::INBOX),                
+          //              'visible'=>Yii::app()->authgateway->isAllowed('document', 'search'),
+          //              'active'=>$this->id=='document' && $this->action->id=='search' && (!isset($_GET['doc_type']) || $_GET['doc_type']==Document::INBOX)
+           //         );
             
             $publish_search = array(
                         'label'=>'Documenti pubblici', 

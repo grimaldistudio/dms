@@ -57,7 +57,7 @@
         $new_spending = '';
         if($this->isAllowed('document', 'upload'))
         {
-            $new_spending = CHtml::link('<i class="icon-plus icon-white"></i>Spesa', array('/spending/create'), array('class'=>'btn btn-primary', 'rel'=>'tooltip', 'title'=>'Carica Nuova Spesa'));
+           // $new_spending = CHtml::link('<i class="icon-plus icon-white"></i>Spesa', array('/spending/create'), array('class'=>'btn btn-primary', 'rel'=>'tooltip', 'title'=>'Carica Nuova Spesa'));
         }
     ?>
     <?php $this->widget('bootstrap.widgets.BootNavbar', array(

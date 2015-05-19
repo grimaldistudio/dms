@@ -190,7 +190,7 @@ class SecureController extends CController
                         'url'=>Yii::app()->createUrl('/profile/edit'), 
                         'active'=>$this->id=='profile'
                     );
-
+/*
             $spending_list = array(
                         'label'=>'Spese',       
                         'visible'=>Yii::app()->authgateway->isAllowed('spending', 'disabled'),                
@@ -211,7 +211,7 @@ class SecureController extends CController
                         'visible'=>Yii::app()->authgateway->isAllowed('spending', 'disabled'),
                         'active'=>$this->id=='spending' && $this->action->id=='disabled'
             );            
-            
+            */
             $items[] = $home;
             $items[] = array('label'=>'Cerca in', 'icon'=>'zoom-in', 'itemOptions'=>array('class'=>'nav-header'));
             $items[] = $protocol_search;
@@ -226,12 +226,12 @@ class SecureController extends CController
             $items[] = $public;
             $items[] = $disabled;
             
-            if(Yii::app()->authgateway->isAllowed('spending', 'owned'))
-            {
-                $items[] = array('label'=>'Spese', 'icon'=>'shopping-cart', 'itemOptions'=>array('class'=>'nav-header'));
-                $items[] = $spending_owned;
-                $items[] = $spending_disabled;
-            }
+           // if(Yii::app()->authgateway->isAllowed('spending', 'owned'))
+           // {
+            //    $items[] = array('label'=>'Spese', 'icon'=>'shopping-cart', 'itemOptions'=>array('class'=>'nav-header'));
+            //    $items[] = $spending_owned;
+            //    $items[] = $spending_disabled;
+           // }
             
             $items[] = array('label'=>'Amministrazione', 'icon'=>'tags', 'itemOptions'=>array('class'=>'nav-header'));            
             $items[] = $tickets;            
@@ -258,9 +258,9 @@ class SecureController extends CController
             $items = array();
             $home = array('label'=>'Home', 'url'=>Yii::app()->homeUrl, 'active'=>($this->id=='site' && $this->action->id=='index'));
             $document = array('label'=>'Cerca in', 'url'=>'#', 'active'=>$this->id=='document', 'items'=>array(
-                array('label' => 'Posta in entrata/uscita', 'url' => Yii::app()->createUrl('/document/search', array('doc_type'=>Document::INBOX))),                
+                //array('label' => 'Posta in entrata/uscita', 'url' => Yii::app()->createUrl('/document/search', array('doc_type'=>Document::INBOX))),                
                 array('label' => 'Document pubblici', 'url' => Yii::app()->createUrl('/document/search', array('doc_type'=>Document::OUTGOING))),
-                array('label' => 'Spese', 'url' => Yii::app()->createUrl('/spending/search'), 'visible'=>Yii::app()->authgateway->isAllowed('spending', 'search')),
+               // array('label' => 'Spese', 'url' => Yii::app()->createUrl('/spending/search'), 'visible'=>Yii::app()->authgateway->isAllowed('spending', 'search')),
                 array('label' => 'Archivio personale', 'url' => Yii::app()->createUrl('/document/search', array('doc_type'=>Document::INTERNAL_USE_TYPE))),
             ));            
 

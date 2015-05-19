@@ -4,8 +4,8 @@
     <meta charset="utf-8">
     <title><?php echo CHtml::encode($this->pageTitle); ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Document Management System">
-    <meta name="author" content="Engineering Solution (fabrizio.dammassa@gmail.com)">
+    <meta name="description" content="Sistema di Gestione Documentale">
+    <meta name="author" content="Engineering Solution (info@engisolution.it)">
 
     <!-- Le styles -->
     <style type="text/css">

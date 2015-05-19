@@ -129,7 +129,7 @@
       <hr>
 
       <footer>
-        <p>&copy; Engineering Solution 2012</p>
+        <p>&copy; Engineering Solution Srl <?php echo date("Y");?></p>
       </footer>
       <?php 
         Yii::app()->clientScript->registerScript('notifications-loader', "

@@ -18,7 +18,7 @@ class UploadDocumentForm extends CFormModel{
         return array(
             // username and password are required
             array('document_file', 'required'),
-            array('document_file', 'file', 'maxSize'=>self::MAX_SIZE*1024*1024, 'types'=>'pdf')
+            array('document_file', 'file', 'maxSize'=>self::MAX_SIZE*1024*1024, 'types'=>'pdf,zip')
         );
     }
  

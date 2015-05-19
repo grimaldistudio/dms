@@ -28,7 +28,7 @@
 	
 <?php echo $form->fileFieldRow($model, 'document_file'); ?>
     <div class="help-block">
-        E' possibile caricare un file PDF di dimensioni massime <?php echo UploadDocumentForm::MAX_SIZE; ?> MB.
+        E' possibile caricare un file PDF/ZIP di dimensioni massime <?php echo UploadDocumentForm::MAX_SIZE; ?> MB.
     </div>
 </div>
 

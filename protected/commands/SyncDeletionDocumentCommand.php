@@ -14,7 +14,7 @@ class SyncDeletionDocumentCommand extends CConsoleCommand{
         
         foreach($results as $result)
         {
-            if($apiClient->sendRequest('DELETE', '/api/deletedocument/'.$result['document_id'], null, Yii::app()->params['api_username'], Yii::app()->params['api_password']))
+            if($apiClient->sendRequest('DELETE', '/noticeboard/api/deletedocument/'.$result['document_id'], null, Yii::app()->params['api_username'], Yii::app()->params['api_password']))
             {
                 Yii::log('Del Document '.$result['document_id'].': '.$apiClient->getResponse()->getStatusCode(), 'info');
                 Yii::log('Del Document '.$result['document_id'].': '.$apiClient->getResponse()->getBody(), 'info');                

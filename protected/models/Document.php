@@ -914,8 +914,8 @@ class Document extends CActiveRecord
     {
         $criteria=new CDbCriteria;
 
-        $criteria->compare('identifier',$this->identifier,true);
-        $criteria->compare('act_number',$this->act_number,true);
+        $criteria->compare('identifier',$this->id);
+        $criteria->compare('act_number',$this->act_number);
         $criteria->compare('name',$this->title,true);
        // $criteria->compare('main_document_type',$this->main_document_type);
         

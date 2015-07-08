@@ -505,7 +505,7 @@ class DocumentController extends SecureController{
             if($model->upload())
             {
                 if(Yii::app()->authgateway->isAllowed('document', 'protocol'))
-                    $success_url = Yii::app()->createAbsoluteUrl('/document/protocol', array('document_name'=>$model->document_file->name));
+                    $success_url = Yii::app()->createAbsoluteUrl('/document/publish', array('document_name'=>$model->document_file->name));
                 else
                     $success_url = Yii::app()->createAbsoluteUrl('/document/archive', array('document_name'=>$model->document_file->name));                    
                 

@@ -481,9 +481,9 @@ class Document extends CActiveRecord
     public function getMainTypeOptions()
     {
         return array(
-            self::INBOX => 'Posta in entrata/uscita',
+           // self::INBOX => 'Posta in entrata/uscita',
             self::OUTGOING => 'Documenti pubblici',
-            self::INTERNAL_USE_TYPE => 'Archivio personale'
+           // self::INTERNAL_USE_TYPE => 'Archivio personale'
         );        
     }
 

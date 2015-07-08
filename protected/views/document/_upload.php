@@ -10,7 +10,7 @@
 <?php 
     $form=$this->beginWidget('bootstrap.widgets.BootActiveForm', array(
                 'id'=>'document-upload-form',
-                'action'=>array('/document/upload'),
+                'action'=>array('/document/publish'),
                 'htmlOptions'=>array('class'=>'well'),    
 		'enableClientValidation' => true,
 		'clientOptions' => array(

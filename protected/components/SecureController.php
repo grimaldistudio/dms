@@ -259,7 +259,7 @@ class SecureController extends CController
             $home = array('label'=>'Home', 'url'=>Yii::app()->homeUrl, 'active'=>($this->id=='site' && $this->action->id=='index'));
             $document = array('label'=>'Cerca in', 'url'=>'#', 'active'=>$this->id=='document', 'items'=>array(
                 //array('label' => 'Posta in entrata/uscita', 'url' => Yii::app()->createUrl('/document/search', array('doc_type'=>Document::INBOX))),                
-                array('label' => 'Document pubblici', 'url' => Yii::app()->createUrl('/document/search', array('doc_type'=>Document::OUTGOING))),
+                array('label' => 'Documenti pubblici', 'url' => Yii::app()->createUrl('/document/search', array('doc_type'=>Document::OUTGOING))),
                // array('label' => 'Spese', 'url' => Yii::app()->createUrl('/spending/search'), 'visible'=>Yii::app()->authgateway->isAllowed('spending', 'search')),
               //  array('label' => 'Archivio personale', 'url' => Yii::app()->createUrl('/document/search', array('doc_type'=>Document::INTERNAL_USE_TYPE))),
             ));            

@@ -26,16 +26,16 @@
                             <?php echo CHtml::link('<i class="icon-eye-open icon-white"></i>', '#', array('id'=>  uniqid("thumb"), 'class'=>'btn btn-primary thumbnail_link', 'data-content'=>'<img src="'.Yii::app()->createUrl('/document/thumbnail', array('group_id'=>$g_id, 'document_name'=>$document['name'])).'" />')); ?>
                             <?php if($this->isAllowed('document', 'protocol')): ?>
                                 <?php if($g_id=='user'): ?>
-                                    <?php echo CHtml::link('In entrata', array('/document/protocol', 'document_name'=>$document['name']), array('class'=>'btn btn-primary', 'data-content'=>'Protocolla il documento', 'rel'=>'tooltip')); ?>
+                                    <?php //echo CHtml::link('In entrata', array('/document/protocol', 'document_name'=>$document['name']), array('class'=>'btn btn-primary', 'data-content'=>'Protocolla il documento', 'rel'=>'tooltip')); ?>
                                 <?php else: ?>
-                                    <?php echo CHtml::link('In entrata', array('/document/protocol', 'group_id'=>$g_id, 'document_name'=>$document['name']), array('class'=>'btn btn-primary', 'data-content'=>'Protocolla il documento', 'rel'=>'tooltip')); ?>
+                                    <?php //echo CHtml::link('In entrata', array('/document/protocol', 'group_id'=>$g_id, 'document_name'=>$document['name']), array('class'=>'btn btn-primary', 'data-content'=>'Protocolla il documento', 'rel'=>'tooltip')); ?>
                                 <?php endif; ?>
                             <?php endif; ?>
                             <?php if($this->isAllowed('document', 'archive')): ?>                            
                                 <?php if($g_id=='user'): ?>
-                                    <?php echo CHtml::link('Archivio', array('/document/archive', 'document_name'=>$document['name']), array('class'=>'btn btn-primary', 'data-content'=>'Archivia il documento per uso personale', 'rel'=>'tooltip')); ?>                            
+                                    <?php //echo CHtml::link('Archivio', array('/document/archive', 'document_name'=>$document['name']), array('class'=>'btn btn-primary', 'data-content'=>'Archivia il documento per uso personale', 'rel'=>'tooltip')); ?>                            
                                 <?php else:  ?> 
-                                    <?php echo CHtml::link('Archivio', array('/document/archive', 'group_id'=>$g_id, 'document_name'=>$document['name']), array('class'=>'btn btn-primary', 'data-content'=>'Archivia il documento per uso personale', 'rel'=>'tooltip')); ?>
+                                    <?php //echo CHtml::link('Archivio', array('/document/archive', 'group_id'=>$g_id, 'document_name'=>$document['name']), array('class'=>'btn btn-primary', 'data-content'=>'Archivia il documento per uso personale', 'rel'=>'tooltip')); ?>
                                 <?php endif; ?>
                             <?php endif; ?>
                             <?php if($this->isAllowed('document', 'publish')): ?>                            

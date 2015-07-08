@@ -24,14 +24,14 @@ else
 
 <div class="btn-group">
         <?php if($scenario=='archive'): ?>
-            <?php if(Yii::app()->authgateway->isAllowed('document', 'protocol')) echo CHtml::link('Passa a Posta in entrata/uscita', array('/document/protocol', 'document_name'=>$document_name, 'group_id'=>$group_id), array('class' => 'btn')); ?>
-            <?php if(Yii::app()->authgateway->isAllowed('document', 'publish')) echo CHtml::link('Passa a Documento pubblico', array('/document/publish', 'document_name'=>$document_name, 'group_id'=>$group_id), array('class' => 'btn')); ?>
+            <?php //if(Yii::app()->authgateway->isAllowed('document', 'protocol')) echo CHtml::link('Passa a Posta in entrata/uscita', array('/document/protocol', 'document_name'=>$document_name, 'group_id'=>$group_id), array('class' => 'btn')); ?>
+            <?php //if(Yii::app()->authgateway->isAllowed('document', 'publish')) echo CHtml::link('Passa a Documento pubblico', array('/document/publish', 'document_name'=>$document_name, 'group_id'=>$group_id), array('class' => 'btn')); ?>
         <?php elseif($scenario=='protocol'): ?>
-            <?php if(Yii::app()->authgateway->isAllowed('document', 'archive')) echo CHtml::link('Passa a Archivio personale', array('/document/archive', 'document_name'=>$document_name, 'group_id'=>$group_id), array('class' => 'btn')); ?>
-            <?php if(Yii::app()->authgateway->isAllowed('document', 'publish')) echo CHtml::link('Passa a Documento pubblico', array('/document/publish', 'document_name'=>$document_name, 'group_id'=>$group_id), array('class' => 'btn')); ?>        
+            <?php //if(Yii::app()->authgateway->isAllowed('document', 'archive')) echo CHtml::link('Passa a Archivio personale', array('/document/archive', 'document_name'=>$document_name, 'group_id'=>$group_id), array('class' => 'btn')); ?>
+            <?php //if(Yii::app()->authgateway->isAllowed('document', 'publish')) echo CHtml::link('Passa a Documento pubblico', array('/document/publish', 'document_name'=>$document_name, 'group_id'=>$group_id), array('class' => 'btn')); ?>        
         <?php else: ?>
-            <?php if(Yii::app()->authgateway->isAllowed('document', 'archive')) echo CHtml::link('Passa a Archivio personale', array('/document/archive', 'document_name'=>$document_name, 'group_id'=>$group_id), array('class' => 'btn')); ?>
-            <?php if(Yii::app()->authgateway->isAllowed('document', 'protocol')) echo CHtml::link('Passa a Posta in entrata/uscita', array('/document/protocol', 'document_name'=>$document_name, 'group_id'=>$group_id), array('class' => 'btn')); ?>        
+            <?php //if(Yii::app()->authgateway->isAllowed('document', 'archive')) echo CHtml::link('Passa a Archivio personale', array('/document/archive', 'document_name'=>$document_name, 'group_id'=>$group_id), array('class' => 'btn')); ?>
+            <?php //if(Yii::app()->authgateway->isAllowed('document', 'protocol')) echo CHtml::link('Passa a Posta in entrata/uscita', array('/document/protocol', 'document_name'=>$document_name, 'group_id'=>$group_id), array('class' => 'btn')); ?>        
         <?php endif; ?>
 </div>
 

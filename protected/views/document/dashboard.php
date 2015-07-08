@@ -10,8 +10,8 @@
     'itemsCssClass'=>'table table-striped table-bordered table-condensed',
     'nullDisplay' => 'n/d',
     'columns'=>array(
-        array('name'=>'identifier', 'filter'=>true),
-        array('name'=>'name', 'filter'=>true),
+        array('name'=>'identifier'),
+        array('name'=>'name'),
 	/*array('filter' =>false,
             'name' => 'main_document_type',
             'value' => '$data->getMainTypeDesc()'),

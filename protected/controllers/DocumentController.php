@@ -352,7 +352,7 @@ class DocumentController extends SecureController{
         else
             $name = 'publish';
         
-        if(Yii::app()->user->hasDocumentPrivilege($model->id, AclManager::PERMISSION_ADMIN))
+        if(Yii::app()->user->hasDocumentPrivilege($model->id, AclManager::PERMISSION_ADMIN) || Role::model()->findRole(4))
             $model->scenario = $name.'_admin';
         else
             $model->scenario = $name.'_update';

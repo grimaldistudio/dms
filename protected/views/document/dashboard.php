@@ -20,7 +20,7 @@
          */
 		array(
             'class'=>'bootstrap.widgets.BootButtonColumn',
-            'htmlOptions'=>array('style'=>'width: 50px'),
+            'htmlOptions'=>array('style'=>'width: 1%'),
             'template'=>'{view} {update} {lock}',
             'buttons'=>array(
                 'view'=>array(
@@ -34,7 +34,7 @@
                     'visible'=>'Yii::app()->user->hasDocumentPrivilege($data->id, AclManager::PERMISSION_WRITE) || Role::model()->findRole(4)'
                 ),
                 'lock'=>array(
-                    'label'=>'Richiedi accesso',
+                    'label'=>'Permessi',
                     'icon'=>'icon-ban-circle',
                     'visible'=>'!Yii::app()->user->hasDocumentPrivilege($data->id, AclManager::PERMISSION_READ)',
                     'url'=>'Yii::app()->createUrl("/document/view", array("id"=>$data[\'id\']))'

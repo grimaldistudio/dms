@@ -233,7 +233,7 @@ class DocumentController extends SecureController{
             if($model->protocolDocument())
             {
                 Yii::app()->user->setFlash('success', 'Documento creato: '.$model->getTitle());
-                $this->redirect(array('/document/pending'));
+                $this->redirect(array('/document/index'));
             }
         }
         // render form

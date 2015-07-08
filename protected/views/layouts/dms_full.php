@@ -39,7 +39,7 @@
         <hr>
 
       <footer>
-        <p>&copy; Engineering Solution 2012</p>
+        <p>&copy; Engineering Solution <?php echo date("Y");?></p>
       </footer>
 
     </div> <!-- /container -->

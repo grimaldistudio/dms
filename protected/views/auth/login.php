@@ -1,7 +1,8 @@
 <?php
 $this->pageTitle=Yii::app()->name . ' - Login';
 ?>
-<h1><?php echo Yii::app()->name?></h1>
+<div class="text-center center"><img src="/images/brand-gaeta.png" /></div>
+<h1><?php echo Yii::app()->name?> del Comune di Gaeta</h1>
 
 <?php $form=$this->beginWidget('bootstrap.widgets.BootActiveForm', array(
 	'id'=>'login-form',

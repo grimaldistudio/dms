@@ -4,17 +4,19 @@
 <?php $this->widget('bootstrap.widgets.BootGridView', array(
     'id'=>'dashboard_gridview',
     'dataProvider'=>$model->dashboard(),
-    'template'=>"{items}",
-    'enableSorting' => false,
-    'enablePagination' => false,   
+    'template'=>"{items}\n{pager}",
+    'enableSorting' => true,
+    'enablePagination' => true,   
     'itemsCssClass'=>'table table-striped table-bordered table-condensed',
     'nullDisplay' => 'n/d',
     'columns'=>array(
-        array('name'=>'identifier', 'filter'=>false),
-        array('name'=>'name', 'filter'=>false),
-		array('filter' =>false,
+        array('name'=>'identifier', 'filter'=>true),
+        array('name'=>'name', 'filter'=>true),
+	/*array('filter' =>false,
             'name' => 'main_document_type',
             'value' => '$data->getMainTypeDesc()'),
+         * 
+         */
 		array(
             'class'=>'bootstrap.widgets.BootButtonColumn',
             'htmlOptions'=>array('style'=>'width: 50px'),

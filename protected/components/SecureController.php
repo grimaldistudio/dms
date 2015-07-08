@@ -60,12 +60,12 @@ class SecureController extends CController
                     );
             
             // documents
-            $archive_search = array(
-                        'label'=>'Archivio personale', 
-                        'url'=>array('/document/search', 'doc_type'=>Document::INTERNAL_USE_TYPE),                
-                        'visible'=>Yii::app()->authgateway->isAllowed('document', 'search'),
-                        'active'=>$this->id=='document' && $this->action->id=='search' && (isset($_GET['doc_type']) && $_GET['doc_type']==Document::INTERNAL_USE_TYPE)
-                    );
+         //   $archive_search = array(
+          //              'label'=>'Archivio personale', 
+          ////              'url'=>array('/document/search', 'doc_type'=>Document::INTERNAL_USE_TYPE),                
+           //             'visible'=>Yii::app()->authgateway->isAllowed('document', 'search'),
+           //             'active'=>$this->id=='document' && $this->action->id=='search' && (isset($_GET['doc_type']) && $_GET['doc_type']==Document::INTERNAL_USE_TYPE)
+           //         );
             
          //   $protocol_search = array(
           //              'label'=>'Posta in entrata/uscita', 
@@ -261,7 +261,7 @@ class SecureController extends CController
                 //array('label' => 'Posta in entrata/uscita', 'url' => Yii::app()->createUrl('/document/search', array('doc_type'=>Document::INBOX))),                
                 array('label' => 'Document pubblici', 'url' => Yii::app()->createUrl('/document/search', array('doc_type'=>Document::OUTGOING))),
                // array('label' => 'Spese', 'url' => Yii::app()->createUrl('/spending/search'), 'visible'=>Yii::app()->authgateway->isAllowed('spending', 'search')),
-                array('label' => 'Archivio personale', 'url' => Yii::app()->createUrl('/document/search', array('doc_type'=>Document::INTERNAL_USE_TYPE))),
+              //  array('label' => 'Archivio personale', 'url' => Yii::app()->createUrl('/document/search', array('doc_type'=>Document::INTERNAL_USE_TYPE))),
             ));            
 
             $admin = array('label'=>'Amministrazione', 'url'=>Yii::app()->createUrl('/ticket'), 'active'=>in_array($this->id, array('ticket', 'tag', 'sender')));            

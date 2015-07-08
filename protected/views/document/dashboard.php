@@ -1,6 +1,6 @@
 <?php $this->pageTitle = "Dashboard"; ?>
 <h1><?php echo $this->pageTitle; ?></h1>
-<h3>Ultimi <?php echo Yii::app()->params['dashboard_list_len'];?> documenti caricati nel sistema</h3>
+<h3>Documenti caricati nel sistema</h3>
 <?php $this->widget('bootstrap.widgets.BootGridView', array(
     'id'=>'dashboard_gridview',
     'dataProvider'=>$model->dashboard(),

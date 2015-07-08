@@ -915,8 +915,8 @@ class Document extends CActiveRecord
         $criteria=new CDbCriteria;
 
         $criteria->compare('identifier',$this->identifier);
-        $criteria->compare('title',$this->title,true);
-        $criteria->compare('main_document_type',$this->main_document_type);
+        $criteria->compare('name',$this->title,true);
+       // $criteria->compare('main_document_type',$this->main_document_type);
         
         $criteria->compare('status', self::ACTIVE_STATUS);
         return new CActiveDataProvider(get_class($this), array(

@@ -40,9 +40,9 @@
                             <?php endif; ?>
                             <?php if($this->isAllowed('document', 'publish')): ?>                            
                                 <?php if($g_id=='user'): ?>
-                                    <?php echo CHtml::link('Pubblico', array('/document/publish', 'document_name'=>$document['name']), array('class'=>'btn btn-primary', 'data-content'=>'Archivia il documento per uso personale', 'rel'=>'tooltip')); ?>                            
+                                    <?php echo CHtml::link('Archivia il documento', array('/document/publish', 'document_name'=>$document['name']), array('class'=>'btn btn-primary', 'data-content'=>'Archivia il documento per uso personale', 'rel'=>'tooltip')); ?>                            
                                 <?php else:  ?> 
-                                    <?php echo CHtml::link('Pubblico', array('/document/publish', 'group_id'=>$g_id, 'document_name'=>$document['name']), array('class'=>'btn btn-primary', 'data-content'=>'Archivia il documento per uso personale', 'rel'=>'tooltip')); ?>
+                                    <?php echo CHtml::link('Archivia il documento', array('/document/publish', 'group_id'=>$g_id, 'document_name'=>$document['name']), array('class'=>'btn btn-primary', 'data-content'=>'Archivia il documento per uso personale', 'rel'=>'tooltip')); ?>
                                 <?php endif; ?>
                             <?php endif; ?>                            
                             <?php if($this->isAllowed('document', 'deletepending')): ?>

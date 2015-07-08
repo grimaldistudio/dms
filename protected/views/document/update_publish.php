@@ -76,7 +76,7 @@ if($model->scenario == 'publish_admin')
 
 <?php if (Role::model()->findRole(4)) echo $form->checkBoxRow($model, 'sync_file'); ?>
 
-<?php echo $form->checkBoxRow($model, 'is_visible_to_all',array('checked'=>'checked')); ?>
+<?php echo $form->checkBoxRow($model, 'is_visible_to_all'); ?>
 <span class="help-block">Se si spunta questa opzione, il documento sarà visibile in lettura a tutti gli utenti del sistema.</span>
 <br/>
 

@@ -137,7 +137,7 @@ else
 
 <?php endif; ?>
 
-<?php echo $form->checkBoxRow($model, 'is_visible_to_all'); ?>
+<?php echo $form->checkBoxRow($model, 'is_visible_to_all', array('checked'=>'checked')); ?>
 <span class="help-block">Se si spunta questa opzione, il documento sarà visibile in lettura a tutti gli utenti del sistema.</span>
 <br/>
 

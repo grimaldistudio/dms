@@ -10,7 +10,7 @@
     'itemsCssClass'=>'table table-striped table-bordered table-condensed',
     'nullDisplay' => 'n/d',
     'columns'=>array(
-        array('name'=>'identifier'),
+        array('name'=>'publication_number'),
         array('name'=>'name'),
 	/*array('filter' =>false,
             'name' => 'main_document_type',

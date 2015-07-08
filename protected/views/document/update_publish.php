@@ -29,9 +29,9 @@ $disabled = "disabled";
 if($model->scenario == 'publish_admin')
     $disabled = "";
 ?>
-<?php echo $form->textFieldRow($model, 'identifier', array('disabled'=>$disabled)); ?>
-<?php echo $form->textFieldRow($model, 'publication_number', array('disabled'=>$disabled)); ?>
-<?php echo $form->textFieldRow($model, 'name', array('disabled'=>$disabled)); ?>
+<?php echo $form->textFieldRow($model, 'identifier'); ?>
+<?php echo $form->textFieldRow($model, 'publication_number'); ?>
+<?php echo $form->textFieldRow($model, 'name'); ?>
 
 <?php echo $form->hiddenField($model, 'revision'); ?>
 <?php echo $form->textAreaRow($model, 'change_description', array('rows'=>5, 'class'=>'span6')) ; ?>

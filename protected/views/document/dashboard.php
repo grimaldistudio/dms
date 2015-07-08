@@ -20,7 +20,7 @@
          */
 		array(
             'class'=>'bootstrap.widgets.BootButtonColumn',
-            'htmlOptions'=>array('style'=>'width: 1%'),
+            'htmlOptions'=>array('style'=>'width: 50px'),
             'template'=>'{view} {update} {lock}',
             'buttons'=>array(
                 'view'=>array(

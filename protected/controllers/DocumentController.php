@@ -369,7 +369,7 @@ class DocumentController extends SecureController{
             }
             if($model->updateDocument())
             {
-                Yii::app()->user->setFlash('success', 'Document modificato');
+                Yii::app()->user->setFlash('success', 'Documento modificato');
                 $this->redirect(array('/document/view', 'id'=>$model->id));
             }
         }

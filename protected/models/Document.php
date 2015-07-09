@@ -78,7 +78,7 @@ class Document extends CActiveRecord
             array('description,tagsname,priority,sender_id,sendername', 'required', 'on'=>'protocol_update,protocol_admin'),
             array('description,tagsname', 'required', 'on'=>'publish_admin,publish_update,archive_update,archive_admin'),
             array('name', 'required', 'on'=>'protocol_admin,archive_admin,publish_admin'),
-            array('change_description,revision', 'required', 'on'=>'protocol_update,protocol_admin,archive_update,archive_admin,publish_update,publish_admin'),            
+           // array('change_description,revision', 'required', 'on'=>'protocol_update,protocol_admin,archive_update,archive_admin,publish_update,publish_admin'),            
             array('identifier', 'safe', 'on'=>'publish,publish_admin'),
             array('identifier,date_received', 'required', 'on' => 'protocol_admin'),
            // array('identifier', 'unique', 'on'=>'protocol,publish,protocol_admin,publish_admin'),

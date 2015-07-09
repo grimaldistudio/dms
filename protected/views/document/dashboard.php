@@ -81,7 +81,7 @@ Yii::app()->clientScript->registerScript('document-disable-controls', "
             success: function(data)
             {
                 if(data.success==1)
-                    $.fn.yiiListView.update('documentslistview');
+                    $.fn.yiiListView.update('dashboard_gridview');
                 else
                     alert(data.errors.join(','));
             },
@@ -114,7 +114,7 @@ Yii::app()->clientScript->registerScript('document-disable-controls', "
             success: function(data)
             {
                 if(data.success==1)
-                    $.fn.yiiListView.update('documentslistview');
+                    $.fn.yiiListView.update('dashboard_gridview');
                 else
                     alert(data.errors.join(','));
             },

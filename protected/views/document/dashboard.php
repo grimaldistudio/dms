@@ -44,7 +44,7 @@
                     'label'=>'Cancella',
                     'icon'=>'icon-trash',
                       'url'=>'Yii::app()->createUrl("/document/delete", array("id"=>$data->id))',
-                    'visible'=>'$data->publication_status == 0 && ( Yii::app()->user->hasDocumentPrivilege($data->id, AclManager::PERMISSION_WRITE) || Role::model()->findRole(4) )',
+                    'visible'=>' Yii::app()->user->hasDocumentPrivilege($data->id, AclManager::PERMISSION_WRITE) || Role::model()->findRole(4)',
                    
                 ),
                 'lock'=>array(

@@ -122,7 +122,7 @@ if(Yii::app()->user->hasDocumentPrivilege($model->id, AclManager::PERMISSION_ADM
             <tr>
                 <td colspan="2">
                     <?php echo CHtml::link(CHtml::image(Yii::app()->baseUrl.'/images/misc/pdficon_large.png'), array('/document/viewpdf', 'id'=>$model->id), array('class'=>'btn', 'target'=>'_blank')); ?>                    
-                    <?php if(Yii::app()->user->hasDocumentPrivilege($model->id, AclManager::PERMISSION_WRITE)): ?>
+                    <?php if(Yii::app()->user->hasDocumentPrivilege($model->id, AclManager::PERMISSION_WRITE) && $model->publication_status == 0): ?>
                         <?php if($this->isAllowed('document', 'update'))  echo CHtml::link('<i class="icon-edit icon-white"></i> Modifica', array('/document/update', 'id'=>$model->id), array('class'=>'btn btn-primary')); ?>
                     <?php endif; ?>
                     <?php if(Yii::app()->user->isAdmin() || $model->creator_id == Yii::app()->user->id): ?>

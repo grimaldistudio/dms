@@ -14,7 +14,8 @@
         array('name'=>'act_number'),
         array('name'=>'name'),
         array('name'=>'publication_status',
-              'value'=>'($data->publication_status == 1) ? "pubblicato" : "non pubblicato" '
+              'value'=>'($data->publication_status == 1) ? "<img src=\"".Yii::app()->baseUrl."/images/misc/green-spotlight.png\">" : "non pubblicato" ',
+            'filter'=>false,
             ),
 	/*array('filter' =>false,
             'name' => 'main_document_type',

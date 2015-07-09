@@ -75,7 +75,7 @@ else
 
 <?php if($model->scenario=='publish'): ?>
 
-<?php echo $form->textFieldRow($model, 'publication_number'); ?>
+<?php //echo $form->textFieldRow($model, 'publication_number'); ?>
 
 <?php echo $form->dropDownListRow($model, 'document_type', $model->getTypeOptions()); ?>
 

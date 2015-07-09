@@ -28,7 +28,7 @@
 		array(
             'class'=>'bootstrap.widgets.BootButtonColumn',
             'htmlOptions'=>array('style'=>'width: 50px'),
-            'template'=>'{view} {update} {deletemy} {lock}',
+            'template'=>'{view} {update} {lock}',
             'buttons'=>array(
                 'view'=>array(
                     'label'=>'Vedi',
@@ -40,12 +40,12 @@
                     'icon'=>'icon-edit',
                     'visible'=>'Yii::app()->user->hasDocumentPrivilege($data->id, AclManager::PERMISSION_WRITE) || Role::model()->findRole(4)'
                 ),
-                'deletemy'=>array(
+                'delete'=>array(
                     'label'=>'Cancella',
                     'icon'=>'icon-trash',
                       'url'=>'Yii::app()->createUrl("/document/delete", array("id"=>$data->id))',
                     'visible'=>'Yii::app()->user->hasDocumentPrivilege($data->id, AclManager::PERMISSION_WRITE) || Role::model()->findRole(4)',
-                    'options'=>array('class'=>'btn-delete'),
+                   
                 ),
                 'lock'=>array(
                     'label'=>'Permessi',

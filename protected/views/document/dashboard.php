@@ -17,7 +17,7 @@
             'header'=>'Pubblicato',
             'htmlOptions'=>array('style'=>'width:1%;'),
             'type'=>'raw',
-              'value'=>'($data->publication_requested == 1) ? "<img src=\"".Yii::app()->baseUrl."/images/misc/green-spotlight.png\" />" : "<img src=\"".Yii::app()->baseUrl."/images/misc/red-spotlight.png\" />" ',
+              'value'=>'($data->publication_status == 1) ? "<img src=\"".Yii::app()->baseUrl."/images/misc/green-spotlight.png\" />" : "<img src=\"".Yii::app()->baseUrl."/images/misc/red-spotlight.png\" />" ',
             'filter'=>false,
             ),
 	/*array('filter' =>false,
@@ -38,13 +38,13 @@
                 'update'=>array(
                     'label'=>'Modifica',
                     'icon'=>'icon-edit',
-                    'visible'=>'(Yii::app()->user->hasDocumentPrivilege($data->id, AclManager::PERMISSION_WRITE) && $data->publication_requested == 0) || Role::model()->findRole(4) '
+                    'visible'=>'(Yii::app()->user->hasDocumentPrivilege($data->id, AclManager::PERMISSION_WRITE) && $data->publication_status == 0) || Role::model()->findRole(4) '
                 ),
                 'delete'=>array(
                     'label'=>'Cancella',
                     'icon'=>'icon-trash',
                     'url'=>'Yii::app()->createUrl("/document/delete", array("id"=>$data->id))',
-                    'visible'=>'( Yii::app()->user->hasDocumentPrivilege($data->id, AclManager::PERMISSION_WRITE) || Role::model()->findRole(4) ) && $data->publication_requested == 0',
+                    'visible'=>'( Yii::app()->user->hasDocumentPrivilege($data->id, AclManager::PERMISSION_WRITE) || Role::model()->findRole(4) ) && $data->publication_status == 0',
                    
                 ),
                 'lock'=>array(

@@ -38,7 +38,7 @@
                 'update'=>array(
                     'label'=>'Modifica',
                     'icon'=>'icon-edit',
-                    'visible'=>'(Yii::app()->user->hasDocumentPrivilege($data->id, AclManager::PERMISSION_WRITE) && $data->publication_status == 0) || (Role::model()->findRole(4) && $data->publication_status == 0)'
+                    'visible'=>'(Yii::app()->user->hasDocumentPrivilege($data->id, AclManager::PERMISSION_WRITE) && $data->publication_status == 0) || Role::model()->findRole(4) '
                 ),
                 'delete'=>array(
                     'label'=>'Cancella',

@@ -43,7 +43,7 @@
                 'deletemy'=>array(
                     'label'=>'Cancella',
                     'icon'=>'icon-trash',
-                      'url'=>'Yii::app()->createUrl("/document/deletepending", array("group_id"=>4,"document_name"=>$data->name))',
+                      'url'=>'Yii::app()->createUrl("/document/delete", array("id"=>$data->id))',
                     'visible'=>'Yii::app()->user->hasDocumentPrivilege($data->id, AclManager::PERMISSION_WRITE) || Role::model()->findRole(4)',
                     'options'=>array('class'=>'btn-delete'),
                 ),

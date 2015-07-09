@@ -45,7 +45,7 @@
                     'icon'=>'icon-trash',
                       'url'=>'Yii::app()->createUrl("/document/deletepending", array("document_name"=>$data->name))',
                     'visible'=>'Yii::app()->user->hasDocumentPrivilege($data->id, AclManager::PERMISSION_WRITE) || Role::model()->findRole(4)',
-                    'htmlOptions'=>array('class'=>'btn-delete'),
+                    'options'=>array('class'=>'btn-delete'),
                 ),
                 'lock'=>array(
                     'label'=>'Permessi',

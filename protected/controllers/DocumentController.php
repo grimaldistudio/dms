@@ -87,7 +87,7 @@ class DocumentController extends SecureController{
             else
             {
                 Yii::app()->user->setFlash('success', 'Documento cancellato');
-                $this->redirect('/dms/document/pending');
+                $this->redirect('/document/pending');
             }
         }
         else

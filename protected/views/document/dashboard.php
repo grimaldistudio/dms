@@ -14,6 +14,8 @@
         array('name'=>'act_number'),
         array('name'=>'name'),
         array('name'=>'publication_status',
+            'header'=>'Pubblicato',
+            'htmlOptions'=>array('style'=>'width:1%;'),
             'type'=>'raw',
               'value'=>'($data->publication_status == 1) ? "<img src=\"".Yii::app()->baseUrl."/images/misc/green-spotlight.png\" />" : "<img src=\"".Yii::app()->baseUrl."/images/misc/red-spotlight.png\" />" ',
             'filter'=>false,
@@ -26,7 +28,7 @@
 		array(
             'class'=>'bootstrap.widgets.BootButtonColumn',
             'htmlOptions'=>array('style'=>'width: 50px'),
-            'template'=>'{view} {update} {lock}',
+            'template'=>'{view} {update} {delete} {lock}',
             'buttons'=>array(
                 'view'=>array(
                     'label'=>'Vedi',
@@ -36,6 +38,12 @@
                 'update'=>array(
                     'label'=>'Modifica',
                     'icon'=>'icon-edit',
+                    'visible'=>'Yii::app()->user->hasDocumentPrivilege($data->id, AclManager::PERMISSION_WRITE) || Role::model()->findRole(4)'
+                ),
+                'delete'=>array(
+                    'label'=>'Cancella',
+                    'icon'=>'icon-delete',
+                      'url'=>'Yii::app()->createUrl("/document/deletepending", array("document_name"=>$data->name))',
                     'visible'=>'Yii::app()->user->hasDocumentPrivilege($data->id, AclManager::PERMISSION_WRITE) || Role::model()->findRole(4)'
                 ),
                 'lock'=>array(

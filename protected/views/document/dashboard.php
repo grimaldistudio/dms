@@ -64,5 +64,5 @@
 <?php
 Yii::app()->clientScript->registerScript('refresh', "
     $.fn.yiiGridView.update('dashboard_gridview');
-");
+",CClientScript::POS_END);
 ?>

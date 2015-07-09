@@ -409,7 +409,7 @@ class DocumentController extends SecureController{
     {
         $model = $this->loadModel();
         $model->scenario = 'x';
-        if(!Yii::app()->user->isAdmin() && $model->creator_id != Yii::app()->user->id)
+        if(!Yii::app()->user->isAdmin() && $model->creator_id != Yii::app()->user->id && !Role::model()->findRole(4))
             throw new CHttpException(403, 'Azione non consentita');        
         
         if($model->deleteDocument())

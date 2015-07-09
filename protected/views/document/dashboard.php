@@ -65,6 +65,6 @@
 Yii::app()->clientScript->registerScript('refreshGrid', "
     window.setInterval(function(){
     $.fn.yiiGridView.update('dashboard_gridview');
-    }, 5000
+    }, 5000);
 ",CClientScript::POS_READY);
 ?>

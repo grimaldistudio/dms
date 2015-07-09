@@ -13,6 +13,9 @@
         array('name'=>'identifier'),
         array('name'=>'act_number'),
         array('name'=>'name'),
+        array('name'=>'publication_status',
+              'value'=>'($data->publication_status == 1) ? "pubblicato" : "non pubblicato" '
+            ),
 	/*array('filter' =>false,
             'name' => 'main_document_type',
             'value' => '$data->getMainTypeDesc()'),

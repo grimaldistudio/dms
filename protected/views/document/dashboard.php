@@ -28,7 +28,7 @@
 		array(
             'class'=>'bootstrap.widgets.BootButtonColumn',
             'htmlOptions'=>array('style'=>'width: 50px'),
-            'template'=>'{view} {update} {lock}',
+            'template'=>'{view} {update} {delete} {lock}',
             'buttons'=>array(
                 'view'=>array(
                     'label'=>'Vedi',
@@ -43,8 +43,8 @@
                 'delete'=>array(
                     'label'=>'Cancella',
                     'icon'=>'icon-trash',
-                      'url'=>'Yii::app()->createUrl("/document/delete", array("id"=>$data->id))',
-                    'visible'=>' Yii::app()->user->hasDocumentPrivilege($data->id, AclManager::PERMISSION_WRITE) || Role::model()->findRole(4)',
+                    'url'=>'Yii::app()->createUrl("/document/delete", array("id"=>$data->id))',
+                    'visible'=>'( Yii::app()->user->hasDocumentPrivilege($data->id, AclManager::PERMISSION_WRITE) || Role::model()->findRole(4) ) && $data->publication_status == 0',
                    
                 ),
                 'lock'=>array(

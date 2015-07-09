@@ -62,7 +62,9 @@
 
 
 <?php
-Yii::app()->clientScript->registerScript('refresh', "
+Yii::app()->clientScript->registerScript('refreshGrid', "
+    window.setInterval(function(){
     $.fn.yiiGridView.update('dashboard_gridview');
-",CClientScript::POS_END);
+    }, 5000
+",CClientScript::POS_READY);
 ?>

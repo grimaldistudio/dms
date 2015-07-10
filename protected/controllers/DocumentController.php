@@ -378,6 +378,9 @@ class DocumentController extends SecureController{
                     $model->publication_number = (isset($modelDoc[0]->publication_number)) ? $modelDoc[0]->publication_number + 1 : 1;                    
             endif;
             
+            //bug fixed
+            if($model->publication_requested == 1) $model->is_dirty = 1;
+            
             if($model->updateDocument())
             {
                 Yii::app()->user->setFlash('success', 'Documento modificato');

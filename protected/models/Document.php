@@ -500,17 +500,31 @@ class Document extends CActiveRecord
     public function getTypeOptions()
     {
         return array(
-            5 => 'Avviso di accertamento',
+             5 => 'Avviso di accertamento',
             10 => 'Bandi e avvisi',
             15 => 'Convocazioni',
             17 => 'Delibere di giunta',
             19 => 'Delibere di consiglio',
             20 => 'Determine',
             25 => 'Oggetti e valori ritrovati',
-            30 => 'Ordinanze',
+            30 => 'Ordinanze',            
             35 => 'Pubblicazioni di matrimonio',
             40 => 'Pubblicazioni di altri enti',
-            45 => 'Pubblicazioni varie'
+            45 => 'Pubblicazioni varie',
+            50 => 'Determine paesistiche',
+            60 => 'Dinieghi di sanatorie edilizie',
+            70 => 'Istanze',
+            80 => 'Concessioni edilizie',
+            90 => 'Permessi di costruire ex art. 10 D.P.R. 380/01',
+           100 => 'Regolamenti',
+           101 => 'Statuti',
+           102 => 'Nulla Osta Vincolo Idrogeologico R.D.L. 3267 - R.D.1126/26 - D.G.R. 6215/96 - D.G.R. 3888/98',
+            103 => 'Richieste n.o. Vincolo Idrogeologico R.D.L. 3267 - R.D. 1126/26 - D.G.R. 6215/96 - D.G.R. 3888/98',
+            104 => 'Decreti sindacali',
+            105 => 'Prospetti dei rapporti riguardanti abusi edilizi',
+            106 => 'Depositi atti da notificare',
+            107 => 'Avvisi',
+            108 => 'Manifesti'
         );
     }
     

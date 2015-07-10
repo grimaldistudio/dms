@@ -235,9 +235,8 @@ class DocumentController extends SecureController{
                     $criteria = new CDbCriteria();
                     $criteria->order = "id DESC";
                     $criteria->limit = 1;
-                    $modelDoc = Document::model()->findAll($criteria);
-                    die("here".$modelDoc[0]->publication_number);
-                    $model->publication_number = (isset($modelDoc->publication_number)) ? $modelDoc->publication_number + 1 : 1;
+                    $modelDoc = Document::model()->findAll($criteria);           
+                    $model->publication_number = (isset($modelDoc[0]->publication_number)) ? $modelDoc[0]->publication_number + 1 : 1;
             
             if($model->protocolDocument())
             {

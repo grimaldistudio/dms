@@ -236,7 +236,7 @@ class DocumentController extends SecureController{
                     $criteria->order = "id DESC";
                     $criteria->limit = 1;
                     $modelDoc = Document::model()->findAll($criteria);
-                    die(var_dump($modelDoc));
+                    die("here".$modelDoc[0]->publication_number);
                     $model->publication_number = (isset($modelDoc->publication_number)) ? $modelDoc->publication_number + 1 : 1;
             
             if($model->protocolDocument())

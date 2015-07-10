@@ -337,6 +337,9 @@ class DocumentController extends SecureController{
     {
         $model = $this->loadModel();
         
+        //bug fixed
+            if($model->publication_requested == 0 && $_POST['Document']['publication_requested'] == 1) $model->is_dirty = 1;
+        
         if(!Yii::app()->user->hasDocumentPrivilege($model->id, AclManager::PERMISSION_WRITE) && !Role::model()->findRole(4))
             throw new CHttpException(403, 'Azione non consentita');
         
@@ -378,8 +381,7 @@ class DocumentController extends SecureController{
                     $model->publication_number = (isset($modelDoc[0]->publication_number)) ? $modelDoc[0]->publication_number + 1 : 1;                    
             endif;
             
-            //bug fixed
-            if($model->publication_requested == 1) $model->is_dirty = 1;
+            
             
             if($model->updateDocument())
             {

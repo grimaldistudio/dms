@@ -372,7 +372,7 @@ class DocumentController extends SecureController{
             if ($name == 'publish') :                           
                     $criteria = new CDbCriteria();
                     $criteria->order = "id DESC";
-                    $criteria->condition = "publication_number != ''";
+                    $criteria->condition = "publication_number > ''";
                     $criteria->limit = 1;
                     $modelDoc = Document::model()->findAll($criteria);           
                     $model->publication_number = (isset($modelDoc[0]->publication_number)) ? $modelDoc[0]->publication_number + 1 : 1;                    

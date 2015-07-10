@@ -369,7 +369,7 @@ class DocumentController extends SecureController{
             }
             
             //PATCH: Publication number 
-            if ($name == 'publish') :                           
+            if ($name == 'publish' && empty($model->publication_number) ) :                           
                     $criteria = new CDbCriteria();
                     $criteria->order = "id DESC";
                     $criteria->condition = "publication_number > ''";

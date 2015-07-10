@@ -39,7 +39,6 @@ class SyncDocumentCommand extends CConsoleCommand{
                 Yii::log('Document '.$result['id'].': '.$apiClient->getResponse()->getStatusCode(), 'info');
                 Yii::log('Document '.$result['id'].': '.$apiClient->getResponse()->getBody(), 'info');                
                 try{
-                    $ps = ($result['publication_request'] == 0) ? 0 : Document::PUBLISHED;
                     Yii::app()->db->createCommand("UPDATE documents SET is_dirty = 0, publication_status = :published_status WHERE id=:id")->execute(array(':published_status'=>$ps, ':id'=>$result['id']));
                 }
                 catch(Exception $e)

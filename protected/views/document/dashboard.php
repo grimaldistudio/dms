@@ -20,7 +20,7 @@
               'value'=>'($data->publication_status == 1) ? "<img src=\"".Yii::app()->baseUrl."/images/misc/green-spotlight.png\" />" : "<img src=\"".Yii::app()->baseUrl."/images/misc/red-spotlight.png\" />" ',
             'filter'=>false,
             ),
-        array('name'=>'dataPubblicazione',
+        array('name'=>'publication_date_from',
             'header'=>'Dal al',
             'value'=>'$data->publication_date_from." - ".$datapublication_date_to',
              ),

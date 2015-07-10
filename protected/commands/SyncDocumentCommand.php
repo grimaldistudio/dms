@@ -34,7 +34,7 @@ class SyncDocumentCommand extends CConsoleCommand{
             $time = strtotime($result['date_created']);
             $data['document_type_name'] = $model->getTypeDesc($data['document_type']);
             $data['relative_path'] = 'saved'.DIRECTORY_SEPARATOR.date('Y', $time).DIRECTORY_SEPARATOR.date('m', $time).DIRECTORY_SEPARATOR.date('d', $time);
-            $data->status = $result['publication_requested'];
+            $data['status'] = $result['publication_requested'];
             if($apiClient->sendRequest('POST', '/noticeboard/api/syncdocument', $data, Yii::app()->params['api_username'], Yii::app()->params['api_password']))
             {
                 Yii::log('Document '.$result['id'].': '.$apiClient->getResponse()->getStatusCode(), 'info');

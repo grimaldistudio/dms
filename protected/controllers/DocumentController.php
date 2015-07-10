@@ -230,6 +230,14 @@ class DocumentController extends SecureController{
             $model->main_document_type = Document::OUTGOING;
             
             $model->attributes = $_POST['Document'];
+            
+              //Publication number patch         
+                    $criteria = new CDbCriteria();
+                    $criteria->order = "id DESC";
+                    $criteria->limit = 1;
+                    $modelDoc = Document::model()->findAll($criteria);
+                    $model->publication_number = (isset($modelDoc->publication_number)) ? $modelDoc->publication_number + 1 : 1;
+            
             if($model->protocolDocument())
             {
                 Yii::app()->user->setFlash('success', 'Documento creato: '.$model->getTitle());
@@ -366,7 +374,8 @@ class DocumentController extends SecureController{
             {
                 Yii::app()->user->setFlash('warning', 'Hai provato ad aggiornare una versione del documento più vecchia della recente. Riapplica i cambiamenti ora.');
                 $this->redirect(array('/document/update', 'id'=>$model->id));
-            }
+            }                      
+            
             if($model->updateDocument())
             {
                 Yii::app()->user->setFlash('success', 'Documento modificato');

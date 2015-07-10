@@ -22,7 +22,7 @@
             ),
         array('name'=>'publication_date_from',
             'header'=>'Dal al',
-            'value'=>'$data->publication_date_from." - ".$datapublication_date_to',
+            'value'=>'date("d/m/Y",strtotime($data->publication_date_from))." ".date("d/m/Y",strtotime($data->publication_date_to))',
              ),
 	/*array('filter' =>false,
             'name' => 'main_document_type',

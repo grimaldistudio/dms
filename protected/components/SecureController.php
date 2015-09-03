@@ -214,10 +214,10 @@ class SecureController extends CController
             */
             $items[] = $home;
             $items[] = array('label'=>'Cerca in', 'icon'=>'zoom-in', 'itemOptions'=>array('class'=>'nav-header'));
-            $items[] = $protocol_search;
+            //$items[] = $protocol_search;
             $items[] = $publish_search;
-            $items[] = $archive_search;
-            $items[] = $spending_list; 
+           // $items[] = $archive_search;
+           // $items[] = $spending_list; 
             
             $items[] = array('label'=>'Documenti', 'icon'=>'book', 'itemOptions'=>array('class'=>'nav-header'));
             $items[] = $pending;

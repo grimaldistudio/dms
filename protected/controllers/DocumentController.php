@@ -338,6 +338,7 @@ class DocumentController extends SecureController{
         $model = $this->loadModel();
         
         //bug fixed
+        if(isset($_POST['Document']['publication_requested']))
             if($model->publication_requested == 1 && $_POST['Document']['publication_requested'] == 0) $model->is_dirty = 1;
         
         if(!Yii::app()->user->hasDocumentPrivilege($model->id, AclManager::PERMISSION_WRITE) && !Role::model()->findRole(4))

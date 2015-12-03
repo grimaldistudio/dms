@@ -39,7 +39,7 @@
         <hr>
 
       <footer>
-        <p>&copy; Engineering Solution Srl<?php echo date("Y");?></p>
+        <p>&copy; Engineering Solution Srl <?php echo date("Y");?></p>
       </footer>
 
     </div> <!-- /container -->
